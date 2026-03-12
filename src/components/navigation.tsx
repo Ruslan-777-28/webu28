@@ -17,9 +17,12 @@ export function Navigation() {
 
   return (
     <div className="p-4 md:p-8 flex justify-between items-center">
-        <Link href="/">
-            <HomeIcon className={cn('h-6 w-6 text-foreground', pathname === '/' && 'text-primary')} />
-        </Link>
+        <div className="flex items-center gap-4">
+            <Link href="/">
+                <HomeIcon className={cn('h-6 w-6 text-foreground', pathname === '/' && 'text-primary')} />
+            </Link>
+            <span className="text-xs text-muted-foreground">простір обміну ціностями</span>
+        </div>
         <div className="flex items-center gap-2 md:gap-4 text-xs font-light">
         {navLinks.map((link, index) => (
           <React.Fragment key={link.href}>
