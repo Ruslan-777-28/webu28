@@ -38,23 +38,14 @@ export function CountdownTimer() {
 
   return (
     <div className="text-center">
-      <div className="flex justify-center gap-1 text-foreground">
-        <div className="flex flex-col items-center">
-          <span className="text-xs font-bold tabular-nums">{formatTime(timeLeft.days)}</span>
-          <span className="text-[10px] font-light uppercase tracking-widest text-muted-foreground">Дні</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <span className="text-xs font-bold tabular-nums">{formatTime(timeLeft.hours)}</span>
-          <span className="text-[10px] font-light uppercase tracking-widest text-muted-foreground">Години</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <span className="text-xs font-bold tabular-nums">{formatTime(timeLeft.minutes)}</span>
-          <span className="text-[10px] font-light uppercase tracking-widest text-muted-foreground">Хвилини</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <span className="text-xs font-bold tabular-nums">{formatTime(timeLeft.seconds)}</span>
-          <span className="text-[10px] font-light uppercase tracking-widest text-muted-foreground">Секунди</span>
-        </div>
+      <div className="flex justify-center gap-1 text-xs font-bold tabular-nums text-foreground">
+        <span>{formatTime(timeLeft.days)}</span>
+        <span>:</span>
+        <span>{formatTime(timeLeft.hours)}</span>
+        <span>:</span>
+        <span>{formatTime(timeLeft.minutes)}</span>
+        <span>:</span>
+        <span>{formatTime(timeLeft.seconds)}</span>
       </div>
     </div>
   );

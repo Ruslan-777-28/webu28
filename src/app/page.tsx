@@ -16,8 +16,8 @@ export default function Home() {
       {/* Center Block */}
       <div className="flex-1 h-full bg-background p-8 flex flex-col items-center justify-center">
         <CountdownTimer />
-        <p className="mt-2 text-xs font-light text-muted-foreground">
-          до старту платформи
+        <p className="mt-4 text-xs font-light text-muted-foreground">
+          до старту залишилось
         </p>
       </div>
 
