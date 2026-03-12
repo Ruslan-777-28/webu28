@@ -1,8 +1,14 @@
 import { Power } from 'lucide-react';
 import { CountdownTimer } from '@/components/ui/countdown-timer';
 import { Navigation } from '@/components/navigation';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { AuthModal } from '@/components/auth-modal';
 
-export default function Home() {
+export default function HomePage() {
   return (
     <main className="flex h-screen w-full overflow-hidden">
       {/* Left Block Container */}
@@ -23,9 +29,16 @@ export default function Home() {
 
       {/* Right Block */}
       <div className="w-[15%] h-full bg-black flex items-center justify-center">
-        <button className="p-4">
-          <Power className="h-6 w-6 text-white" />
-        </button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="p-4">
+              <Power className="h-6 w-6 text-white" />
+            </button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <AuthModal />
+          </DialogContent>
+        </Dialog>
       </div>
     </main>
   );
