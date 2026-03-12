@@ -37,8 +37,8 @@ export default function HomePage() {
             <p className="mt-4 text-xs font-light text-muted-foreground">
               до старту залишилось
             </p>
-            <p className="mt-2 text-xs font-light text-muted-foreground">
-              Перетвори час на цінність.
+            <p className="mt-2 text-xs font-light text-muted-foreground text-center">
+              Перетвори час<br />на цінність.
             </p>
           </div>
         </div>
@@ -56,7 +56,7 @@ export default function HomePage() {
 
       {/* Right Block */}
       <div className="w-full md:w-[15%] h-screen md:sticky md:top-0 bg-black flex flex-col items-center justify-center shadow-[-30px_0_30px_-10px_rgba(0,0,0,0.4)]">
-        <div className="text-white text-center text-sm space-y-2 mb-8">
+        <div className="text-gray-400 text-center text-sm space-y-4 mb-8">
           <p>таро</p>
           <p>нумерологія</p>
           <p>гадання</p>
@@ -72,7 +72,7 @@ export default function HomePage() {
             <AuthModal />
           </DialogContent>
         </Dialog>
-        <div className="text-white text-center text-sm space-y-2 mt-8">
+        <div className="text-gray-400 text-center text-sm space-y-4 mt-8">
           <p>онлайн консультацїї</p>
           <p>цифрові товари</p>
         </div>
