@@ -1,5 +1,6 @@
 import { Power, Home as HomeIcon } from 'lucide-react';
 import { CountdownTimer } from '@/components/ui/countdown-timer';
+import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -10,11 +11,11 @@ export default function Home() {
         <div className="p-8 flex justify-between items-center">
           <HomeIcon className="h-6 w-6" />
           <div className="flex items-center gap-4 text-xs font-light">
-            <span>PRO</span>
+            <Link href="/pro">PRO</Link>
             <span className="text-muted-foreground">|</span>
-            <span>USER</span>
+            <Link href="/user">USER</Link>
             <span className="text-muted-foreground">|</span>
-            <span>BLOG</span>
+            <Link href="/blog">BLOG</Link>
           </div>
         </div>
 
