@@ -1,3 +1,10 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-image-1",
+      "description": "Abstract gradient background with geometric shapes, in shades of blue and cyan, evoking a sense of calm and technology.",
+      "imageUrl": "https://picsum.photos/seed/welcome/1200/800",
+      "imageHint": "abstract geometric"
+    }
+  ]
 }
