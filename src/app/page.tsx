@@ -1,9 +1,23 @@
+import { Power, Home as HomeIcon } from 'lucide-react';
+
 export default function Home() {
   return (
     <main className="flex h-screen w-full overflow-hidden">
       {/* Left Block Container */}
       <div className="w-[60%] h-full flex flex-col">
-        {/* This div creates the space at the top */}
+        {/* Header for the left block */}
+        <div className="p-8 flex justify-between items-center">
+          <HomeIcon className="h-6 w-6" />
+          <div className="flex items-center gap-4 text-sm font-semibold">
+            <span>PRO</span>
+            <span className="text-muted-foreground">|</span>
+            <span>USER</span>
+            <span className="text-muted-foreground">|</span>
+            <span>BLOG</span>
+          </div>
+        </div>
+
+        {/* This div creates the space between header and bottom block */}
         <div className="flex-grow" />
         {/* This is the gray block at the bottom */}
         <div className="bg-secondary p-8">
@@ -17,7 +31,11 @@ export default function Home() {
       </div>
 
       {/* Right Block */}
-      <div className="w-[15%] h-full bg-black" />
+      <div className="w-[15%] h-full bg-black flex items-center justify-center">
+        <button className="p-4">
+          <Power className="h-8 w-8 text-white" />
+        </button>
+      </div>
     </main>
   );
 }
