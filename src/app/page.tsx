@@ -18,6 +18,23 @@ export default function HomePage() {
         {/* This is the white block at the bottom */}
         <div className="bg-background p-4 md:p-8 flex-1 flex items-center justify-center">
           <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" className="w-full h-full">
+            <defs>
+              <clipPath id="circleClip">
+                <circle cx="50" cy="50" r="49.5" />
+              </clipPath>
+            </defs>
+            <foreignObject x="0" y="0" width="100" height="100" clipPath="url(#circleClip)">
+              <video
+                // @ts-ignore -- xmlns is required for video inside foreignObject
+                xmlns="http://www.w3.org/1999/xhtml"
+                className="w-full h-full object-cover"
+                src="https://videos.pexels.com/video-files/3209828/3209828-hd_1280_720_25fps.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+              />
+            </foreignObject>
             <circle cx="50" cy="50" r="49.5" stroke="white" strokeWidth="0.5" fill="none" />
           </svg>
         </div>
