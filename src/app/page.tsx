@@ -1,4 +1,5 @@
 import { Power, Home as HomeIcon } from 'lucide-react';
+import { CountdownTimer } from '@/components/ui/countdown-timer';
 
 export default function Home() {
   return (
@@ -8,7 +9,7 @@ export default function Home() {
         {/* Header for the left block */}
         <div className="p-8 flex justify-between items-center">
           <HomeIcon className="h-6 w-6" />
-          <div className="flex items-center gap-4 text-sm font-semibold">
+          <div className="flex items-center gap-4 text-xs font-light">
             <span>PRO</span>
             <span className="text-muted-foreground">|</span>
             <span>USER</span>
@@ -17,17 +18,13 @@ export default function Home() {
           </div>
         </div>
 
-        {/* This div creates the space between header and bottom block */}
-        <div className="flex-grow" />
         {/* This is the gray block at the bottom */}
-        <div className="bg-secondary p-8">
-          <div className="h-96" />
-        </div>
+        <div className="bg-secondary p-8 flex-1"></div>
       </div>
 
       {/* Center Block */}
-      <div className="flex-1 h-full bg-background p-8">
-        {/* Content will go here */}
+      <div className="flex-1 h-full bg-background p-8 flex items-center justify-center">
+        <CountdownTimer />
       </div>
 
       {/* Right Block */}
