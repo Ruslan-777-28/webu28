@@ -27,7 +27,6 @@ export default function HomePage() {
               <rect width="100" height="100" fill="transparent" />
               <g stroke="white" strokeWidth="0.5" fill="none">
                 <circle cx="50" cy="50" r="35" />
-                <circle cx="50" cy="50" r="15" />
               </g>
             </g>
             <circle cx="50" cy="50" r="49.5" stroke="white" strokeWidth="0.5" fill="none" />
