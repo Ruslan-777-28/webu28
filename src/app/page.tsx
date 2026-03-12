@@ -12,11 +12,11 @@ export default function HomePage() {
   return (
     <main className="flex flex-col md:flex-row h-screen w-full overflow-hidden">
       {/* Left Block Container */}
-      <div className="w-full md:w-[60%] h-[50vh] md:h-full flex flex-col">
+      <div className="w-full md:w-[60%] h-[50vh] md:h-full flex flex-col bg-background">
         <Navigation />
 
         {/* This is the white block at the bottom */}
-        <div className="bg-background p-4 md:p-8 flex-1 flex items-center justify-center">
+        <div className="p-4 md:p-8 flex-1 flex items-center justify-center">
           <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" className="w-full h-full">
             <defs>
               <clipPath id="circleClip">
@@ -24,15 +24,12 @@ export default function HomePage() {
               </clipPath>
             </defs>
             <foreignObject x="0" y="0" width="100" height="100" clipPath="url(#circleClip)">
-              <video
-                // @ts-ignore -- xmlns is required for video inside foreignObject
+              <img
+                // @ts-ignore -- xmlns is required for img inside foreignObject
                 xmlns="http://www.w3.org/1999/xhtml"
                 className="w-full h-full object-cover"
-                src="https://videos.pexels.com/video-files/5691515/5691515-hd_1920_1080_25fps.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
+                src="https://i.gifer.com/1VAB.gif"
+                alt="Abstract monochrome animation"
               />
             </foreignObject>
             <circle cx="50" cy="50" r="49.5" stroke="white" strokeWidth="0.5" fill="none" />
