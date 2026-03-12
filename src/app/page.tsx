@@ -23,16 +23,15 @@ export default function HomePage() {
                 <circle cx="50" cy="50" r="49.5" />
               </clipPath>
             </defs>
-            <foreignObject x="0" y="0" width="100" height="100" clipPath="url(#circleClip)">
-              <img
-                // @ts-ignore -- xmlns is required for img inside foreignObject
-                xmlns="http://www.w3.org/1999/xhtml"
-                className="w-full h-full object-cover"
-                src="https://picsum.photos/seed/exchange/600/600"
-                alt="An abstract image representing value exchange."
-                data-ai-hint="value exchange"
-              />
-            </foreignObject>
+            <g clipPath="url(#circleClip)">
+              <rect width="100" height="100" fill="transparent" />
+              <g stroke="currentColor" strokeWidth="0.25" fill="none">
+                <circle cx="50" cy="50" r="45" />
+                <circle cx="50" cy="50" r="35" />
+                <circle cx="50" cy="50" r="25" />
+                <circle cx="50" cy="50" r="15" />
+              </g>
+            </g>
             <circle cx="50" cy="50" r="49.5" stroke="white" strokeWidth="0.5" fill="none" />
           </svg>
         </div>
