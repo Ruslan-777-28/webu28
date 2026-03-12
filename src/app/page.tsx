@@ -1,23 +1,13 @@
-import { Power, Home as HomeIcon } from 'lucide-react';
+import { Power } from 'lucide-react';
 import { CountdownTimer } from '@/components/ui/countdown-timer';
-import Link from 'next/link';
+import { Navigation } from '@/components/navigation';
 
 export default function Home() {
   return (
     <main className="flex h-screen w-full overflow-hidden">
       {/* Left Block Container */}
       <div className="w-[60%] h-full flex flex-col">
-        {/* Header for the left block */}
-        <div className="p-8 flex justify-between items-center">
-          <HomeIcon className="h-6 w-6 text-primary" />
-          <div className="flex items-center gap-4 text-xs font-light">
-            <Link href="/pro">PRO</Link>
-            <span className="text-muted-foreground">|</span>
-            <Link href="/user">USER</Link>
-            <span className="text-muted-foreground">|</span>
-            <Link href="/blog">BLOG</Link>
-          </div>
-        </div>
+        <Navigation />
 
         {/* This is the gray block at the bottom */}
         <div className="bg-secondary p-8 flex-1"></div>
