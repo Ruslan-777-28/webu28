@@ -21,6 +21,9 @@ export default function HomePage() {
 
       {/* Center Block */}
       <div className="relative w-full md:flex-1 h-[25vh] md:h-full bg-background p-4 md:p-8 flex flex-col items-center justify-center">
+        <p className="mb-4 text-xs font-light text-muted-foreground">
+          время=енергия=новая ценость
+        </p>
         <CountdownTimer />
         <p className="mt-4 text-xs font-light text-muted-foreground">
           до старту залишилось
