@@ -25,10 +25,8 @@ export default function HomePage() {
             </defs>
             <g clipPath="url(#circleClip)">
               <rect width="100" height="100" fill="transparent" />
-              <g stroke="currentColor" strokeWidth="0.25" fill="none">
-                <circle cx="50" cy="50" r="45" />
+              <g stroke="white" strokeWidth="0.5" fill="none">
                 <circle cx="50" cy="50" r="35" />
-                <circle cx="50" cy="50" r="25" />
                 <circle cx="50" cy="50" r="15" />
               </g>
             </g>

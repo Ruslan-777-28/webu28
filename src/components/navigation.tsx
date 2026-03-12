@@ -10,7 +10,7 @@ export function Navigation() {
   const pathname = usePathname();
 
   const navLinks = [
-    { href: '/pro', label: 'PRO' },
+    { href: '/pro', label: 'EXPERTS' },
     { href: '/user', label: 'USER' },
     { href: '/blog', label: 'BLOG' },
   ];
