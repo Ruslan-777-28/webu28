@@ -35,7 +35,7 @@ export default function HomePage() {
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-[15%] h-[25vh] md:h-full bg-black flex items-center justify-center">
+      <div className="w-full md:w-[15%] h-[25vh] md:h-full bg-black flex items-center justify-center shadow-[-15px_0_20px_-10px_rgba(0,0,0,0.3),_-5px_0_10px_-5px_rgba(0,0,0,0.2)]">
         <Dialog>
           <DialogTrigger asChild>
             <button className="p-4">
