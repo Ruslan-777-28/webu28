@@ -9,7 +9,7 @@ export default function Home() {
       <div className="w-[60%] h-full flex flex-col">
         {/* Header for the left block */}
         <div className="p-8 flex justify-between items-center">
-          <HomeIcon className="h-6 w-6" />
+          <HomeIcon className="h-6 w-6 text-primary" />
           <div className="flex items-center gap-4 text-xs font-light">
             <Link href="/pro">PRO</Link>
             <span className="text-muted-foreground">|</span>
