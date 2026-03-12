@@ -18,8 +18,8 @@ export function Navigation() {
   return (
     <div className="p-4 md:p-8 flex justify-between items-center">
         <div className="flex items-center gap-4">
-            <Link href="/">
-                <HomeIcon className={cn('h-6 w-6 text-foreground', pathname === '/' && 'text-primary')} />
+            <Link href="/" className={cn(pathname === '/' && 'border-b border-primary')}>
+                <HomeIcon className={cn('h-6 w-6 text-muted-foreground')} />
             </Link>
             <span className="text-xs text-muted-foreground">простір обміну ціностями</span>
         </div>

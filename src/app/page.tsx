@@ -28,8 +28,9 @@ export default function HomePage() {
                 // @ts-ignore -- xmlns is required for img inside foreignObject
                 xmlns="http://www.w3.org/1999/xhtml"
                 className="w-full h-full object-cover"
-                src="https://firebasestudio.ai/storage/v1/object/public/cli-live-testing-1.appspot.com/images/clwflj14v0000m9ow9w5g3s5q/time-is-money.png_1721226068213?t=2024-07-17T14:21:09.116Z"
-                alt="Time is money exchange"
+                src="https://picsum.photos/seed/exchange/600/600"
+                alt="An abstract image representing value exchange."
+                data-ai-hint="value exchange"
               />
             </foreignObject>
             <circle cx="50" cy="50" r="49.5" stroke="white" strokeWidth="0.5" fill="none" />

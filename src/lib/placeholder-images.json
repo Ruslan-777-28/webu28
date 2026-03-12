@@ -1,3 +1,10 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "value-exchange",
+      "description": "An abstract image representing value exchange.",
+      "imageUrl": "https://picsum.photos/seed/exchange/600/600",
+      "imageHint": "value exchange"
+    }
+  ]
 }
