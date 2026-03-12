@@ -16,7 +16,11 @@ export default function HomePage() {
         <Navigation />
 
         {/* This is the gray block at the bottom */}
-        <div className="bg-secondary p-4 md:p-8 flex-1"></div>
+        <div className="bg-secondary p-4 md:p-8 flex-1 flex items-center justify-center">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" className="w-full h-full">
+            <circle cx="50" cy="50" r="49.5" stroke="white" strokeWidth="1" fill="none" />
+          </svg>
+        </div>
       </div>
 
       {/* Center Block */}
