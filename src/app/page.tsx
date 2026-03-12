@@ -20,17 +20,8 @@ export default function HomePage() {
             {/* This is the image block at the bottom */}
             <div className="p-4 md:p-8 flex-1 flex items-center justify-center">
               <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" className="w-full h-full">
-                <defs>
-                  <clipPath id="circleClip">
-                    <circle cx="50" cy="50" r="49.5" />
-                  </clipPath>
-                </defs>
-                <image href="/vector-monochrome.svg" width="100" height="100" clipPath="url(#circleClip)" />
-                <g clipPath="url(#circleClip)">
-                  <rect width="100" height="100" fill="transparent" />
-                  <g stroke="white" strokeWidth="0.5" fill="none">
-                    <circle cx="50" cy="50" r="35" />
-                  </g>
+                <g stroke="white" strokeWidth="0.5" fill="none">
+                  <circle cx="50" cy="50" r="35" />
                 </g>
                 <circle cx="50" cy="50" r="49.5" stroke="white" strokeWidth="0.5" fill="none" />
               </svg>
@@ -53,7 +44,7 @@ export default function HomePage() {
 
 
       {/* Right Block */}
-      <div className="w-full md:w-[15%] h-[25vh] bg-black flex items-center justify-center shadow-[-30px_0_30px_-10px_rgba(0,0,0,0.4)]">
+      <div className="w-full md:w-[15%] h-[25vh] md:h-screen md:sticky md:top-0 bg-black flex items-center justify-center shadow-[-30px_0_30px_-10px_rgba(0,0,0,0.4)]">
         <Dialog>
           <DialogTrigger asChild>
             <button className="p-4">
