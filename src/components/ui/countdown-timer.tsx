@@ -38,22 +38,22 @@ export function CountdownTimer() {
 
   return (
     <div className="text-center">
-      <div className="flex justify-center gap-8 text-foreground">
+      <div className="flex justify-center gap-6 text-foreground">
         <div className="flex flex-col items-center">
-          <span className="text-6xl font-bold tabular-nums">{formatTime(timeLeft.days)}</span>
-          <span className="text-sm font-light uppercase tracking-widest text-muted-foreground">Дні</span>
+          <span className="text-4xl font-bold tabular-nums">{formatTime(timeLeft.days)}</span>
+          <span className="text-xs font-light uppercase tracking-widest text-muted-foreground">Дні</span>
         </div>
         <div className="flex flex-col items-center">
-          <span className="text-6xl font-bold tabular-nums">{formatTime(timeLeft.hours)}</span>
-          <span className="text-sm font-light uppercase tracking-widest text-muted-foreground">Години</span>
+          <span className="text-4xl font-bold tabular-nums">{formatTime(timeLeft.hours)}</span>
+          <span className="text-xs font-light uppercase tracking-widest text-muted-foreground">Години</span>
         </div>
         <div className="flex flex-col items-center">
-          <span className="text-6xl font-bold tabular-nums">{formatTime(timeLeft.minutes)}</span>
-          <span className="text-sm font-light uppercase tracking-widest text-muted-foreground">Хвилини</span>
+          <span className="text-4xl font-bold tabular-nums">{formatTime(timeLeft.minutes)}</span>
+          <span className="text-xs font-light uppercase tracking-widest text-muted-foreground">Хвилини</span>
         </div>
         <div className="flex flex-col items-center">
-          <span className="text-6xl font-bold tabular-nums">{formatTime(timeLeft.seconds)}</span>
-          <span className="text-sm font-light uppercase tracking-widest text-muted-foreground">Секунди</span>
+          <span className="text-4xl font-bold tabular-nums">{formatTime(timeLeft.seconds)}</span>
+          <span className="text-xs font-light uppercase tracking-widest text-muted-foreground">Секунди</span>
         </div>
       </div>
     </div>

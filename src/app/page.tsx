@@ -30,7 +30,7 @@ export default function Home() {
       {/* Right Block */}
       <div className="w-[15%] h-full bg-black flex items-center justify-center">
         <button className="p-4">
-          <Power className="h-8 w-8 text-white" />
+          <Power className="h-6 w-6 text-white" />
         </button>
       </div>
     </main>
