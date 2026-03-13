@@ -1,3 +1,4 @@
+'use client';
 import { Navigation } from '@/components/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -83,9 +84,9 @@ export default function BlogPage() {
   const popularPosts = posts.slice(0, 5);
 
   return (
-    <main className="flex flex-col w-full min-h-screen bg-white text-foreground">
+    <div className="flex flex-col w-full min-h-screen">
       <Navigation />
-      <div className="container mx-auto px-4 md:px-6 py-6">
+      <div className="container mx-auto px-4 md:px-6 py-6 flex-grow">
 
         {/* Hero Block */}
         <section className="text-center py-12 md:py-20">
@@ -116,10 +117,10 @@ export default function BlogPage() {
         {/* Search, Categories and Main Feed */}
         <section className="my-12">
             <Tabs defaultValue={categories[0].value} className="w-full">
-                <div className="flex flex-col md:flex-row items-center gap-4 mb-6 border-b pb-4 sticky top-0 bg-white/95 backdrop-blur-sm z-10 -mx-4 px-4 sm:mx-0 sm:px-0">
+                <div className="flex flex-col md:flex-row items-center gap-2 mb-6 border-b pb-4 sticky top-0 bg-background/95 backdrop-blur-sm z-10 -mx-4 px-4 sm:mx-0 sm:px-0">
                     <div className="relative flex-grow w-full md:w-auto">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input type="search" placeholder="Пошук по статтях..." className="pl-10 w-full md:w-80"/>
+                        <Input type="search" placeholder="Пошук по статтях..." className="pl-10 w-full md:w-64"/>
                     </div>
                     <ScrollArea className="w-full md:flex-1 whitespace-nowrap">
                         <TabsList className="bg-transparent p-0 h-auto gap-4 justify-start">
@@ -206,6 +207,8 @@ export default function BlogPage() {
         </section>
 
       </div>
-    </main>
+    </div>
   );
 }
+
+    
