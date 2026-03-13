@@ -29,7 +29,7 @@ export default function HomePage() {
 
   return (
     <main className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Firestore connection test</h1>
+      <h1 className="mb-4 text-2xl font-bold">Firestore connection test</h1>
       <p>{status}</p>
     </main>
   );
