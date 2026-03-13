@@ -9,6 +9,8 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { CreatePostModal } from '@/components/create-post-modal';
 
 // Using a component for article card to avoid repetition and for clarity
 const ArticleCard = ({ post, className, isFeatured = false }: { post: any, className?: string, isFeatured?: boolean }) => (
@@ -178,6 +180,16 @@ export default function BlogPage() {
                 ))}
 
             </Tabs>
+        </section>
+
+        {/* Call to Action Block */}
+        <section className="my-20 text-center">
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Button size="lg">хочу опублікувати матеріал</Button>
+                </DialogTrigger>
+                <CreatePostModal />
+            </Dialog>
         </section>
 
         {/* Subscription Block */}
