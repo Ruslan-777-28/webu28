@@ -1,8 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/client';
 import { Button } from '@/components/ui/button';
 import { Navigation } from '@/components/navigation';
 import Image from 'next/image';
