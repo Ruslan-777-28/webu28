@@ -117,8 +117,8 @@ export default function BlogPage() {
         {/* Search, Categories and Main Feed */}
         <section className="my-12">
             <Tabs defaultValue={categories[0].value} className="w-full">
-                <div className="flex flex-col md:flex-row items-center gap-2 mb-6 border-b pb-4 sticky top-0 bg-background/95 backdrop-blur-sm z-10 -mx-4 px-4 sm:mx-0 sm:px-0">
-                    <div className="relative flex-grow w-full md:w-auto">
+                <div className="flex flex-col md:flex-row items-center mb-6 border-b pb-4 sticky top-0 bg-background/95 backdrop-blur-sm z-10 -mx-4 px-4 sm:mx-0 sm:px-0">
+                    <div className="relative w-full md:w-auto">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input type="search" placeholder="Пошук по статтях..." className="pl-10 w-full md:w-64"/>
                     </div>
@@ -210,5 +210,3 @@ export default function BlogPage() {
     </div>
   );
 }
-
-    
