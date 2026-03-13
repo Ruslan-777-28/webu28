@@ -186,7 +186,7 @@ export default function BlogPage() {
         <section className="my-20 text-center">
             <Dialog>
                 <DialogTrigger asChild>
-                    <Button size="lg">хочу опублікувати матеріал</Button>
+                    <Button size="lg">хочу опублікувати контент</Button>
                 </DialogTrigger>
                 <CreatePostModal />
             </Dialog>
