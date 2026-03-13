@@ -1,34 +1,35 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { app, auth, db, storage } from '@/lib/firebase/client';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 
 export default function HomePage() {
-  const [status, setStatus] = useState('Checking Firebase...');
+  const [status, setStatus] = useState('Checking Firestore...');
 
   useEffect(() => {
-    try {
-      const ok =
-        !!app &&
-        !!auth &&
-        !!db &&
-        !!storage &&
-        process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+    async function run() {
+      try {
+        const ref = doc(db, 'blogSettings', 'main');
+        const snap = await getDoc(ref);
 
-      setStatus(
-        ok
-          ? `Firebase connected: ${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}`
-          : 'Firebase init failed'
-      );
-    } catch (error) {
-      console.error(error);
-      setStatus('Firebase init failed');
+        if (snap.exists()) {
+          setStatus('Firestore connected. blogSettings/main exists.');
+        } else {
+          setStatus('Firestore connected, but blogSettings/main does not exist yet.');
+        }
+      } catch (error) {
+        console.error(error);
+        setStatus('Firestore read failed. Check config or rules.');
+      }
     }
+
+    run();
   }, []);
 
   return (
     <main className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Firebase connection test</h1>
+      <h1 className="text-2xl font-bold mb-4">Firestore connection test</h1>
       <p>{status}</p>
     </main>
   );
