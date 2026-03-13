@@ -127,6 +127,11 @@ service cloud.firestore {
       }
     }
     
+    match /blogSettings/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
     match /{document=**} {
       allow read, write: if false;
     }
