@@ -1,38 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Button } from '@/components/ui/button';
-
-// The data to seed.
-const blogSettingsData = {
-  blogPageTitle: 'Blog',
-  blogPageSubtitle: 'Insights, articles, and guidance',
-  heroDescription:
-    'Explore articles, ideas, and expert materials from the platform ecosystem.',
-  heroPrimaryCtaLabel: 'Read Articles',
-  heroPrimaryCtaLink: '/blog',
-  heroSecondaryCtaLabel: 'Explore Categories',
-  heroSecondaryCtaLink: '/blog#categories',
-  featuredSectionTitle: 'Featured',
-  latestSectionTitle: 'Latest Articles',
-  popularSectionTitle: 'Popular',
-  categoriesSectionTitle: 'Categories',
-  authorsSectionTitle: 'Authors',
-  subscribeTitle: 'Stay Updated',
-  subscribeDescription: 'Get updates about new articles and featured content.',
-  seoTitle: 'Blog',
-  seoDescription: 'Articles, insights, and expert content from our platform.',
-  canonicalUrl: '/blog',
-  articlesPerPage: 9,
-  defaultSort: 'latest',
-  showFeaturedSection: true,
-  showPopularSection: true,
-  showCategoriesSection: true,
-  showAuthorsSection: false,
-  showSubscribeBlock: true,
-};
 
 export default function HomePage() {
   const [status, setStatus] = useState('Checking Firestore...');
@@ -73,16 +44,24 @@ export default function HomePage() {
   async function handleSeedDatabase() {
     setSeedStatus('Seeding...');
     try {
-      const ref = doc(db, 'blogSettings', 'main');
-      await setDoc(ref, blogSettingsData);
-      setSeedStatus('Successfully seeded blogSettings/main document!');
+      const response = await fetch('/api/seed-blog-settings', {
+        method: 'POST',
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to seed database.');
+      }
+      
+      setSeedStatus(result.message);
       // Re-check firestore to show the new data
       await checkFirestore();
     } catch (error: any) {
-      console.error('Firestore seed error:', error);
+      console.error('API seed error:', error);
       setSeedStatus('Error seeding database.');
       setDetails(
-        `code: ${error?.code ?? 'unknown'} | message: ${
+        `message: ${
           error?.message ?? 'no message'
         }`
       );
@@ -102,6 +81,7 @@ export default function HomePage() {
         <p className="mb-4 text-sm text-muted-foreground">
           Click the button below to create the initial `blogSettings/main`
           document in your Firestore database. This only needs to be done once.
+          This now uses a secure server-side API route.
         </p>
         <Button
           onClick={handleSeedDatabase}
