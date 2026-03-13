@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -23,6 +22,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { auth, db } from "@/lib/firebase/client";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Неправильна адреса електронної пошти." }),
@@ -38,7 +41,9 @@ const registerSchema = z.object({
     path: ["confirmPassword"],
 });
 
-export function AuthModal() {
+export function AuthModal({ setOpen }: { setOpen?: (open: boolean) => void }) {
+  const { toast } = useToast();
+
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -56,14 +61,43 @@ export function AuthModal() {
     },
   });
 
-  function onLoginSubmit(values: z.infer<typeof loginSchema>) {
-    console.log("Login:", values);
-    // TODO: Implement Firebase login
+  async function onLoginSubmit(values: z.infer<typeof loginSchema>) {
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      toast({ title: "Вхід успішний!" });
+      setOpen?.(false);
+    } catch (error: any) {
+      console.error("Login Error:", error);
+      toast({
+        variant: "destructive",
+        title: "Помилка входу",
+        description: "Неправильний email або пароль.",
+      });
+    }
   }
 
-  function onRegisterSubmit(values: z.infer<typeof registerSchema>) {
-    console.log("Register:", values);
-    // TODO: Implement Firebase registration
+  async function onRegisterSubmit(values: z.infer<typeof registerSchema>) {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      const user = userCredential.user;
+      
+      await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.email?.split('@')[0] || 'New User',
+          photoURL: `https://i.pravatar.cc/150?u=${user.uid}`,
+          createdAt: serverTimestamp(),
+      });
+      toast({ title: "Реєстрація успішна!" });
+      setOpen?.(false);
+    } catch (error: any) {
+      console.error("Register Error:", error);
+       toast({
+        variant: "destructive",
+        title: "Помилка реєстрації",
+        description: error.message,
+      });
+    }
   }
 
   return (
@@ -112,7 +146,9 @@ export function AuthModal() {
                   />
                 </CardContent>
                 <CardFooter className="px-1">
-                  <Button type="submit" className="w-full">Увійти</Button>
+                  <Button type="submit" className="w-full" disabled={loginForm.formState.isSubmitting}>
+                    {loginForm.formState.isSubmitting ? 'Вхід...' : 'Увійти'}
+                  </Button>
                 </CardFooter>
               </form>
             </Form>
@@ -164,7 +200,9 @@ export function AuthModal() {
                   />
                 </CardContent>
                 <CardFooter className="px-1">
-                  <Button type="submit" className="w-full">Зареєструватися</Button>
+                   <Button type="submit" className="w-full" disabled={registerForm.formState.isSubmitting}>
+                    {registerForm.formState.isSubmitting ? 'Реєстрація...' : 'Зареєструватися'}
+                  </Button>
                 </CardFooter>
               </form>
             </Form>

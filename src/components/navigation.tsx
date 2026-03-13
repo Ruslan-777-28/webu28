@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home as HomeIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,15 +12,39 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { AuthModal } from '@/components/auth-modal';
+import { useUser } from '@/hooks/use-auth';
+import { UserNav } from './user-nav';
+import { Skeleton } from './ui/skeleton';
 
 export function Navigation() {
   const pathname = usePathname();
+  const { user, loading } = useUser();
+  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
 
   const navLinks = [
     { href: '/pro', label: 'EXPERTS' },
     { href: '/user', label: 'USER' },
     { href: '/blog', label: 'BLOG' },
   ];
+
+  const renderAuthControl = () => {
+    if (loading) {
+      return <Skeleton className="h-10 w-10 rounded-full" />;
+    }
+    if (user) {
+      return <UserNav />;
+    }
+    return (
+      <Dialog open={isAuthModalOpen} onOpenChange={setAuthModalOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline">Увійти</Button>
+        </DialogTrigger>
+        <DialogContent className="w-[90%] sm:max-w-[425px]">
+          <AuthModal setOpen={setAuthModalOpen} />
+        </DialogContent>
+      </Dialog>
+    );
+  };
 
   return (
     <div className="p-4 md:p-8 flex justify-between items-center">
@@ -53,14 +77,7 @@ export function Navigation() {
         </div>
 
       <div className="flex items-center">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline">Увійти</Button>
-          </DialogTrigger>
-          <DialogContent className="w-[90%] sm:max-w-[425px]">
-            <AuthModal />
-          </DialogContent>
-        </Dialog>
+        {renderAuthControl()}
       </div>
     </div>
   );
