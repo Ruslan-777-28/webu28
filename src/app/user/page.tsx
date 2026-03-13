@@ -5,12 +5,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Languages, Clock, Calendar } from 'lucide-react';
+import { Mail, Languages, Clock, Calendar, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { Navigation } from '@/components/navigation';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { EditProfileModal } from '@/components/edit-profile-modal';
+import { useState } from 'react';
 
 export default function UserPage() {
   const { profile, loading, user } = useUser();
+  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
 
   const renderContent = () => {
     if (loading) {
@@ -74,58 +79,69 @@ export default function UserPage() {
 
     return (
       <div className="container mx-auto max-w-3xl py-8">
-        <Card className="overflow-hidden">
-          <CardHeader className="flex flex-col md:flex-row items-start gap-6 bg-muted/30 p-6">
-            <Avatar className="h-24 w-24 border-4 border-background shadow-md">
-              <AvatarImage src={profile.avatarUrl} alt={profile.name} />
-              <AvatarFallback className="text-3xl">
-                {profile.name?.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="pt-2">
-              <CardTitle className="text-3xl font-bold">{profile.name}</CardTitle>
-              <CardDescription className="text-lg text-muted-foreground flex items-center gap-2 mt-1">
-                <Mail className="h-4 w-4" />
-                {profile.email}
-              </CardDescription>
-              {profile.createdAt && (
-                <p className="text-sm text-muted-foreground flex items-center gap-2 mt-2">
-                  <Calendar className="h-4 w-4" />
-                  Member since {format(profile.createdAt.toDate(), 'MMMM yyyy')}
-                </p>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent className="p-6 space-y-6">
-            <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">About</h3>
-              <p className="text-foreground whitespace-pre-wrap">
-                {profile.bio || 'This user has not provided a bio yet.'}
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t">
-               <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2"><Languages className="h-4 w-4" />Preferred Language</h3>
-                  <Badge variant="outline">{profile.preferredLanguage || 'Not specified'}</Badge>
-              </div>
-               <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2"><Clock className="h-4 w-4" />Availability</h3>
-                   <div className="flex items-center gap-2">
-                       <Badge variant="secondary" className="flex items-center gap-2">
-                           <span className={`h-2 w-2 rounded-full ${availabilityColor[availabilityStatus]}`} />
-                           <span className="capitalize">{availabilityStatus}</span>
-                       </Badge>
-                       {availabilityStatus !== 'available' && profile.availability?.until && (
-                           <span className="text-muted-foreground text-xs">
-                               until {format(profile.availability.until.toDate(), 'PP')}
-                           </span>
-                       )}
-                  </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
+            <Card className="overflow-hidden">
+                <CardHeader className="flex flex-row items-start justify-between gap-6 bg-muted/30 p-6">
+                    <div className="flex items-start gap-6">
+                        <Avatar className="h-24 w-24 border-4 border-background shadow-md">
+                        <AvatarImage src={profile.avatarUrl} alt={profile.name} />
+                        <AvatarFallback className="text-3xl">
+                            {profile.name?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                        </Avatar>
+                        <div className="pt-2">
+                            <CardTitle className="text-3xl font-bold">{profile.name}</CardTitle>
+                            <CardDescription className="text-lg text-muted-foreground flex items-center gap-2 mt-1">
+                                <Mail className="h-4 w-4" />
+                                {profile.email}
+                            </CardDescription>
+                            {profile.createdAt && (
+                                <p className="text-sm text-muted-foreground flex items-center gap-2 mt-2">
+                                <Calendar className="h-4 w-4" />
+                                Member since {format(profile.createdAt.toDate(), 'MMMM yyyy')}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                    <DialogTrigger asChild>
+                        <Button variant="outline" size="icon">
+                            <Pencil className="h-4 w-4" />
+                            <span className="sr-only">Edit Profile</span>
+                        </Button>
+                    </DialogTrigger>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6">
+                    <div>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-1">About</h3>
+                    <p className="text-foreground whitespace-pre-wrap">
+                        {profile.bio || 'This user has not provided a bio yet.'}
+                    </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t">
+                    <div>
+                        <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2"><Languages className="h-4 w-4" />Preferred Language</h3>
+                        <Badge variant="outline">{profile.preferredLanguage || 'Not specified'}</Badge>
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2"><Clock className="h-4 w-4" />Availability</h3>
+                        <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="flex items-center gap-2">
+                                <span className={`h-2 w-2 rounded-full ${availabilityColor[availabilityStatus]}`} />
+                                <span className="capitalize">{availabilityStatus}</span>
+                            </Badge>
+                            {availabilityStatus !== 'available' && profile.availability?.until && (
+                                <span className="text-muted-foreground text-xs">
+                                    until {format(profile.availability.until.toDate(), 'PP')}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                    </div>
+                </CardContent>
+            </Card>
+            {isEditDialogOpen && <EditProfileModal profile={profile} setOpen={setEditDialogOpen} />}
+        </Dialog>
       </div>
     );
   }
