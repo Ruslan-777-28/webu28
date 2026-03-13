@@ -84,8 +84,14 @@ export function AuthModal({ setOpen }: { setOpen?: (open: boolean) => void }) {
       await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
           email: user.email,
-          displayName: user.email?.split('@')[0] || 'New User',
-          photoURL: `https://i.pravatar.cc/150?u=${user.uid}`,
+          name: user.email?.split('@')[0] || 'New User',
+          avatarUrl: `https://i.pravatar.cc/150?u=${user.uid}`,
+          bio: '',
+          preferredLanguage: 'українська',
+          availability: {
+              status: 'available',
+              until: null,
+          },
           createdAt: serverTimestamp(),
       });
       toast({ title: "Реєстрація успішна!" });

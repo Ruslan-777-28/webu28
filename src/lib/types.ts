@@ -38,3 +38,17 @@ export type BlogSettings = {
     showFeaturedSection: boolean;
     showPopularSection: boolean;
 }
+
+export type UserProfile = {
+  uid: string;
+  name: string;
+  email: string;
+  bio?: string;
+  avatarUrl?: string;
+  preferredLanguage?: string;
+  availability?: {
+    status: 'available' | 'busy' | 'away';
+    until?: import('firebase/firestore').Timestamp | null;
+  };
+  createdAt: import('firebase/firestore').Timestamp;
+};
