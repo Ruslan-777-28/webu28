@@ -95,6 +95,7 @@ export default function BlogPage() {
                 <div className="flex flex-wrap justify-center gap-4">
                     <Button size="lg">Читати останні статті</Button>
                     <Button size="lg" variant="outline">Перейти до категорій</Button>
+                    <Button size="lg" variant="outline">Новини AWE28</Button>
                 </div>
             </div>
         </section>
