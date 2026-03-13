@@ -2,6 +2,9 @@ import { Navigation } from '@/components/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import React from 'react';
+import { Search, ArrowUpDown } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export default function BlogPage() {
   const categories = [
@@ -33,12 +36,12 @@ export default function BlogPage() {
       <div className="w-full px-4 md:px-8 py-6">
         <Tabs defaultValue={categories[0].value} className="w-full">
           <ScrollArea className="w-full whitespace-nowrap border-b">
-            <TabsList className="bg-transparent p-0 h-auto">
+            <TabsList className="bg-transparent p-0 h-auto gap-4">
               {categories.map((category) => (
                 <TabsTrigger
                   key={category.value}
                   value={category.value}
-                  className="bg-transparent text-muted-foreground shadow-none rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none"
+                  className="bg-transparent text-muted-foreground shadow-none rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none px-2"
                 >
                   {category.label}
                 </TabsTrigger>
@@ -47,6 +50,21 @@ export default function BlogPage() {
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
           
+          <div className="mt-6 flex items-center gap-4">
+            <div className="relative flex-grow">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Пошук постів..."
+                className="pl-10 w-full md:w-80"
+              />
+            </div>
+            <Button variant="outline" className="shrink-0">
+              <ArrowUpDown className="h-4 w-4 mr-2" />
+              Сортувати
+            </Button>
+          </div>
+
           <TabsContent value="all">
             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {allPosts.map(post => (
