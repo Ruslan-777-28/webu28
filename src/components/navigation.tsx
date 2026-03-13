@@ -23,7 +23,6 @@ export function Navigation() {
 
   const navLinks = [
     { href: '/pro', label: 'EXPERTS' },
-    { href: '/user', label: 'USER' },
     { href: '/blog', label: 'BLOG' },
   ];
 
