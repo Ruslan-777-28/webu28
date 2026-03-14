@@ -32,8 +32,8 @@ export default function HomePage() {
 
   return (
     <div className="flex h-screen w-full">
-      {/* Left Block (55%) with Navigation */}
-      <div className="w-[55%] bg-muted p-8 flex flex-col justify-between border-r border-black/20">
+      {/* Left Block (68%) with Navigation */}
+      <div className="w-[68%] bg-muted p-8 flex flex-col justify-between border-r border-black/20">
         <div>
           <div className="flex items-center gap-4">
             <Link href="/" className={cn(pathname === '/' ? 'text-primary' : 'text-muted-foreground')}>
@@ -65,8 +65,8 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* Center Block (25%) */}
-      <div className="w-[25%] bg-card flex items-center justify-center">
+      {/* Center Block (12%) */}
+      <div className="w-[12%] bg-card flex items-center justify-center">
          <CountdownTimer />
       </div>
 
