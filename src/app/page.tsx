@@ -70,7 +70,9 @@ export default function HomePage() {
 
       {/* Right Block */}
       <div className="w-1/5 bg-black relative z-10 shadow-[-16px_0px_24px_-16px_rgba(0,0,0,0.5),_-32px_0px_48px_-24px_rgba(0,0,0,0.3)]">
-        {/* This is the right-side block. Content can be added here later. */}
+        <div className="pt-8 text-center">
+          <h2 className="text-white font-bold text-xl tracking-widest">LECTOR</h2>
+        </div>
       </div>
     </div>
   );
