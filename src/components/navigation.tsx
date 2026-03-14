@@ -4,14 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home as HomeIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { AuthModal } from '@/components/auth-modal';
+import React from 'react';
 import { useUser } from '@/hooks/use-auth';
 import { UserNav } from './user-nav';
 import { Skeleton } from './ui/skeleton';
@@ -19,7 +12,6 @@ import { Skeleton } from './ui/skeleton';
 export function Navigation() {
   const pathname = usePathname();
   const { user, loading } = useUser();
-  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
 
   const navLinks = [
     { href: '/pro', label: 'EXPERTS' },
@@ -34,16 +26,7 @@ export function Navigation() {
     if (user) {
       return <UserNav />;
     }
-    return (
-      <Dialog open={isAuthModalOpen} onOpenChange={setAuthModalOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline">Увійти</Button>
-        </DialogTrigger>
-        <DialogContent className="w-[90%] sm:max-w-[425px]">
-          <AuthModal setOpen={setAuthModalOpen} />
-        </DialogContent>
-      </Dialog>
-    );
+    return null;
   };
 
   return (
