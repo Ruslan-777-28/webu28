@@ -33,27 +33,29 @@ export default function HomePage() {
   return (
     <div className="flex h-screen w-full">
       {/* Left Block (55%) with Navigation */}
-      <div className="w-[55%] bg-muted p-8 flex flex-col justify-between border-r">
+      <div className="w-[55%] bg-muted p-8 flex flex-col justify-between border-r border-black/20">
         <div>
           <div className="flex items-center gap-4 mb-12">
             <Link href="/" className={cn(pathname === '/' ? 'text-primary' : 'text-muted-foreground')}>
                 <HomeIcon className={cn('h-5 w-5 hover:text-foreground transition-colors')} />
             </Link>
-            <span className="text-sm text-muted-foreground leading-tight">простір обміну<br/>цінностями</span>
+            <span className="text-xs text-muted-foreground">простір обміну цінностями</span>
           </div>
 
-          <nav className="flex flex-col items-start gap-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'text-lg font-light text-foreground/80 hover:text-primary transition-colors',
-                  pathname.startsWith(link.href) && 'text-primary font-medium'
-                )}
-              >
-                {link.label}
-              </Link>
+          <nav className="flex items-center gap-4">
+            {navLinks.map((link, index) => (
+               <React.Fragment key={link.href}>
+                <Link
+                  href={link.href}
+                  className={cn(
+                    'text-sm font-normal text-foreground/80 hover:text-primary transition-colors',
+                    pathname.startsWith(link.href) && 'text-primary font-medium'
+                  )}
+                >
+                  {link.label}
+                </Link>
+                {index < navLinks.length - 1 && <span className="text-foreground/30">|</span>}
+              </React.Fragment>
             ))}
           </nav>
         </div>
