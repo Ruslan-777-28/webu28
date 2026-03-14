@@ -1,27 +1,75 @@
 'use client';
 
-import { Navigation } from '@/components/navigation';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Home as HomeIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import React from 'react';
+import { useUser } from '@/hooks/use-auth';
+import { UserNav } from '@/components/user-nav';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function HomePage() {
-  return (
-    <div className="flex flex-col h-screen">
-      <Navigation />
-      <main className="flex-grow flex w-full">
-        {/* Left Block (40%) */}
-        <div className="w-2/5 bg-muted">
-          {/* This is the left-side block. Content can be added here later. */}
-        </div>
-        
-        {/* Center Block (40%) */}
-        <div className="w-2/5 bg-card">
-           {/* This is the center block. Content can be added here later. */}
-        </div>
+  const pathname = usePathname();
+  const { user, loading } = useUser();
 
-        {/* Right Block (20%) */}
-        <div className="w-1/5 bg-black">
-          {/* This is the right-side block. Content can be added here later. */}
+  const navLinks = [
+    { href: '/pro', label: 'EXPERTS' },
+    { href: '/user', label: 'USER' },
+    { href: '/blog', label: 'BLOG' },
+  ];
+
+  const renderAuthControl = () => {
+    if (loading) {
+      return <Skeleton className="h-10 w-10 rounded-full" />;
+    }
+    if (user) {
+      return <UserNav />;
+    }
+    return null;
+  };
+
+  return (
+    <div className="flex h-screen w-full">
+      {/* Left Block (40%) with Navigation */}
+      <div className="w-2/5 bg-muted p-8 flex flex-col justify-between">
+        <div>
+          <div className="flex items-center gap-4 mb-12">
+            <Link href="/" className={cn(pathname === '/' ? 'text-primary' : 'text-muted-foreground')}>
+                <HomeIcon className={cn('h-8 w-8 hover:text-foreground transition-colors')} />
+            </Link>
+            <span className="text-sm text-muted-foreground leading-tight">простір обміну<br/>цінностями</span>
+          </div>
+
+          <nav className="flex flex-col items-start gap-6">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  'text-2xl font-light text-foreground/80 hover:text-primary transition-colors',
+                  pathname.startsWith(link.href) && 'text-primary font-medium'
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
         </div>
-      </main>
+        <div className="flex items-center">
+          {renderAuthControl()}
+        </div>
+      </div>
+      
+      {/* Center Block (40%) */}
+      <div className="w-2/5 bg-card">
+         {/* This is the center block. Content can be added here later. */}
+      </div>
+
+      {/* Right Block (20%) */}
+      <div className="w-1/5 bg-black">
+        {/* This is the right-side block. Content can be added here later. */}
+      </div>
     </div>
   );
 }
