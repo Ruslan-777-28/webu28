@@ -31,12 +31,12 @@ export default function HomePage() {
 
   return (
     <div className="flex h-screen w-full">
-      {/* Left Block (40%) with Navigation */}
-      <div className="w-2/5 bg-muted p-8 flex flex-col justify-between">
+      {/* Left Block (55%) with Navigation */}
+      <div className="w-[55%] bg-muted p-8 flex flex-col justify-between border-r border-black">
         <div>
           <div className="flex items-center gap-4 mb-12">
             <Link href="/" className={cn(pathname === '/' ? 'text-primary' : 'text-muted-foreground')}>
-                <HomeIcon className={cn('h-8 w-8 hover:text-foreground transition-colors')} />
+                <HomeIcon className={cn('h-6 w-6 hover:text-foreground transition-colors')} />
             </Link>
             <span className="text-sm text-muted-foreground leading-tight">простір обміну<br/>цінностями</span>
           </div>
@@ -47,7 +47,7 @@ export default function HomePage() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  'text-2xl font-light text-foreground/80 hover:text-primary transition-colors',
+                  'text-xl font-light text-foreground/80 hover:text-primary transition-colors',
                   pathname.startsWith(link.href) && 'text-primary font-medium'
                 )}
               >
@@ -61,8 +61,8 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* Center Block (40%) */}
-      <div className="w-2/5 bg-card">
+      {/* Center Block (25%) */}
+      <div className="w-[25%] bg-card">
          {/* This is the center block. Content can be added here later. */}
       </div>
 
