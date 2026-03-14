@@ -33,7 +33,7 @@ export default function HomePage() {
   return (
     <div className="flex h-screen w-full">
       {/* Left Block (68%) with Navigation */}
-      <div className="w-[68%] bg-muted p-8 flex flex-col justify-between border-r border-black/20">
+      <div className="w-[68%] bg-card p-8 flex flex-col justify-between border-r border-black/20">
         <div>
           <div className="flex items-center gap-4">
             <Link href="/" className={cn(pathname === '/' ? 'text-primary' : 'text-muted-foreground')}>
