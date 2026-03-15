@@ -183,7 +183,7 @@ export default function ProPage() {
         </section>
 
         {/* 2. SECTION “Це для вас, якщо ви...” */}
-        <section className="py-20 bg-backgroundAlt">
+        <section className="py-20 bg-card">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               Це для вас, якщо ви...
@@ -216,7 +216,7 @@ export default function ProPage() {
               {benefits.map((benefit, index) => (
                 <Card key={index} className="text-center border-none shadow-none">
                   <CardContent className="p-6">
-                    <div className="inline-flex items-center justify-center bg-backgroundAlt rounded-full p-3 mb-4">
+                    <div className="inline-flex items-center justify-center bg-card rounded-full p-3 mb-4">
                       <benefit.icon className="h-8 w-8 text-accent" />
                     </div>
                     <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
@@ -229,7 +229,7 @@ export default function ProPage() {
         </section>
         
         {/* 4. SECTION “Як це працює” */}
-        <section className="py-20 bg-backgroundAlt">
+        <section className="py-20 bg-card">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
               Як це працює
@@ -266,7 +266,7 @@ export default function ProPage() {
               {workFormats.map((format, index) => (
                 <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow">
                   <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
-                      <div className="bg-backgroundAlt p-2 rounded-lg">
+                      <div className="bg-card p-2 rounded-lg">
                           <format.icon className="h-6 w-6 text-accent" />
                       </div>
                     <CardTitle className="text-lg">{format.title}</CardTitle>
@@ -281,7 +281,7 @@ export default function ProPage() {
         </section>
 
         {/* 6. SECTION “Чому це більше, ніж робота через соцмережі...” */}
-        <section className="py-20 bg-backgroundAlt">
+        <section className="py-20 bg-card">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
@@ -295,10 +295,10 @@ export default function ProPage() {
                   Замість розрізнених каналів, випадкових повідомлень і хаотичної присутності в різних сервісах ви отримуєте простір, де профіль, формати взаємодії, публічність і монетизація поєднані в одну зрозумілу систему. Це допомагає виглядати професійніше, працювати спокійніше й вибудовувати довшу довіру з аудиторією.
                 </p>
               </div>
-              <div className="bg-card p-8 rounded-lg shadow-sm border space-y-4">
+              <div className="bg-background p-8 rounded-lg shadow-sm border space-y-4">
                 {comparisonPoints.map((point, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+                    <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
                     <p className="text-md font-medium">{point}</p>
                   </div>
                 ))}
@@ -320,7 +320,7 @@ export default function ProPage() {
         </section>
 
         {/* 8. SECTION “Монетизація” */}
-        <section className="py-20 bg-backgroundAlt">
+        <section className="py-20 bg-card">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -370,7 +370,7 @@ export default function ProPage() {
         </section>
 
         {/* 10. FINAL CTA SECTION */}
-        <section className="py-20 md:py-28 bg-backgroundAlt">
+        <section className="py-20 md:py-28 bg-card">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Ваші знання вже мають цінність

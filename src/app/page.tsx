@@ -113,7 +113,7 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row items-center justify-center md:items-start md:gap-8 w-full">
                 {/* Circle */}
                 <div className="relative w-[350px] h-[350px] md:w-[443px] md:h-[443px] flex-shrink-0">
-                    <div className="absolute inset-0 rounded-full border border-gray-200" />
+                    <div className="absolute inset-0 rounded-full border border-border" />
                 </div>
                 {/* Timer */}
                 <div className="flex-shrink-0 mt-8 md:mt-24 md:order-first">
@@ -136,7 +136,7 @@ export default function HomePage() {
       </div>
       
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-sidebar relative z-10 shadow-[-1.2582912rem_0_0.50331648rem_-0.25165824rem_rgba(128,128,128,0.15)] flex flex-col">
+      <div className="w-full md:w-1/5 bg-sidebar relative z-10 flex flex-col">
         <div className="sticky top-0 z-20 bg-sidebar p-4 text-center md:pt-8">
           <h2 className="text-sidebar-foreground font-thin text-sm tracking-widest underline decoration-primary underline-offset-4">LECTOR</h2>
           <div className="mt-4">

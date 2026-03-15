@@ -149,7 +149,7 @@ export default function CommunityPage() {
                 </section>
 
                 {/* 2. SECTION “Що тут відбувається” */}
-                <section className="py-20 bg-backgroundAlt">
+                <section className="py-20 bg-card">
                     <div className="container mx-auto px-4 max-w-4xl text-center">
                         <h2 className="text-3xl md:text-4xl font-bold mb-6">
                             Що таке LECTOR
@@ -172,7 +172,7 @@ export default function CommunityPage() {
                             {whyNeedItItems.map((item, index) => (
                             <Card key={index} className="text-center border-none shadow-none">
                                 <CardContent className="p-6">
-                                <div className="inline-flex items-center justify-center bg-backgroundAlt rounded-full p-3 mb-4">
+                                <div className="inline-flex items-center justify-center bg-card rounded-full p-3 mb-4">
                                     <item.icon className="h-8 w-8 text-accent" />
                                 </div>
                                 <h3 className="text-xl font-bold mb-2">{item.title}</h3>
@@ -185,7 +185,7 @@ export default function CommunityPage() {
                 </section>
 
                 {/* 4. SECTION “Що ви отримуєте після реєстрації” */}
-                <section className="py-20 bg-backgroundAlt">
+                <section className="py-20 bg-card">
                     <div className="container mx-auto px-4">
                         <div className="text-center max-w-3xl mx-auto mb-12">
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -223,7 +223,7 @@ export default function CommunityPage() {
                             <div className="absolute left-6 top-0 hidden h-full w-0.5 bg-border md:block" />
                             {howItWorksSteps.map((item) => (
                             <div key={item.step} className="relative flex items-start gap-6 pl-12 md:pl-16">
-                                <div className="absolute left-0 top-1.5 flex h-12 w-12 items-center justify-center rounded-full bg-backgroundAlt border shadow-sm">
+                                <div className="absolute left-0 top-1.5 flex h-12 w-12 items-center justify-center rounded-full bg-card border shadow-sm">
                                     <span className="text-xl font-bold text-accent">{item.step}</span>
                                 </div>
                                 <div>
@@ -237,7 +237,7 @@ export default function CommunityPage() {
                 </section>
                 
                 {/* 6. SECTION “Формати взаємодії” */}
-                <section className="py-20 bg-backgroundAlt">
+                <section className="py-20 bg-card">
                     <div className="container mx-auto px-4">
                         <div className="text-center max-w-3xl mx-auto mb-12">
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -282,23 +282,23 @@ export default function CommunityPage() {
                             </div>
                             <div className="bg-card p-8 rounded-lg shadow-sm border space-y-4">
                                 <div className="flex items-start gap-3">
-                                    <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+                                    <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
                                     <p className="text-md font-medium">не потрібно шукати все вручну</p>
                                 </div>
                                 <div className="flex items-start gap-3">
-                                    <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+                                    <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
                                     <p className="text-md font-medium">профілі, категорії й контент зібрані в одному місці</p>
                                 </div>
                                 <div className="flex items-start gap-3">
-                                    <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+                                    <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
                                     <p className="text-md font-medium">легше знайти людину під свій запит</p>
                                 </div>
                                 <div className="flex items-start gap-3">
-                                    <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+                                    <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
                                     <p className="text-md font-medium">менше шуму, більше сенсу</p>
                                 </div>
                                 <div className="flex items-start gap-3">
-                                    <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+                                    <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
                                     <p className="text-md font-medium">зручніша й цілісніша взаємодія</p>
                                 </div>
                             </div>
@@ -307,7 +307,7 @@ export default function CommunityPage() {
                 </section>
 
                 {/* 8. SECTION “Для яких ситуацій...” */}
-                <section className="py-20 bg-backgroundAlt">
+                <section className="py-20 bg-card">
                     <div className="container mx-auto px-4">
                         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
                             Коли платформа може бути особливо корисною
@@ -347,7 +347,7 @@ export default function CommunityPage() {
                 </section>
 
                 {/* 10. FINAL CTA SECTION */}
-                <section className="py-20 md:py-28 bg-backgroundAlt">
+                <section className="py-20 md:py-28 bg-card">
                     <div className="container mx-auto px-4 text-center">
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">
                         Зареєструйтесь, щоб перейти від пошуку до справжньої взаємодії
