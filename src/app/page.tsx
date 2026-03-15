@@ -24,16 +24,6 @@ export default function HomePage() {
     { href: '/blog', label: 'BLOG' },
   ];
 
-  const renderAuthControl = () => {
-    if (loading) {
-      return <Skeleton className="h-10 w-10 rounded-full" />;
-    }
-    if (user) {
-      return <UserNav />;
-    }
-    return null;
-  };
-
   const renderRightBlockAuthControl = () => {
     if (loading) {
       return <Skeleton className="h-10 w-10 rounded-full" />;
@@ -114,7 +104,6 @@ export default function HomePage() {
                   </React.Fragment>
                   ))}
               </nav>
-              {renderAuthControl()}
             </div>
           </div>
         </div>
