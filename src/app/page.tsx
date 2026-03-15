@@ -98,7 +98,7 @@ export default function HomePage() {
         {/* Main content area */}
         <div className="flex-grow flex flex-col items-center justify-center pt-8">
             <div className="flex items-start justify-center gap-8 w-full pr-16">
-                <div className="relative" style={{ width: '680px', height: '680px' }}>
+                <div className="relative" style={{ width: '544px', height: '544px' }}>
                     <div className="absolute inset-0 rounded-full border border-gray-200" />
                 </div>
                 <div className="flex-shrink-0">
@@ -110,7 +110,7 @@ export default function HomePage() {
                 </div>
             </div>
 
-            <div className="text-center px-8 pb-8 -mt-24">
+            <div className="text-center px-8 pb-8 mt-8">
                 <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
                     Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
                 </p>
