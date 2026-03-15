@@ -72,7 +72,7 @@ export default function HomePage() {
             </div>
           
             <div className="flex items-center gap-4">
-              <nav className="flex items-center gap-4">
+              <nav className="flex items-center gap-4 mr-4">
                   {navLinks.map((link, index) => (
                   <React.Fragment key={link.href}>
                       <Link
@@ -97,18 +97,18 @@ export default function HomePage() {
         
         {/* Main content area */}
         <div className="flex-grow flex flex-col items-center pt-8">
-            <div className="flex items-center justify-center gap-8">
-                <div className="relative" style={{ width: '497px', height: '497px' }}>
+            <div className="flex items-start justify-center gap-8 w-full pr-16">
+                <div className="relative mt-8" style={{ width: '571.55px', height: '571.55px' }}>
                     <div className="absolute inset-0 rounded-full border border-gray-200" />
                 </div>
                 <div className="flex-shrink-0">
-                    <div className="sticky top-20 flex h-full flex-col items-center justify-center p-8 text-center">
+                    <div className="sticky top-20 flex h-full flex-col items-center justify-center p-8 text-center" style={{height: '571.55px'}}>
                         <CountdownTimer />
                     </div>
                 </div>
             </div>
 
-            <div className="text-center px-8 pt-8 pb-8">
+            <div className="text-center px-8 pt-12 pb-8">
                 <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
                     Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
                 </p>
@@ -130,8 +130,8 @@ export default function HomePage() {
             </Button>
           </div>
         </div>
-        <div className="flex-grow flex justify-center items-start pt-12">
-            <div className="flex flex-col items-start gap-y-1 text-white text-sm font-thin w-full px-4" style={{paddingTop: '10rem'}}>
+        <div className="flex-grow flex justify-center items-start pt-12 overflow-y-auto">
+            <div className="flex flex-col items-start gap-y-0.5 text-white text-sm font-thin w-full px-4" style={{paddingTop: '10rem'}}>
                 {esotericWords.map(({word, color, margin}) => (
                     <span key={word} className={cn(color, margin)}>{word}</span>
                 ))}
