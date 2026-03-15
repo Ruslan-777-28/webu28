@@ -33,7 +33,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col md:flex-row min-h-[200vh] w-full">
       {/* Left Block */}
-      <div className="relative w-full md:w-[68%] bg-white p-4 md:p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-black/20 overflow-hidden">
+      <div className="relative w-full md:w-[68%] bg-white p-4 md:p-8 flex flex-col border-b md:border-b-0 md:border-r border-black/20 overflow-hidden">
         <div className="sticky top-0 z-20 bg-white -m-4 md:-m-8 p-4 md:p-8">
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -43,31 +43,31 @@ export default function HomePage() {
               <span className="text-xs text-muted-foreground ml-4">простір обміну цінностями</span>
             </div>
           
-            <nav className="flex items-center gap-4">
-                {navLinks.map((link, index) => (
-                <React.Fragment key={link.href}>
-                    <Link
-                    href={link.href}
-                    className={cn(
-                        'text-sm font-normal text-foreground/80 hover:text-primary transition-colors',
-                        pathname.startsWith(link.href) && 'text-primary font-medium'
-                    )}
-                    >
-                    {link.label}
-                    </Link>
-                    {index < navLinks.length - 1 && <span className="text-foreground/30">|</span>}
-                </React.Fragment>
-                ))}
-            </nav>
+            <div className="flex items-center gap-4">
+              <nav className="flex items-center gap-4">
+                  {navLinks.map((link, index) => (
+                  <React.Fragment key={link.href}>
+                      <Link
+                      href={link.href}
+                      className={cn(
+                          'text-sm font-normal text-foreground/80 hover:text-primary transition-colors',
+                          pathname.startsWith(link.href) && 'text-primary font-medium'
+                      )}
+                      >
+                      {link.label}
+                      </Link>
+                      {index < navLinks.length - 1 && <span className="text-foreground/30">|</span>}
+                  </React.Fragment>
+                  ))}
+              </nav>
+              {renderAuthControl()}
+            </div>
           </div>
         </div>
 
 
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
         
-        <div className="relative z-10 flex items-center mt-4 md:mt-0">
-          {renderAuthControl()}
-        </div>
       </div>
       
       {/* Center Block */}
