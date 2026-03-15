@@ -75,7 +75,7 @@ export default function HomePage() {
         </div>
 
         <div className="relative flex-grow p-4 md:p-8 overflow-hidden">
-            <div className="absolute top-[25%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
+            <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
             
             <div className="relative z-10 h-full flex flex-col justify-end items-center text-center pb-8">
                 <p className="text-sm text-muted-foreground max-w-2xl mb-4">
