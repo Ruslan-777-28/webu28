@@ -96,7 +96,7 @@ export default function HomePage() {
         </div>
         
         <div className="relative flex-grow flex flex-col justify-end items-center" style={{paddingTop: '2%', minHeight: 'calc(100vh - 220px)'}}>
-            <div className="relative w-[68vmin] max-w-[31.5rem] h-[68vmin] max-h-[31.5rem] rounded-full border border-gray-200 flex items-center justify-center">
+            <div className="relative w-[65vmin] max-w-[31.5rem] h-[65vmin] max-h-[31.5rem] rounded-full border border-gray-200 flex items-center justify-center">
             </div>
         </div>
             
