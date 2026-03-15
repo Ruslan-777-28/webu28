@@ -110,7 +110,6 @@ export default function HomePage() {
         
         {/* Main content area */}
         <main className="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
-            <h2 className="text-2xl font-bold mb-8 text-foreground text-center max-w-4xl">ВІДКРИЙ ДОСТУП ДО ЗНАНЬ БЕЗ КОРДОНІВ 24/7</h2>
             <div className="flex flex-col md:flex-row items-center justify-center md:gap-16 w-full">
                 {/* Circle */}
                 <div className="relative w-[350px] h-[350px] md:w-[443px] md:h-[443px] flex-shrink-0">
@@ -127,6 +126,7 @@ export default function HomePage() {
             </div>
              {/* Text Block */}
             <div className="text-center text-sm text-muted-foreground max-w-5xl mt-12">
+                <h2 className="text-2xl font-bold mb-8 text-foreground text-center max-w-4xl mx-auto">ВІДКРИЙ ДОСТУП ДО ЗНАНЬ БЕЗ КОРДОНІВ 24/7</h2>
                 <p className="mb-4">
 Платформа створена для людей, які шукають відповіді на важливі питання про стосунки, життєві рішення, особистий розвиток і власний шлях. Тут можна отримати персональні консультації, нове бачення ситуації та глибші інсайти у зручному форматі спілкування з експертами й практиками з усього світу. Ідея сервісу проста: коли час, компетенція, досвід та знання поєднуються у змістовній розмові, виникає справжня цінність для обох сторін. Платформа відкриває доступ до живої взаємодії без мовних і географічних бар’єрів, допомагає знайти фахівця під конкретний запит і створює простір для глибшого пізнання, підтримки та нових рішень. Це екосистема обміну живою енергією, сенсами та знаннями, де кожна розмова може стати точкою ясності, підтримки й нового напрямку.
                 </p>
