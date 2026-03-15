@@ -38,18 +38,16 @@ service cloud.firestore {
     match /users/{uid} {
       allow get, list: if isSignedIn();
       allow create: if isSelf(uid);
-      // Only Admin can change roles. Others can update their own profile but not roles.
+      // Admin can change any field. Others can update their own profile but not roles.
       allow update: if (isSelf(uid) && request.resource.data.roles == resource.data.roles) || isAdmin();
       allow delete: if isAdmin();
     }
 
     // ---------- Posts (Blog and other types) ----------
     match /posts/{postId} {
-        // Public can list posts. Get is more restrictive. Staff can get any post.
-        allow list: if true;
-        allow get: if (resource.data.contentType == 'blog' && resource.data.status == 'published')
-                    || (resource.data.get('contentType', 'blog') != 'blog')
-                    || isAuthor();
+        // Public can list and get published blog posts. Staff can get any post.
+        allow list, get: if (resource.data.contentType == 'blog' && resource.data.status == 'published')
+                         || isAuthor();
         
         // Authors can create posts for themselves.
         allow create: if isAuthor() && request.resource.data.authorId == request.auth.uid;

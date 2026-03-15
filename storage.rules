@@ -1,12 +1,15 @@
-
 rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
 
     // ---------- Helpers ----------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
     function hasClaim(claim) {
-      return request.auth != null && request.auth.token[claim] == true;
+      return isSignedIn() && request.auth.token[claim] == true;
     }
 
     function isAdmin() {
@@ -16,11 +19,15 @@ service firebase.storage {
     function isEditor() {
       return isAdmin() || hasClaim('editor');
     }
+
+    function isSelf(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
     
     // ---------- Rules ----------
     match /avatars/{userId}/{fileName} {
       allow read: if true;
-      allow write: if (request.auth != null && request.auth.uid == userId) || isAdmin();
+      allow write: if isSelf(userId) || isAdmin();
     }
 
     match /posts/{path=**} {
@@ -34,7 +41,7 @@ service firebase.storage {
     }
 
     match /users/{path=**} {
-      allow read: if request.auth != null;
+      allow read: if isSignedIn();
       allow write: if isEditor();
     }
   }

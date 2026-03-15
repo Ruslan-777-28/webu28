@@ -9,7 +9,7 @@ const STAFF_ROLES: UserRole[] = ['admin', 'editor', 'author', 'moderator'];
 
 export async function POST(req: NextRequest) {
     try {
-        // 1. Verify the caller is an admin
+        // 1. Verify the caller is an admin by checking their ID token's custom claims.
         const idToken = req.headers.get('authorization')?.split('Bearer ')[1];
         if (!idToken) {
             return NextResponse.json({ success: false, message: 'Unauthorized: No token provided.' }, { status: 401 });
@@ -37,10 +37,10 @@ export async function POST(req: NextRequest) {
             }
         });
         
-        // 4. Set custom claims on the user
+        // 4. Set custom claims on the user in Firebase Auth
         await adminAuth.setCustomUserClaims(uid, claims);
 
-        // 5. Update the user document in Firestore
+        // 5. Update the user document in Firestore to keep UI and DB in sync
         const userRef = adminDb.collection('users').doc(uid);
         await userRef.update({
             'roles': roles, // Update the entire roles map
