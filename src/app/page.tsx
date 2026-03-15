@@ -88,11 +88,9 @@ export default function HomePage() {
 
         <div className="flex-grow flex flex-col justify-between">
            <div className="relative flex-grow flex flex-col justify-center items-center pt-[3%]" style={{minHeight: 'calc(100vh - 220px)'}}>
-              <div className="relative w-[112.56vmin] max-w-[calc(2rem+48rem)] h-[112.56vmin] max-h-[calc(2rem+48rem)] rounded-full border border-gray-200 flex items-center justify-center">
+              <div className="relative w-[118.188vmin] max-w-[calc(2rem+50.4rem)] h-[118.188vmin] max-h-[calc(2rem+50.4rem)] rounded-full border border-gray-200 flex items-center justify-center">
                   <div className="w-[80%] h-[80%] rounded-full border border-gray-200 flex items-center justify-center">
-                    <div className="w-[80%] h-[80%] rounded-full border border-gray-200 flex items-center justify-center">
-                        <div className="w-[80%] h-[80%] rounded-full border border-gray-200"></div>
-                    </div>
+                    <div className="w-[80%] h-[80%] rounded-full border border-gray-200"></div>
                   </div>
               </div>
           </div>
@@ -109,14 +107,14 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-[28.938rem] bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky h-fit text-gray-500" style={{top: 'calc(52% + 3%)'}}>
+      <div className="w-full md:w-[30.3849rem] bg-white flex justify-center p-8 md:p-0">
+         <div className="sticky h-fit text-gray-500" style={{top: 'calc(47% + 3%)'}}>
             <CountdownTimer />
          </div>
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-10rem_0_4rem_-2rem_rgba(128,128,128,0.32)] flex flex-col">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-8rem_0_3.2rem_-1.6rem_rgba(128,128,128,0.256)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest">LECTOR</h2>
         </div>
