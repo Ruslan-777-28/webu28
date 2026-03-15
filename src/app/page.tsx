@@ -95,8 +95,8 @@ export default function HomePage() {
           </div>
         </div>
         
-        <div className="relative flex-grow flex flex-col justify-end items-center" style={{paddingTop: 'calc(26% + 3% + 3%)', minHeight: 'calc(100vh - 220px)'}}>
-            <div className="relative w-[156.92251905vmin] max-w-[calc(1.98rem+66.534534rem)] h-[156.92251905vmin] max-h-[calc(1.98rem+66.534534rem)] rounded-full border border-gray-200 flex items-center justify-center">
+        <div className="relative flex-grow flex flex-col justify-end items-center" style={{paddingTop: 'calc(23% + 3% + 3%)', minHeight: 'calc(100vh - 220px)'}}>
+            <div className="relative w-[118vmin] max-w-[54.8rem] h-[118vmin] max-h-[54.8rem] rounded-full border border-gray-200 flex items-center justify-center">
             </div>
         </div>
             
@@ -112,13 +112,13 @@ export default function HomePage() {
       
       {/* Center Block */}
       <div className="w-full md:w-auto bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky h-fit text-gray-500" style={{top: 'calc(26% + 3% + 3%)'}}>
+         <div className="sticky h-fit text-gray-500" style={{top: 'calc(23% + 3%)'}}>
             <CountdownTimer />
          </div>
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-1.572864rem_0_0.6291456rem_-0.3145728rem_rgba(128,128,128,0.15)] flex flex-col">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-1.2582912rem_0_0.50331648rem_-0.25165824rem_rgba(128,128,128,0.15)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest underline decoration-purple-500 underline-offset-4">LECTOR</h2>
           <div className="mt-4">
