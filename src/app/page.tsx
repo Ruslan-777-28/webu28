@@ -51,7 +51,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col md:flex-row min-h-[100vh] w-full">
       {/* Left Block */}
-      <div className="relative w-full md:flex-[1.15] md:min-w-0 bg-white flex flex-col">
+      <div className="relative w-full md:flex-grow md:min-w-0 bg-white flex flex-col">
         <div className="sticky top-0 z-30 bg-white p-4 md:p-8">
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -95,26 +95,22 @@ export default function HomePage() {
           </div>
         </div>
         
-        <div className="relative flex-grow flex flex-col justify-start items-center" style={{paddingTop: '0%', minHeight: 'calc(100vh - 220px)'}}>
-            <div className="relative w-full max-w-[95%] aspect-[1/1]">
+        <div className="relative flex-grow flex flex-col justify-center items-center" style={{minHeight: 'calc(100vh - 220px)'}}>
+            <div className="relative w-full max-w-[85%] aspect-square">
                 <div className="absolute inset-0 rounded-full border border-gray-200" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <CountdownTimer />
+                </div>
             </div>
         </div>
             
-        <div className="relative text-center px-4 pb-8 pt-4">
+        <div className="relative text-center px-4 pb-8 pt-4 -mt-48">
             <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
 Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
             </p>
             <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
 Ідея платформи проста: коли час, компетенція, досвід  та знання об’єднуються у змістовній розмові, виникає справжня цінність для обох сторін. Для користувачів це можливість швидко і зручно звернутися до спеціалістів з усього світу та отримати індивідуальну консультацію. Для практиків — це простір, де можна ділитися своїм досвідом, розвивати особистий бренд і перетворювати знання на стабільну професійну діяльність . 4 типи комунікації з консультацій духовних практик з усіх куточків світу , без мовного бар'єру , 24/7.
             </p>
-        </div>
-      </div>
-      
-      {/* Center Block */}
-      <div className="w-full md:w-auto bg-white flex justify-center items-center p-8 md:p-0">
-        <div className="sticky top-1/4 -translate-y-1/4 text-center w-full">
-          <CountdownTimer />
         </div>
       </div>
       
@@ -129,7 +125,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="flex-grow flex justify-center pt-48">
-            <div className="flex flex-col items-start gap-y-12 text-white text-sm font-thin w-full px-4 pt-48">
+            <div className="flex flex-col items-start gap-y-12 text-white text-sm font-thin w-full px-4" style={{paddingTop: '25rem'}}>
                 {esotericWords.map(({word, color, margin}) => (
                     <span key={word} className={cn(color, margin)}>{word}</span>
                 ))}
