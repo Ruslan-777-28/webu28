@@ -30,7 +30,14 @@ export default function HomePage() {
     return null;
   };
 
-  const esotericWords = ['таро', 'шаман', 'ретрит', 'рейки', 'астрологія', 'нумерологія'];
+  const esotericWords = [
+    { word: 'таро', color: 'text-gray-300', margin: 'ml-4' },
+    { word: 'шаман', color: 'text-gray-500', margin: 'ml-12' },
+    { word: 'ретрит', color: 'text-gray-200', margin: 'ml-2' },
+    { word: 'рейки', color: 'text-gray-400', margin: 'ml-8' },
+    { word: 'астрологія', color: 'text-gray-300', margin: 'ml-5' },
+    { word: 'нумерологія', color: 'text-gray-500', margin: 'ml-10' },
+  ];
 
   return (
     <div className="flex flex-col md:flex-row min-h-[160vh] w-full">
@@ -68,7 +75,7 @@ export default function HomePage() {
         </div>
 
 
-        <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
+        <div className="absolute top-[25%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
         
         <div className="relative z-10 flex-grow flex flex-col justify-end items-center text-center pb-8">
             <p className="text-sm text-muted-foreground max-w-2xl">
@@ -86,14 +93,14 @@ export default function HomePage() {
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-16px_0px_24px_-16px_rgba(128,128,128,0.5),_-32px_0px_48px_-24px_rgba(128,128,128,0.3)]">
+      <div className="w-full md:w-1/5 bg-black relative z-10">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest">LECTOR</h2>
         </div>
         <div className="flex justify-center pt-16">
-            <div className="flex flex-col items-center gap-4 text-white text-sm font-thin">
-                {esotericWords.map((word) => (
-                    <span key={word}>{word}</span>
+            <div className="flex flex-col items-start gap-4 text-white text-sm font-thin w-full px-4">
+                {esotericWords.map(({word, color, margin}) => (
+                    <span key={word} className={cn(color, margin)}>{word}</span>
                 ))}
             </div>
         </div>
