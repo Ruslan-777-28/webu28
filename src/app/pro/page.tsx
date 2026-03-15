@@ -10,6 +10,13 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel";
+import {
   CheckCircle,
   ChevronRight,
   CircleDollarSign,
@@ -156,6 +163,40 @@ const faqItems = [
         answer: 'Так. Ви не обмежені одним сценарієм і можете будувати власну модель взаємодії відповідно до свого стилю й напряму.',
     },
 ];
+
+const professionals = [
+    {
+        avatar: 'https://picsum.photos/seed/expert2/200',
+        name: 'Олена Коваль',
+        specialization: 'Таролог, Астропсихолог',
+        description: 'Допомагаю знайти ясність у стосунках і кар’єрі через глибокий аналіз карт та натальної карти.',
+    },
+    {
+        avatar: 'https://picsum.photos/seed/expert3/200',
+        name: 'Максим Сидоренко',
+        specialization: 'Енергопрактик, Провідник медитацій',
+        description: 'Працюю з енергетичним полем для відновлення балансу та гармонії. Проводжу індивідуальні та групові сесії.',
+    },
+    {
+        avatar: 'https://picsum.photos/seed/expert4/200',
+        name: 'Ірина Вогник',
+        specialization: 'Нумеролог',
+        description: 'Розкриваю потенціал особистості через аналіз чисел. Складаю персональні прогнози та матриці долі.',
+    },
+    {
+        avatar: 'https://picsum.photos/seed/expert5/200',
+        name: 'Сергій Ткач',
+        specialization: 'Духовний наставник',
+        description: 'Супроводжую на шляху особистісного зростання, допомагаю знайти відповіді на глибокі життєві питання.',
+    },
+    {
+        avatar: 'https://picsum.photos/seed/expert6/200',
+        name: 'Анна Лисенко',
+        specialization: 'Human Design',
+        description: 'Читаю бодіграфи, допомагаю зрозуміти свою унікальну природу та стратегію прийняття рішень.',
+    },
+];
+
 
 export default function ProPage() {
   return (
@@ -365,8 +406,52 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 8. SECTION “Монетизація” */}
+        {/* 8. Professionals Showcase */}
         <section className="py-20 bg-card">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Професіонали, які вже з нами
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Платформа вже об’єднує людей, які працюють через знання, досвід, інтуїцію й особисту практику. Тут формується жива екосистема експертів і провідників з різних напрямів.
+              </p>
+            </div>
+
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full max-w-6xl mx-auto"
+            >
+              <CarouselContent className="-ml-4">
+                {professionals.map((pro, index) => (
+                  <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                    <div className="p-1 h-full">
+                      <Card className="h-full flex flex-col items-center text-center p-8 bg-background border-border shadow-sm hover:shadow-lg transition-shadow duration-300">
+                        <Avatar className="h-20 w-20 mb-4 border-2 border-border">
+                          <AvatarImage src={pro.avatar} alt={pro.name} />
+                          <AvatarFallback>{pro.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <h3 className="text-xl font-bold text-foreground mb-1">{pro.name}</h3>
+                        <p className="text-sm font-medium text-accent mb-4">{pro.specialization}</p>
+                        <p className="text-sm text-muted-foreground text-center flex-grow">
+                          {pro.description}
+                        </p>
+                      </Card>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden sm:flex left-[-50px]" />
+              <CarouselNext className="hidden sm:flex right-[-50px]" />
+            </Carousel>
+          </div>
+        </section>
+
+        {/* 9. SECTION “Монетизація” */}
+        <section className="py-20 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -394,8 +479,8 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 9. FAQ SECTION */}
-        <section className="py-20 bg-background">
+        {/* 10. FAQ SECTION */}
+        <section className="py-20 bg-card">
           <div className="container mx-auto px-4 max-w-3xl">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               Поширені запитання
@@ -415,8 +500,8 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 10. FINAL CTA SECTION */}
-        <section className="py-20 md:py-28 bg-card">
+        {/* 11. FINAL CTA SECTION */}
+        <section className="py-20 md:py-28 bg-background">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Ваші знання вже мають цінність
