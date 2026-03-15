@@ -38,7 +38,7 @@ export function CountdownTimer() {
 
   return (
     <div className="text-center">
-      <div className="flex justify-center gap-1 text-xs font-bold tabular-nums text-foreground">
+      <div className="flex justify-center gap-1 text-xs font-bold tabular-nums text-muted-foreground">
         <span>{formatTime(timeLeft.days)}</span>
         <span>:</span>
         <span>{formatTime(timeLeft.hours)}</span>

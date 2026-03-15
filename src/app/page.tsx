@@ -41,7 +41,7 @@ export default function HomePage() {
           </Link>
           <span className="text-xs text-muted-foreground">простір обміну цінностями</span>
         
-          <nav className="flex items-center gap-4">
+          <nav className="flex items-center gap-4 ml-4">
               {navLinks.map((link, index) => (
               <React.Fragment key={link.href}>
                   <Link
