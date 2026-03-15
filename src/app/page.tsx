@@ -15,8 +15,8 @@ export default function HomePage() {
   const { user, loading } = useUser();
 
   const navLinks = [
-    { href: '/pro', label: 'EXPERTS' },
-    { href: '/user', label: 'USER' },
+    { href: '/pro', label: 'FOR EXPERTS' },
+    { href: '/user', label: 'FOR COMMUNITY' },
     { href: '/blog', label: 'BLOG' },
   ];
 
@@ -81,35 +81,37 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="flex-grow flex flex-col">
-          <div className="relative flex-grow flex flex-col justify-center items-center pt-[3%]" style={{minHeight: 'calc(100vh - 180px)'}}>
-              <div className="relative w-[102.1vmin] max-w-2xl h-[102.1vmin] max-h-2xl rounded-full border border-gray-200 flex items-center justify-center">
+        <div className="flex-grow flex flex-col justify-between">
+           <div className="relative flex-grow flex flex-col justify-center items-center pt-[3%]" style={{minHeight: 'calc(100vh - 220px)'}}>
+              <div className="relative w-[107.2vmin] max-w-2xl h-[107.2vmin] max-h-2xl rounded-full border border-gray-200 flex items-center justify-center">
                   <div className="w-[80%] h-[80%] rounded-full border border-gray-200 flex items-center justify-center">
-                    <div className="w-[80%] h-[80%] rounded-full border border-gray-200"></div>
+                    <div className="w-[80%] h-[80%] rounded-full border border-gray-200 flex items-center justify-center">
+                        <div className="w-[80%] h-[80%] rounded-full border border-gray-200"></div>
+                    </div>
                   </div>
               </div>
           </div>
             
-            <div className="relative text-center px-4 pb-8 pt-4">
-                <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
- Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
-                </p>
-                <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-  Ідея платформи проста: коли час, компетенція, досвід  та знання об’єднуються у змістовній розмові, виникає справжня цінність для обох сторін. Для користувачів це можливість швидко і зручно звернутися до спеціалістів з усього світу та отримати індивідуальну консультацію. Для практиків — це простір, де можна ділитися своїм досвідом, розвивати особистий бренд і перетворювати знання на стабільну професійну діяльність . 4 типи комунікації з консультацій духовних практик з усіх куточків світу , без мовного бар'єру , 24/7.
-                </p>
-            </div>
+          <div className="relative text-center px-4 pb-8 pt-4">
+              <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
+Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
+              </p>
+              <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+Ідея платформи проста: коли час, компетенція, досвід  та знання об’єднуються у змістовній розмові, виникає справжня цінність для обох сторін. Для користувачів це можливість швидко і зручно звернутися до спеціалістів з усього світу та отримати індивідуальну консультацію. Для практиків — це простір, де можна ділитися своїм досвідом, розвивати особистий бренд і перетворювати знання на стабільну професійну діяльність . 4 типи комунікації з консультацій духовних практик з усіх куточків світу , без мовного бар'єру , 24/7.
+              </p>
+          </div>
         </div>
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-[26.25rem] bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky top-[54%] h-fit text-gray-500">
+      <div className="w-full md:w-[27.56rem] bg-white flex justify-center p-8 md:p-0">
+         <div className="sticky top-[52%] h-fit text-gray-500">
             <CountdownTimer />
          </div>
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-8rem_0_3.5rem_-1.5rem_rgba(128,128,128,0.4)] flex flex-col">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-12rem_0_5rem_-2.5rem_rgba(128,128,128,0.4)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest">LECTOR</h2>
         </div>

@@ -14,8 +14,8 @@ export function Navigation() {
   const { user, loading } = useUser();
 
   const navLinks = [
-    { href: '/pro', label: 'EXPERTS' },
-    { href: '/user', label: 'USER' },
+    { href: '/pro', label: 'FOR EXPERTS' },
+    { href: '/user', label: 'FOR COMMUNITY' },
     { href: '/blog', label: 'BLOG' },
   ];
 
