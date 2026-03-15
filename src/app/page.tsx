@@ -30,8 +30,10 @@ export default function HomePage() {
     return null;
   };
 
+  const esotericWords = ['таро', 'шаман', 'ретрит', 'рейки', 'астрологія', 'нумерологія'];
+
   return (
-    <div className="flex flex-col md:flex-row min-h-[200vh] w-full">
+    <div className="flex flex-col md:flex-row min-h-[160vh] w-full">
       {/* Left Block */}
       <div className="relative w-full md:w-[68%] bg-white p-4 md:p-8 flex flex-col border-b md:border-b-0 md:border-r border-black/20 overflow-hidden">
         <div className="sticky top-0 z-20 bg-white -m-4 md:-m-8 p-4 md:p-8">
@@ -72,13 +74,22 @@ export default function HomePage() {
       
       {/* Center Block */}
       <div className="w-full md:w-[12%] bg-white flex items-center justify-center p-8 md:p-0">
-         <CountdownTimer />
+         <div className="text-gray-500">
+            <CountdownTimer />
+         </div>
       </div>
 
       {/* Right Block */}
       <div className="w-full md:w-1/5 bg-black relative z-10 shadow-lg md:shadow-[-16px_0px_24px_-16px_rgba(0,0,0,0.5),_-32px_0px_48px_-24px_rgba(0,0,0,0.3)]">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest">LECTOR</h2>
+        </div>
+        <div className="flex justify-center pt-16">
+            <div className="flex flex-col items-center gap-4 text-white text-sm font-thin">
+                {esotericWords.map((word) => (
+                    <span key={word}>{word}</span>
+                ))}
+            </div>
         </div>
       </div>
     </div>
