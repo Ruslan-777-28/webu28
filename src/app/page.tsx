@@ -68,7 +68,7 @@ export default function HomePage() {
                         : 'text-muted-foreground hover:text-foreground'
                       )} />
               </Link>
-              <span className="text-xs text-muted-foreground ml-4">простір обміну цінностями</span>
+              <span className="text-xs text-muted-foreground ml-4">екосистема обміну ціностями</span>
             </div>
           
             <div className="flex items-center gap-4">
@@ -98,7 +98,7 @@ export default function HomePage() {
         {/* Main content area */}
         <div className="flex-grow flex flex-col items-center justify-center pt-8">
             <div className="flex items-start justify-center gap-8 w-full">
-                <div className="relative" style={{ width: '336px', height: '336px' }}>
+                <div className="relative" style={{ width: '443px', height: '443px' }}>
                     <div className="absolute inset-0 rounded-full border border-gray-200" />
                 </div>
                 <div className="flex-shrink-0">
