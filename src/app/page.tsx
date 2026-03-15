@@ -96,26 +96,29 @@ export default function HomePage() {
         </div>
         
         {/* Main content area */}
-        <div className="flex-grow flex flex-col items-center justify-center pt-8">
-            <div className="flex items-start justify-center gap-8 w-full">
-                <div className="relative" style={{ width: '443px', height: '443px' }}>
+        <main className="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
+            <div className="flex flex-col md:flex-row items-center justify-center md:items-start md:gap-8 w-full">
+                {/* Circle */}
+                <div className="relative w-[350px] h-[350px] md:w-[443px] md:h-[443px] flex-shrink-0">
                     <div className="absolute inset-0 rounded-full border border-gray-200" />
                 </div>
-                <div className="flex-shrink-0">
-                    <div className="mt-24 flex flex-col items-center justify-center p-8 text-center">
+                {/* Timer */}
+                <div className="flex-shrink-0 mt-8 md:mt-24">
+                    <div className="flex flex-col items-center justify-center text-center">
                         <p className="text-sm text-muted-foreground mb-2">час=енергія</p>
                         <CountdownTimer />
                         <p className="text-xs text-muted-foreground mt-2">до старту залишилось</p>
                     </div>
                 </div>
             </div>
+             {/* Text Block */}
             <div className="text-center text-sm text-muted-foreground max-w-3xl mt-8">
                 <h2 className="text-2xl font-bold mb-4">ВІДКРИЙ ДОСТУП ДО ЗНАНЬ БЕЗ КОРДОНІВ 24/7</h2>
                 <p className="mb-4">
 Платформа створена для людей, які шукають відповіді на важливі питання про стосунки, життєві рішення, особистий розвиток і власний шлях. Тут можна отримати персональні консультації, нове бачення ситуації та глибші інсайти у зручному форматі спілкування з експертами й практиками з усього світу. Ідея сервісу проста: коли час, компетенція, досвід та знання поєднуються у змістовній розмові, виникає справжня цінність для обох сторін. Платформа відкриває доступ до живої взаємодії без мовних і географічних бар’єрів, допомагає знайти фахівця під конкретний запит і створює простір для глибшого пізнання, підтримки та нових рішень. Це екосистема обміну живою енергією, сенсами та знаннями, де кожна розмова може стати точкою ясності, підтримки й нового напрямку.
                 </p>
             </div>
-        </div>
+        </main>
 
       </div>
       
