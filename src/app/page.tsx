@@ -112,8 +112,8 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-auto bg-white flex justify-center p-8 md:p-0" style={{paddingTop: '20%'}}>
-        <div className="text-center w-56">
+      <div className="w-full md:w-40 bg-white flex justify-center p-8 md:p-0" style={{paddingTop: '34%'}}>
+        <div className="text-center w-full">
           <CountdownTimer />
         </div>
       </div>
@@ -129,7 +129,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="flex-grow flex justify-center pt-24">
-            <div className="flex flex-col items-start gap-y-8 text-white text-sm font-thin w-full px-4 pt-24">
+            <div className="flex flex-col items-start gap-y-12 text-white text-sm font-thin w-full px-4 pt-24">
                 {esotericWords.map(({word, color, margin}) => (
                     <span key={word} className={cn(color, margin)}>{word}</span>
                 ))}
