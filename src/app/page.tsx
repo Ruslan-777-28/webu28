@@ -42,7 +42,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col md:flex-row min-h-[160vh] w-full">
       {/* Left Block */}
-      <div className="relative w-full md:w-[68%] bg-white p-4 md:p-8 flex flex-col border-b md:border-b-0 md:border-r border-black/20 overflow-hidden">
+      <div className="relative w-full md:flex-1 bg-white p-4 md:p-8 flex flex-col border-b md:border-b-0 md:border-r border-black/20 overflow-hidden">
         <div className="sticky top-0 z-20 bg-white -m-4 md:-m-8 p-4 md:p-8">
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -86,7 +86,7 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-auto bg-white flex items-center justify-center p-8 md:p-0">
+      <div className="w-full md:w-24 bg-white flex items-center justify-center p-8 md:p-0">
          <div className="text-gray-500">
             <CountdownTimer />
          </div>
