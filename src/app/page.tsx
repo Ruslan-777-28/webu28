@@ -95,8 +95,9 @@ export default function HomePage() {
           </div>
         </div>
         
-        <div className="relative flex-grow flex flex-col justify-end items-center" style={{paddingTop: '2%', minHeight: 'calc(100vh - 220px)'}}>
-            <div className="relative w-full h-full rounded-full border border-gray-200 flex items-center justify-center">
+        <div className="relative flex-grow flex flex-col justify-center items-center p-4">
+            <div className="relative w-full max-w-[80vh] aspect-square">
+                <div className="absolute inset-0 rounded-full border border-gray-200" />
             </div>
         </div>
             
@@ -111,7 +112,12 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-
+      <div className="w-full md:w-auto bg-white flex justify-center p-8 md:p-0" style={{paddingTop: '20%'}}>
+        <div className="text-center w-64">
+          <CountdownTimer />
+        </div>
+      </div>
+      
       {/* Right Block */}
       <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-1.2582912rem_0_0.50331648rem_-0.25165824rem_rgba(128,128,128,0.15)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
@@ -123,7 +129,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="flex-grow flex justify-center pt-24">
-            <div className="flex flex-col items-start gap-5 text-white text-sm font-thin w-full px-4 pt-8">
+            <div className="flex flex-col items-start gap-5 text-white text-sm font-thin w-full px-4 pt-24">
                 {esotericWords.map(({word, color, margin}) => (
                     <span key={word} className={cn(color, margin)}>{word}</span>
                 ))}
