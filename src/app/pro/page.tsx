@@ -17,23 +17,27 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel";
 import {
+  Activity,
+  Award,
+  BookOpen,
+  Calendar,
   CheckCircle,
-  ChevronRight,
+  ChevronsUp,
   CircleDollarSign,
   File,
   Globe,
+  Handshake,
   Layers,
   Megaphone,
   MessageSquare,
   Package,
+  PenSquare,
   Rocket,
+  ShieldCheck,
   Star,
+  TrendingUp,
   Users,
   Video,
-  Calendar,
-  Zap,
-  Repeat,
-  ShieldCheck,
   Wallet
 } from 'lucide-react';
 import React from 'react';
@@ -125,6 +129,29 @@ const workFormats = [
     { icon: MessageSquare, title: 'Текстова взаємодія', text: 'Формат для тих, хто працює через текст, короткі відповіді або асинхронний контакт.' },
     { icon: File, title: 'Обмін файлами', text: 'Можливість передавати матеріали, розбори, рекомендації чи персональні файли.' },
     { icon: Package, title: 'Цифрові продукти', text: 'Продаж авторських матеріалів, гідів, файлів, практик або інших цифрових форматів.' },
+];
+
+const growthBenefits = [
+    {
+        icon: TrendingUp,
+        title: 'Видимість у категорії',
+        text: 'Зростайте у своїй ніші завдяки активності, якості взаємодії та довірі користувачів.',
+    },
+    {
+        icon: Award,
+        title: 'Репутація, яка працює на вас',
+        text: 'Ваш шлях у платформі формує репутаційну вагу, що підсилює довіру і вибір на вашу користь.',
+    },
+    {
+        icon: ChevronsUp,
+        title: 'Бути серед тих, кого обирають першими',
+        text: 'Професіонал може не просто бути присутнім, а рухатися до сильної позиції у своїй категорії.',
+    },
+    {
+        icon: Activity,
+        title: 'Екосистема, що стимулює розвиток',
+        text: 'Активність, стабільна присутність і якісний сервіс перетворюються на відчутне зростання всередині платформи.',
+    },
 ];
 
 const comparisonPoints = [
@@ -394,8 +421,36 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 7. SECTION “Чому це більше, ніж робота через соцмережі...” */}
+        {/* 7. SECTION: Visibility & Growth */}
         <section className="py-20 bg-background">
+            <div className="container mx-auto px-4">
+                <div className="text-center max-w-3xl mx-auto mb-12">
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                        Ставайте помітними у своїй ніші
+                    </h2>
+                    <p className="text-lg text-muted-foreground">
+                        Платформа враховує активність, якість взаємодії, довіру та результати, формуючи видимість професіонала всередині екосистеми. Це створює простір не лише для монетизації, а й для реального зростання статусу та імені.
+                    </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {growthBenefits.map((benefit, index) => (
+                        <Card key={index} className="text-center border-none shadow-none bg-transparent">
+                            <CardContent className="p-6">
+                                <div className="inline-flex items-center justify-center bg-card rounded-full p-3 mb-4 border">
+                                    <benefit.icon className="h-8 w-8 text-accent" />
+                                </div>
+                                <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
+                                <p className="text-muted-foreground">{benefit.text}</p>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
+
+
+        {/* 8. SECTION “Чому це більше, ніж робота через соцмережі...” */}
+        <section className="py-20 bg-card">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
@@ -409,7 +464,7 @@ export default function ProPage() {
                   Замість розрізнених каналів, випадкових повідомлень і хаотичної присутності в різних сервісах ви отримуєте простір, де профіль, формати взаємодії, публічність і монетизація поєднані в одну зрозумілу систему. Це допомагає виглядати професійніше, працювати спокійніше й вибудовувати довшу довіру з аудиторією.
                 </p>
               </div>
-              <div className="bg-card p-8 rounded-lg shadow-sm border space-y-4">
+              <div className="bg-background p-8 rounded-lg shadow-sm border space-y-4">
                 {comparisonPoints.map((point, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
@@ -421,8 +476,8 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 8. SECTION: Profile Mockup & Personal Brand */}
-        <section className="py-20 bg-card">
+        {/* 9. SECTION: Profile Mockup & Personal Brand */}
+        <section className="py-20 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -433,10 +488,10 @@ export default function ProPage() {
               </p>
             </div>
 
-            <div className="max-w-2xl mx-auto bg-background p-6 sm:p-8 rounded-xl shadow-lg border border-border">
+            <div className="max-w-2xl mx-auto bg-card p-6 sm:p-8 rounded-xl shadow-lg border border-border">
                 <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6">
                     <div className="flex-shrink-0">
-                        <Avatar className="h-24 w-24 border-4 border-background shadow-md">
+                        <Avatar className="h-24 w-24 border-4 border-card shadow-md">
                             <AvatarImage src="https://picsum.photos/seed/expert1/200" alt="Alina Zoryana"/>
                             <AvatarFallback>AZ</AvatarFallback>
                         </Avatar>
@@ -477,8 +532,8 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 9. Professionals Showcase */}
-        <section className="py-20 bg-background">
+        {/* 10. Professionals Showcase */}
+        <section className="py-20 bg-card">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -500,7 +555,7 @@ export default function ProPage() {
                 {professionals.map((pro, index) => (
                   <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
                     <div className="p-1 h-full">
-                      <Card className="h-full flex flex-col items-center text-center p-8 bg-card border-border shadow-sm hover:shadow-lg transition-shadow duration-300">
+                      <Card className="h-full flex flex-col items-center text-center p-8 bg-background border-border shadow-sm hover:shadow-lg transition-shadow duration-300">
                         <Avatar className="h-20 w-20 mb-4 border-2 border-border">
                           <AvatarImage src={pro.avatar} alt={pro.name} />
                           <AvatarFallback>{pro.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
@@ -521,8 +576,8 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 10. SECTION “Монетизація” */}
-        <section className="py-20 bg-card">
+        {/* 11. SECTION “Монетизація” */}
+        <section className="py-20 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -534,10 +589,10 @@ export default function ProPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {monetizationPaths.map((path, index) => (
-                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow bg-background">
+                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow bg-card">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-3">
-                       <div className="bg-card p-2 rounded-lg border">
+                       <div className="bg-background p-2 rounded-lg border">
                           <path.icon className="h-6 w-6 text-accent" />
                        </div>
                       {path.title}
@@ -552,8 +607,8 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 11. FAQ SECTION */}
-        <section className="py-20 bg-background">
+        {/* 12. FAQ SECTION */}
+        <section className="py-20 bg-card">
           <div className="container mx-auto px-4 max-w-3xl">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               Поширені запитання
@@ -573,8 +628,8 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 12. FINAL CTA SECTION */}
-        <section className="py-20 md:py-28 bg-card">
+        {/* 13. FINAL CTA SECTION */}
+        <section className="py-20 md:py-28 bg-background">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Ваші знання вже мають цінність
@@ -590,3 +645,5 @@ export default function ProPage() {
     </>
   );
 }
+
+    
