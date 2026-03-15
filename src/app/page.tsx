@@ -42,9 +42,9 @@ export default function HomePage() {
   return (
     <div className="flex flex-col md:flex-row min-h-[160vh] w-full">
       {/* Left Block */}
-      <div className="relative w-full md:flex-1 bg-white p-4 md:p-8 flex flex-col border-b md:border-b-0 md:border-r border-black/20 overflow-hidden">
-        <div className="sticky top-0 z-20 bg-white -m-4 md:-m-8 p-4 md:p-8">
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
+      <div className="relative w-full md:flex-1 bg-white flex flex-col border-b md:border-b-0 md:border-r border-black/20">
+        <div className="sticky top-0 z-30 bg-white p-4 md:p-8">
+          <div className="relative flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Link href="/" className={cn(pathname === '/' ? 'text-primary' : 'text-muted-foreground')}>
                   <HomeIcon className={cn('h-5 w-5 hover:text-foreground transition-colors')} />
@@ -74,16 +74,17 @@ export default function HomePage() {
           </div>
         </div>
 
-
-        <div className="absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
-        
-        <div className="relative z-10 flex-grow flex flex-col justify-end items-center text-center pb-8">
-            <p className="text-sm text-muted-foreground max-w-2xl mb-4">
+        <div className="relative flex-grow p-4 md:p-8 overflow-hidden">
+            <div className="absolute top-[35%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
+            
+            <div className="relative z-10 h-full flex flex-col justify-end items-center text-center pb-8">
+                <p className="text-sm text-muted-foreground max-w-2xl mb-4">
  Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
-            </p>
-            <p className="text-sm text-muted-foreground max-w-2xl">
+                </p>
+                <p className="text-sm text-muted-foreground max-w-2xl">
   Ідея платформи проста: коли час, компетенція, досвід  та знання об’єднуються у змістовній розмові, виникає справжня цінність для обох сторін. Для користувачів це можливість швидко і зручно звернутися до спеціалістів з усього світу та отримати індивідуальну консультацію. Для практиків — це простір, де можна ділитися своїм досвідом, розвивати особистий бренд і перетворювати знання на стабільну професійну діяльність . 4 типи комунікації з консультацій духовних практик з усіх куточків світу , без мовного бар'єру , 24/7.
-            </p>
+                </p>
+            </div>
         </div>
       </div>
       
@@ -95,11 +96,11 @@ export default function HomePage() {
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-2rem_0_3rem_-1rem_rgba(128,128,128,0.4)]">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-2rem_0_3rem_-1rem_rgba(128,128,128,0.4)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest">LECTOR</h2>
         </div>
-        <div className="flex justify-center pt-16">
+        <div className="flex-grow flex justify-center pt-16">
             <div className="flex flex-col items-start gap-4 text-white text-sm font-thin w-full px-4">
                 {esotericWords.map(({word, color, margin}) => (
                     <span key={word} className={cn(color, margin)}>{word}</span>
