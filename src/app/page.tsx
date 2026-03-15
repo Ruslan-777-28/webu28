@@ -96,22 +96,19 @@ export default function HomePage() {
         </div>
         
         {/* Main content area */}
-        <div className="relative flex-grow flex items-center justify-start" style={{ paddingTop: '0%', minHeight: 'calc(100vh - 220px)' }}>
-            <div className="flex items-center justify-center gap-8 pl-8">
-                <div className="relative" style={{ width: '400px', height: '400px' }}>
+        <div className="relative flex-grow flex items-start justify-start pt-8" style={{ minHeight: 'calc(100vh - 220px)' }}>
+            <div className="flex items-center justify-center gap-8 pl-8 mr-16">
+                <div className="relative" style={{ width: '300px', height: '300px' }}>
                     <div className="absolute inset-0 rounded-full border border-gray-200" />
                 </div>
                 <div className="flex-shrink-0" style={{ width: 'auto' }}>
                     <div className="sticky top-0 z-20 flex h-full flex-col items-center justify-center p-8 text-center" style={{ paddingTop: '2%' }}>
-                        <div className="relative w-32 h-32 mb-4">
-                           <div className="absolute inset-0 rounded-full border border-gray-400" />
-                        </div>
                         <CountdownTimer />
                     </div>
                 </div>
             </div>
 
-            <div className="absolute bottom-0 left-0 right-0 text-center px-8 pb-8" style={{ top: 'calc(50% + 200px + 2rem)', transform: 'translateY(-50%)' }}>
+            <div className="absolute bottom-0 left-0 right-0 text-center px-8 pb-8" style={{ top: 'calc(50% + 150px)', transform: 'translateY(-50%)' }}>
                 <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
                     Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
                 </p>
