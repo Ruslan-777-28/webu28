@@ -131,7 +131,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="flex-grow flex justify-center items-start pt-12">
-            <div className="flex flex-col items-start gap-y-12 text-white text-sm font-thin w-full px-4" style={{paddingTop: '10rem'}}>
+            <div className="flex flex-col items-start gap-y-6 text-white text-sm font-thin w-full px-4" style={{paddingTop: '10rem'}}>
                 {esotericWords.map(({word, color, margin}) => (
                     <span key={word} className={cn(color, margin)}>{word}</span>
                 ))}
