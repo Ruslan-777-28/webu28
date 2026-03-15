@@ -75,15 +75,15 @@ export default function HomePage() {
         </div>
 
         <div className="relative flex-grow p-4 md:p-8 flex flex-col justify-end">
-            <div className="flex-grow flex items-center justify-center">
+            <div className="flex-grow flex items-center justify-center pb-10">
                 <div className="w-[80vmin] max-w-xl h-[80vmin] max-h-xl rounded-full border border-gray-200" />
             </div>
             
             <div className="relative text-center pb-8">
-                <p className="text-sm text-muted-foreground max-w-2xl mb-4">
+                <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
  Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
                 </p>
-                <p className="text-sm text-muted-foreground max-w-2xl">
+                <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
   Ідея платформи проста: коли час, компетенція, досвід  та знання об’єднуються у змістовній розмові, виникає справжня цінність для обох сторін. Для користувачів це можливість швидко і зручно звернутися до спеціалістів з усього світу та отримати індивідуальну консультацію. Для практиків — це простір, де можна ділитися своїм досвідом, розвивати особистий бренд і перетворювати знання на стабільну професійну діяльність . 4 типи комунікації з консультацій духовних практик з усіх куточків світу , без мовного бар'єру , 24/7.
                 </p>
             </div>
