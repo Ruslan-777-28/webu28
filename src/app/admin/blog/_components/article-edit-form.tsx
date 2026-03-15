@@ -177,7 +177,7 @@ export function ArticleEditForm() {
                                         <FormControl>
                                             <SelectTrigger>
                                             <SelectValue placeholder="Select a category" />
-                                            </Trigger>
+                                            </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
                                             <SelectItem value="taro">таро</SelectItem>

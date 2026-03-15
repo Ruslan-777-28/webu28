@@ -98,7 +98,7 @@ export function AllArticlesTable({ showFilters = true }: { showFilters?: boolean
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead padding="checkbox">
+              <TableHead className="px-2 py-1 h-auto">
                 <Checkbox aria-label="Select all" />
               </TableHead>
               <TableHead>Cover</TableHead>
@@ -117,7 +117,7 @@ export function AllArticlesTable({ showFilters = true }: { showFilters?: boolean
           <TableBody>
             {placeholderPosts.map((post) => (
               <TableRow key={post.id}>
-                <TableCell padding="checkbox">
+                <TableCell className="px-2 py-1 h-auto">
                   <Checkbox aria-label={`Select row ${post.id}`} />
                 </TableCell>
                 <TableCell>

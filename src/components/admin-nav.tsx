@@ -51,7 +51,7 @@ export function AdminNav() {
               <Link href={item.href} legacyBehavior passHref>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname.startsWith(item.href)}
+                  isActive={pathname.startsWith(item.href) && (pathname === item.href || (item.href !== '/admin/blog' && pathname.length > item.href.length))}
                   tooltip={item.label}
                 >
                   <a>

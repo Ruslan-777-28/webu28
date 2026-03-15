@@ -41,7 +41,7 @@ export default function BlogSettingsPage() {
 
     function onSubmit(data: SettingsFormValues) {
         console.log(data);
-        // Here you would save the settings to Firestore
+        // Here you would save the settings to Firestore, likely to 'blogSettings/main'
     }
 
     return (
