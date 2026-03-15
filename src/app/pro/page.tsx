@@ -28,6 +28,8 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import Footer from '@/components/layout/footer';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
 const forYouItems = [
     'астролог',
@@ -307,15 +309,59 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 7. SECTION “Особистий бренд і довіра” */}
+        {/* 7. SECTION: Profile Mockup & Personal Brand */}
         <section className="py-20 bg-background">
-          <div className="container mx-auto px-4 max-w-4xl text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Платформа для вашого імені, а не тільки для послуг
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              Ваш профіль — це не просто сторінка. Це простір, де люди бачать ваш стиль, сенси, подачу, матеріали та формат роботи. Тут можна не лише пропонувати консультації, а й формувати власну присутність, яка працює на довіру, впізнаваність і довгострокову цінність.
-            </p>
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Так вас бачитимуть користувачі платформи
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Ваш профіль — це не просто сторінка, а професійна подача вашої експертності, стилю, напрямів роботи та формату взаємодії.
+              </p>
+            </div>
+
+            <div className="max-w-2xl mx-auto bg-card p-6 sm:p-8 rounded-xl shadow-lg border border-border">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6">
+                    <div className="flex-shrink-0">
+                        <Avatar className="h-24 w-24 border-4 border-background shadow-md">
+                            <AvatarImage src="https://picsum.photos/seed/expert1/200" alt="Alina Zoryana"/>
+                            <AvatarFallback>AZ</AvatarFallback>
+                        </Avatar>
+                    </div>
+                    <div className="flex-grow">
+                        <h3 className="text-2xl font-bold text-foreground">Alina Zoryana</h3>
+                        <p className="text-muted-foreground mt-1">Допомагаю знайти відповіді через Таро та астрологію. 10+ років практики.</p>
+                        <div className="flex items-center justify-center sm:justify-start gap-4 mt-3 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1.5">
+                                <Globe className="h-4 w-4" />
+                                Українська, English
+                            </span>
+                            <span className="text-border">|</span>
+                            <div className="flex items-center gap-2">
+                                <span className="relative flex h-2.5 w-2.5">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                                </span>
+                                <span>Online</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="mt-6">
+                    <h4 className="font-semibold text-foreground mb-3">Напрямки:</h4>
+                    <div className="flex flex-wrap gap-2">
+                        <Badge variant="secondary">Таро</Badge>
+                        <Badge variant="secondary">Астрологія</Badge>
+                        <Badge variant="secondary">Нумерологія</Badge>
+                        <Badge variant="secondary">Стосунки</Badge>
+                        <Badge variant="secondary">Карти долі</Badge>
+                    </div>
+                </div>
+                <div className="mt-8 border-t border-border pt-6">
+                     <Button className="w-full" size="lg">Замовити консультацію</Button>
+                </div>
+            </div>
           </div>
         </section>
 
