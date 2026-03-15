@@ -32,6 +32,7 @@ import {
   MessageSquare,
   Package,
   PenSquare,
+  Repeat,
   Rocket,
   ShieldCheck,
   Star,
