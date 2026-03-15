@@ -40,11 +40,11 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="flex flex-col md:flex-row min-h-[160vh] w-full">
+    <div className="flex flex-col md:flex-row min-h-[140vh] w-full">
       {/* Left Block */}
       <div className="relative w-full md:flex-1 bg-white flex flex-col border-b md:border-b-0 md:border-r border-black/20">
         <div className="sticky top-0 z-30 bg-white p-4 md:p-8">
-          <div className="relative flex flex-wrap items-center justify-between gap-4">
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Link href="/" className={cn(pathname === '/' ? 'text-primary' : 'text-muted-foreground')}>
                   <HomeIcon className={cn('h-5 w-5 hover:text-foreground transition-colors')} />
@@ -89,8 +89,8 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-24 bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky top-[40%] h-fit text-gray-500">
+      <div className="w-full md:w-28 bg-white flex justify-center p-8 md:p-0">
+         <div className="sticky top-[55%] h-fit text-gray-500">
             <CountdownTimer />
          </div>
       </div>
