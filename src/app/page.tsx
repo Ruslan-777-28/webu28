@@ -75,7 +75,7 @@ export default function HomePage() {
         </div>
 
 
-        <div className="absolute top-[25%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
+        <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
         
         <div className="relative z-10 flex-grow flex flex-col justify-end items-center text-center pb-8">
             <p className="text-sm text-muted-foreground max-w-2xl">
@@ -93,7 +93,7 @@ export default function HomePage() {
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-1rem_0_1.5rem_-0.5rem_rgba(128,128,128,0.4)]">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest">LECTOR</h2>
         </div>
