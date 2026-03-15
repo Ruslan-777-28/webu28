@@ -31,11 +31,11 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex flex-col md:flex-row min-h-screen w-full">
       {/* Left Block */}
-      <div className="relative w-[68%] bg-white p-8 flex flex-col justify-between border-r border-black/20 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vh] h-[90vh] rounded-full border border-gray-200" />
-        <div className="flex items-center gap-4">
+      <div className="relative w-full md:w-[68%] bg-white p-4 md:p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-black/20 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
+        <div className="flex flex-wrap items-center gap-4">
           <Link href="/" className={cn(pathname === '/' ? 'text-primary' : 'text-muted-foreground')}>
               <HomeIcon className={cn('h-5 w-5 hover:text-foreground transition-colors')} />
           </Link>
@@ -59,19 +59,19 @@ export default function HomePage() {
           </nav>
         </div>
 
-        <div className="flex items-center">
+        <div className="flex items-center mt-4 md:mt-0">
           {renderAuthControl()}
         </div>
       </div>
       
       {/* Center Block */}
-      <div className="w-[12%] bg-white flex items-center justify-center">
+      <div className="w-full md:w-[12%] bg-white flex items-center justify-center p-8 md:p-0">
          <CountdownTimer />
       </div>
 
       {/* Right Block */}
-      <div className="w-1/5 bg-black relative z-10 shadow-[-16px_0px_24px_-16px_rgba(0,0,0,0.5),_-32px_0px_48px_-24px_rgba(0,0,0,0.3)]">
-        <div className="pt-8 text-center">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-lg md:shadow-[-16px_0px_24px_-16px_rgba(0,0,0,0.5),_-32px_0px_48px_-24px_rgba(0,0,0,0.3)]">
+        <div className="p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-base tracking-widest">LECTOR</h2>
         </div>
       </div>
