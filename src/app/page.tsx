@@ -42,7 +42,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col md:flex-row min-h-[100vh] w-full">
       {/* Left Block */}
-      <div className="relative w-full md:flex-1 bg-white flex flex-col border-b md:border-b-0 md:border-r border-black/20">
+      <div className="relative w-full md:flex-1 bg-white flex flex-col border-b md:border-b-0 border-black/20">
         <div className="sticky top-0 z-30 bg-white p-4 md:p-8">
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -74,12 +74,12 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="relative flex-grow p-4 md:p-8 flex flex-col">
-            <div className="flex-grow flex items-center justify-center pb-2">
-                <div className="w-[84vmin] max-w-xl h-[84vmin] max-h-xl rounded-full border border-gray-200" />
+        <div className="relative flex-grow flex flex-col">
+            <div className="flex-grow flex items-center justify-center pb-6">
+                <div className="w-[88.2vmin] max-w-xl h-[88.2vmin] max-h-xl rounded-full border border-gray-200" />
             </div>
             
-            <div className="relative text-center pb-8">
+            <div className="relative text-center px-4 pb-8">
                 <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
  Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
                 </p>
@@ -91,8 +91,8 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-[12.6rem] bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky top-[65%] h-fit text-gray-500">
+      <div className="w-full md:w-[13.23rem] bg-white flex justify-center p-8 md:p-0">
+         <div className="sticky top-[60%] h-fit text-gray-500">
             <CountdownTimer />
          </div>
       </div>
