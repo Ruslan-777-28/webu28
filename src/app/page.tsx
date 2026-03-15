@@ -95,10 +95,8 @@ export default function HomePage() {
           </div>
         </div>
         
-        <div className="relative flex-grow flex flex-col justify-end items-center" style={{paddingTop: 'calc(3% + 3%)', minHeight: 'calc(100vh - 220px)'}}>
-            <div className="relative w-[174.3583545vmin] max-w-[calc(2.2rem+73.92726rem)] h-[174.3583545vmin] max-h-[calc(2.2rem+73.92726rem)] rounded-full border border-gray-200 flex items-center justify-center">
-                <div className="w-[80%] h-[80%] rounded-full border border-gray-200 flex items-center justify-center">
-                </div>
+        <div className="relative flex-grow flex flex-col justify-end items-center" style={{paddingTop: 'calc(26% + 3% + 3%)', minHeight: 'calc(100vh - 220px)'}}>
+            <div className="relative w-[156.92251905vmin] max-w-[calc(1.98rem+66.534534rem)] h-[156.92251905vmin] max-h-[calc(1.98rem+66.534534rem)] rounded-full border border-gray-200 flex items-center justify-center">
             </div>
         </div>
             
@@ -120,7 +118,7 @@ export default function HomePage() {
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-1.96608rem_0_0.786432rem_-0.393216rem_rgba(128,128,128,0.15)] flex flex-col">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-1.572864rem_0_0.6291456rem_-0.3145728rem_rgba(128,128,128,0.15)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest underline decoration-purple-500 underline-offset-4">LECTOR</h2>
           <div className="mt-4">
