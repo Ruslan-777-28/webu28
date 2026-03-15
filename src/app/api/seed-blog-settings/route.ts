@@ -1,23 +1,25 @@
 import { NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
+import type { BlogSettings } from '@/lib/types';
 
-const blogSettingsData = {
-  blogPageTitle: "Blog",
-  blogPageSubtitle: "Insights, articles, and guidance",
-  heroDescription: "Explore articles, ideas, and expert materials from the platform ecosystem.",
-  heroPrimaryCtaLabel: "Read Articles",
+const blogSettingsData: BlogSettings = {
+  blogPageTitle: "Блог про духовні практики",
+  blogPageSubtitle: "Ідеї, практики, аналітика, поради та матеріали, які допомагають краще зрозуміти себе, знайти фахівця, інструмент або рішення.",
+  heroDescription: "Досліджуйте статті, ідеї та експертні матеріали з екосистеми платформи.",
+  heroPrimaryCtaLabel: "Читати статті",
   heroPrimaryCtaLink: "/blog",
-  heroSecondaryCtaLabel: "Explore Categories",
+  heroSecondaryCtaLabel: "Оглянути категорії",
   heroSecondaryCtaLink: "/blog#categories",
-  featuredSectionTitle: "Featured",
-  latestSectionTitle: "Latest Articles",
-  popularSectionTitle: "Popular",
-  categoriesSectionTitle: "Categories",
-  authorsSectionTitle: "Authors",
-  subscribeTitle: "Stay Updated",
-  subscribeDescription: "Get updates about new articles and featured content.",
-  seoTitle: "Blog",
-  seoDescription: "Articles, insights, and expert content from our platform.",
+  featuredSectionTitle: "Рекомендоване",
+  latestSectionTitle: "Останні статті",
+  popularSectionTitle: "Найпопулярніше",
+  categoriesSectionTitle: "Категорії",
+  authorsSectionTitle: "Автори",
+  subscribeTitle: "Будьте в курсі",
+  subscribeDescription: "Отримуйте оновлення про нові статті та рекомендований контент.",
+  seoTitle: "Блог про духовні практики | AWE28",
+  seoDescription: "Все про таро, астрологію, нумерологію та інші духовні практики.",
+  ogImageUrl: "",
   canonicalUrl: "/blog",
   articlesPerPage: 9,
   defaultSort: "latest",
@@ -25,15 +27,16 @@ const blogSettingsData = {
   showPopularSection: true,
   showCategoriesSection: true,
   showAuthorsSection: false,
-  showSubscribeBlock: true
+  showSubscribeBlock: true,
+  categories: ['таро', 'астрологія', 'шаман', 'ретрит', 'гадання', 'нумерологія', 'практики', 'поради', 'аналітика'],
+  tags: ['самопізнання', 'стосунки', 'кар\'єра', 'енергія', 'медитація', 'майбутнє'],
 };
+
 
 export async function POST() {
     try {
         const ref = adminDb.collection('blogSettings').doc('main');
         
-        // Using set with merge: true makes the operation idempotent.
-        // It will create the document if it doesn't exist, or update it if it does.
         await ref.set(blogSettingsData, { merge: true });
         
         return NextResponse.json({ success: true, message: 'Successfully seeded blogSettings/main document!' });

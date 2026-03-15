@@ -6,32 +6,38 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import type { BlogPost } from '@/lib/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 
 const articleSchema = z.object({
-    // Content
+    // Core Content
     title: z.string().min(1, "Title is required"),
     slug: z.string().min(1, "Slug is required"),
     excerpt: z.string().optional(),
     content: z.string().optional(),
-    categoryId: z.string().min(1, "Category is required"),
-    
-    // SEO
-    seoTitle: z.string().optional(),
-    seoDescription: z.string().optional(),
     
     // Media
     coverImageUrl: z.string().url().optional().or(z.literal('')),
     coverAlt: z.string().optional(),
-    
-    // Settings
-    status: z.enum(['draft', 'published', 'scheduled']),
+
+    // Taxonomy
+    category: z.string().min(1, "Category is required"),
+    tags: z.string().optional(), // Comma-separated tags
+
+    // Status & Visibility
+    status: z.enum(['draft', 'published', 'scheduled', 'archived']),
     featured: z.boolean(),
+    pinned: z.boolean(),
+
+    // SEO
+    seoTitle: z.string().optional(),
+    seoDescription: z.string().optional(),
+    noindex: z.boolean(),
+    nofollow: z.boolean(),
 });
 
 type ArticleFormValues = z.infer<typeof articleSchema>;
@@ -41,18 +47,27 @@ const defaultValues: Partial<ArticleFormValues> = {
     slug: '',
     status: 'draft',
     featured: false,
+    pinned: false,
+    noindex: false,
+    nofollow: false,
 };
 
-export function ArticleEditForm() {
+export function ArticleEditForm({ initialData }: { initialData?: Partial<ArticleFormValues>}) {
     const form = useForm<ArticleFormValues>({
         resolver: zodResolver(articleSchema),
-        defaultValues,
+        defaultValues: initialData || defaultValues,
         mode: "onChange",
     });
 
      function onSubmit(data: ArticleFormValues) {
-        console.log(data);
-        // Here you would save the article to Firestore
+        // In a real app, you would add authorId, authorName, contentType
+        // and handle timestamps before saving to Firestore.
+        const postData = {
+            ...data,
+            tags: data.tags?.split(',').map(tag => tag.trim()).filter(Boolean),
+            contentType: 'blog',
+        };
+        console.log(postData);
     }
 
     return (
@@ -114,7 +129,7 @@ export function ArticleEditForm() {
                             </CardContent>
                         </Card>
                          <Card>
-                            <CardHeader><CardTitle>SEO</CardTitle></CardHeader>
+                            <CardHeader><CardTitle>SEO & Social</CardTitle></CardHeader>
                             <CardContent className="space-y-4">
                                  <FormField
                                     control={form.control}
@@ -138,6 +153,32 @@ export function ArticleEditForm() {
                                         </FormItem>
                                     )}
                                 />
+                                <div className="flex gap-8">
+                                    <FormField
+                                        control={form.control}
+                                        name="noindex"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center gap-2 space-y-0">
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <FormLabel>No Index</FormLabel>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="nofollow"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center gap-2 space-y-0">
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <FormLabel>No Follow</FormLabel>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                             </CardContent>
                         </Card>
                     </div>
@@ -161,31 +202,7 @@ export function ArticleEditForm() {
                                             <SelectItem value="draft">Draft</SelectItem>
                                             <SelectItem value="published">Published</SelectItem>
                                             <SelectItem value="scheduled">Scheduled</SelectItem>
-                                        </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                    )}
-                                />
-                                 <FormField
-                                    control={form.control}
-                                    name="categoryId"
-                                    render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Category</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                            <SelectValue placeholder="Select a category" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="taro">таро</SelectItem>
-                                            <SelectItem value="astrology">астрологія</SelectItem>
-                                            <SelectItem value="shaman">шаман</SelectItem>
-                                            <SelectItem value="retreat">ретрит</SelectItem>
-                                            <SelectItem value="divination">гадання</SelectItem>
-                                            <SelectItem value="numerology">нумерологія</SelectItem>
+                                            <SelectItem value="archived">Archived</SelectItem>
                                         </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -199,7 +216,20 @@ export function ArticleEditForm() {
                                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                                             <div className="space-y-0.5">
                                                 <FormLabel>Featured Article</FormLabel>
-                                                <FormDescription>Show this article in the featured section.</FormDescription>
+                                            </div>
+                                            <FormControl>
+                                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="pinned"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                            <div className="space-y-0.5">
+                                                <FormLabel>Pinned Article</FormLabel>
                                             </div>
                                             <FormControl>
                                                 <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -208,6 +238,49 @@ export function ArticleEditForm() {
                                     )}
                                 />
                             </CardContent>
+                        </Card>
+                         <Card>
+                            <CardHeader><CardTitle>Taxonomy</CardTitle></CardHeader>
+                             <CardContent className="space-y-4">
+                                 <FormField
+                                    control={form.control}
+                                    name="category"
+                                    render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Category</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                            <SelectValue placeholder="Select a category" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {/* In a real app, these would be fetched from blogSettings/main */}
+                                            <SelectItem value="таро">таро</SelectItem>
+                                            <SelectItem value="астрологія">астрологія</SelectItem>
+                                            <SelectItem value="шаман">шаман</SelectItem>
+                                            <SelectItem value="ретрит">ретрит</SelectItem>
+                                            <SelectItem value="гадання">гадання</SelectItem>
+                                            <SelectItem value="нумерологія">нумерологія</SelectItem>
+                                        </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="tags"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Tags</FormLabel>
+                                            <FormControl><Input placeholder="tag1, tag2, tag3" {...field} /></FormControl>
+                                            <FormDescription>Comma-separated values.</FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                             </CardContent>
                         </Card>
                          <Card>
                             <CardHeader><CardTitle>Media</CardTitle></CardHeader>

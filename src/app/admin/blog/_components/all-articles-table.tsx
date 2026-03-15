@@ -17,64 +17,79 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, ArrowUpDown } from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
 import Image from 'next/image';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { BlogPost } from '@/lib/types';
 import { Input } from '@/components/ui/input';
+import Link from 'next/link';
 
+// Updated placeholder data to match the new BlogPost type
 const placeholderPosts: BlogPost[] = [
   {
     id: '1',
+    contentType: 'blog',
     title: 'Як читати карти Таро: Посібник для початківців',
     slug: 'yak-chitati-karti-taro',
     excerpt: 'Відкрийте для себе світ Таро та навчіться...',
     status: 'published',
-    author: { name: 'Олена П.' },
-    category: { id: '1', name: 'таро' },
+    authorId: 'user1',
+    authorName: 'Олена П.',
+    category: 'таро',
     featured: true,
     publishedAt: '2024-07-15',
     updatedAt: '2024-07-16',
     coverImageUrl: 'https://picsum.photos/seed/taro1/80/45',
+    createdAt: new Date('2024-07-15').toISOString(),
   },
   {
     id: '2',
+    contentType: 'blog',
     title: 'Астрологічний прогноз на серпень 2024',
     slug: 'astrologichniy-prognoz-serpen-2024',
     excerpt: 'Що зірки готують для вашого знаку зодіаку...',
     status: 'published',
-    author: { name: 'Максим К.' },
-    category: { id: '2', name: 'астрологія' },
+    authorId: 'user2',
+    authorName: 'Максим К.',
+    category: 'астрологія',
     featured: false,
     publishedAt: '2024-07-14',
     updatedAt: '2024-07-14',
     coverImageUrl: 'https://picsum.photos/seed/astro1/80/45',
+    createdAt: new Date('2024-07-14').toISOString(),
   },
   {
     id: '3',
+    contentType: 'blog',
     title: 'Сила шаманських практик',
     slug: 'sila-shamanskih-praktik',
     excerpt: 'Подорож до витоків давніх знань...',
     status: 'draft',
-    author: { name: 'Анонім' },
-    category: { id: '3', name: 'шаман' },
+    authorId: 'user3',
+    authorName: 'Анонім',
+    category: 'шаман',
     featured: false,
-    publishedAt: '',
+    publishedAt: null,
     updatedAt: '2024-07-12',
     coverImageUrl: 'https://picsum.photos/seed/shaman1/80/45',
+    createdAt: new Date('2024-07-12').toISOString(),
   },
    {
     id: '4',
+    contentType: 'blog',
     title: 'Цифрова нумерологія: значення чисел',
     slug: 'cifrova-numerologiya',
     excerpt: 'Як дата народження та ім\'я впливають на вашу долю...',
     status: 'scheduled',
-    author: { name: 'Ірина В.' },
-    category: { id: '4', name: 'нумерологія' },
+    authorId: 'user4',
+    authorName: 'Ірина В.',
+    category: 'нумерологія',
     featured: false,
     publishedAt: '2024-08-01',
     updatedAt: '2024-07-10',
     coverImageUrl: 'https://picsum.photos/seed/numero1/80/45',
+    scheduledAt: '2024-08-01',
+    createdAt: new Date('2024-07-10').toISOString(),
   },
 ];
 
@@ -102,15 +117,12 @@ export function AllArticlesTable({ showFilters = true }: { showFilters?: boolean
                 <Checkbox aria-label="Select all" />
               </TableHead>
               <TableHead>Cover</TableHead>
-              <TableHead>
-                Title
-              </TableHead>
+              <TableHead>Title</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Category</TableHead>
+              <TableHead>Author</TableHead>
               <TableHead>Featured</TableHead>
-              <TableHead>
-                Published
-              </TableHead>
+              <TableHead>Last Updated</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -121,7 +133,7 @@ export function AllArticlesTable({ showFilters = true }: { showFilters?: boolean
                   <Checkbox aria-label={`Select row ${post.id}`} />
                 </TableCell>
                 <TableCell>
-                    <Image src={post.coverImageUrl} alt={post.title} width={80} height={45} className="rounded-md object-cover" />
+                    {post.coverImageUrl && <Image src={post.coverImageUrl} alt={post.title} width={80} height={45} className="rounded-md object-cover" />}
                 </TableCell>
                 <TableCell className="font-medium">{post.title}</TableCell>
                 <TableCell>
@@ -131,8 +143,9 @@ export function AllArticlesTable({ showFilters = true }: { showFilters?: boolean
                     </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline">{post.category.name}</Badge>
+                  <Badge variant="outline">{post.category}</Badge>
                 </TableCell>
+                <TableCell>{post.authorName}</TableCell>
                 <TableCell>
                   {post.featured ? (
                     <Badge variant="secondary">Yes</Badge>
@@ -141,7 +154,7 @@ export function AllArticlesTable({ showFilters = true }: { showFilters?: boolean
                   )}
                 </TableCell>
                 <TableCell>
-                  {post.status === 'published' || post.status === 'scheduled' ? post.publishedAt : '-'}
+                  {new Date(post.updatedAt).toLocaleDateString()}
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -153,7 +166,9 @@ export function AllArticlesTable({ showFilters = true }: { showFilters?: boolean
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
+                      <Link href={`/admin/blog/articles/${post.id}`} passHref>
+                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                      </Link>
                       <DropdownMenuItem>Preview</DropdownMenuItem>
                       <DropdownMenuItem>Duplicate</DropdownMenuItem>
                       <DropdownMenuSeparator />
