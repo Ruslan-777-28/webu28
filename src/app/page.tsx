@@ -96,7 +96,7 @@ export default function HomePage() {
         </div>
         
         <div className="relative flex-grow flex flex-col justify-end items-center" style={{paddingTop: '2%', minHeight: 'calc(100vh - 220px)'}}>
-            <div className="relative w-[106.2vmin] max-w-[49.3rem] h-[106.2vmin] max-h-[49.3rem] rounded-full border border-gray-200 flex items-center justify-center">
+            <div className="relative w-[68vmin] max-w-[31.5rem] h-[68vmin] max-h-[31.5rem] rounded-full border border-gray-200 flex items-center justify-center">
             </div>
         </div>
             
@@ -112,7 +112,7 @@ export default function HomePage() {
       
       {/* Center Block */}
       <div className="w-full md:w-auto bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky h-fit text-gray-500" style={{top: 'calc(23% + 3%)'}}>
+         <div className="sticky h-fit text-gray-500" style={{top: '44%'}}>
             <CountdownTimer />
          </div>
       </div>
@@ -127,7 +127,7 @@ export default function HomePage() {
             </Button>
           </div>
         </div>
-        <div className="flex-grow flex justify-center pt-8">
+        <div className="flex-grow flex justify-center pt-16">
             <div className="flex flex-col items-start gap-5 text-white text-sm font-thin w-full px-4">
                 {esotericWords.map(({word, color, margin}) => (
                     <span key={word} className={cn(color, margin)}>{word}</span>
