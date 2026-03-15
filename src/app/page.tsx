@@ -51,7 +51,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col md:flex-row min-h-[100vh] w-full">
       {/* Left Block */}
-      <div className="relative w-full md:flex-grow md:min-w-0 bg-white flex flex-col md:pr-24" style={{ width: '80%' }}>
+      <div className="relative w-full md:flex-grow md:min-w-0 bg-white flex flex-col md:pr-12" style={{ flexBasis: '85%' }}>
         <div className="sticky top-0 z-30 bg-white p-4 md:p-8">
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -96,23 +96,31 @@ export default function HomePage() {
         </div>
         
         {/* Main content area */}
-        <div className="flex-grow flex flex-col items-center justify-start pt-8">
-          <div className="flex items-center justify-center gap-8">
-            <div className="relative w-full max-w-md aspect-square">
-              <div className="absolute inset-0 rounded-full border border-gray-200" />
+        <div className="relative flex-grow flex items-center justify-start" style={{ paddingTop: '0%', minHeight: 'calc(100vh - 220px)' }}>
+            <div className="flex items-center justify-center gap-8 pl-8">
+                <div className="relative" style={{ width: '400px', height: '400px' }}>
+                    <div className="absolute inset-0 rounded-full border border-gray-200" />
+                </div>
+                <div className="flex-shrink-0" style={{ width: 'auto' }}>
+                    <div className="sticky top-0 z-20 flex h-full flex-col items-center justify-center p-8 text-center" style={{ paddingTop: '2%' }}>
+                        <div className="relative w-32 h-32 mb-4">
+                           <div className="absolute inset-0 rounded-full border border-gray-400" />
+                        </div>
+                        <CountdownTimer />
+                    </div>
+                </div>
             </div>
-            <CountdownTimer />
-          </div>
 
-          <div className="relative text-center px-4 pb-8 pt-4">
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
-                Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
-            </p>
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-                Ідея платформи проста: коли час, компетенція, досвід  та знання об’єднуються у змістовній розмові, виникає справжня цінність для обох сторін. Для користувачів це можливість швидко і зручно звернутися до спеціалістів з усього світу та отримати індивідуальну консультацію. Для практиків — це простір, де можна ділитися своїм досвідом, розвивати особистий бренд і перетворювати знання на стабільну професійну діяльність . 4 типи комунікації з консультацій духовних практик з усіх куточків світу , без мовного бар'єру , 24/7.
-            </p>
-          </div>
+            <div className="absolute bottom-0 left-0 right-0 text-center px-8 pb-8" style={{ top: 'calc(50% + 200px + 2rem)', transform: 'translateY(-50%)' }}>
+                <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
+                    Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
+                </p>
+                <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+                    Ідея платформи проста: коли час, компетенція, досвід  та знання об’єднуються у змістовній розмові, виникає справжня цінність для обох сторін. Для користувачів це можливість швидко і зручно звернутися до спеціалістів з усього світу та отримати індивідуальну консультацію. Для практиків — це простір, де можна ділитися своїм досвідом, розвивати особистий бренд і перетворювати знання на стабільну професійну діяльність . 4 типи комунікації з консультацій духовних практик з усіх куточків світу , без мовного бар'єру , 24/7.
+                </p>
+            </div>
         </div>
+
       </div>
       
       {/* Right Block */}
@@ -126,7 +134,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="flex-grow flex justify-center items-start pt-12">
-            <div className="flex flex-col items-start gap-y-12 text-white text-sm font-thin w-full px-4" style={{paddingTop: '5rem'}}>
+            <div className="flex flex-col items-start gap-y-12 text-white text-sm font-thin w-full px-4" style={{paddingTop: '10rem'}}>
                 {esotericWords.map(({word, color, margin}) => (
                     <span key={word} className={cn(color, margin)}>{word}</span>
                 ))}
