@@ -85,6 +85,7 @@ export function Navigation() {
         </div>
 
       <div className="flex items-center">
+        <span className="mr-2 text-sm font-thin tracking-widest uppercase text-foreground">LECTOR</span>
         {renderAuthControl()}
       </div>
     </div>
