@@ -38,23 +38,20 @@ service cloud.firestore {
     match /users/{uid} {
       allow get, list: if isSignedIn();
       allow create: if isSelf(uid);
-      // Only Admin can change roles. Others can update their own profile.
+      // Only Admin can change roles. Others can update their own profile but not roles.
       allow update: if (isSelf(uid) && request.resource.data.roles == resource.data.roles) || isAdmin();
       allow delete: if isAdmin();
     }
 
     // ---------- Posts (Blog and other types) ----------
     match /posts/{postId} {
-        // Public can read published blog posts, and any non-blog posts (maintaining original open access for them)
+        // Public can list posts. Get is more restrictive. Staff can get any post.
+        allow list: if true;
         allow get: if (resource.data.contentType == 'blog' && resource.data.status == 'published')
-                    || (resource.data.get('contentType', 'blog') != 'blog');
+                    || (resource.data.get('contentType', 'blog') != 'blog')
+                    || isAuthor();
         
-        allow list: if true; 
-
-        // Staff can read any post for the admin panel. Public can read published.
-        allow read: if isAuthor() || (resource.data.contentType == 'blog' && resource.data.status == 'published');
-        
-        // Authors can create posts
+        // Authors can create posts for themselves.
         allow create: if isAuthor() && request.resource.data.authorId == request.auth.uid;
 
         // Authors can update their own posts. Editors/Admins can update any post.
@@ -67,7 +64,7 @@ service cloud.firestore {
         match /comments/{commentId} {
             allow read: if true;
             allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
-            allow update: if false;
+            allow update: if false; // Comments are immutable
             allow delete: if isSignedIn() && (resource.data.uid == request.auth.uid || isModerator());
         }
     }
@@ -94,7 +91,7 @@ service cloud.firestore {
         allow write: if isEditor();
     }
 
-    // ---------- Other App-Specific Collections (from original rules) ----------
+    // ---------- Other App-Specific Collections (Kept from original rules) ----------
     match /notifications/{notificationId} {
       allow read: if isSelf(resource.data.uid);
       allow write: if false;
@@ -113,7 +110,7 @@ service cloud.firestore {
     match /communicationOffers/{offerId} {
       allow get, list: if isSignedIn();
       allow create: if isSelf(request.resource.data.ownerId);
-      allow update, delete: if isSelf(resource.data.authorId);
+      allow update, delete: if isSelf(resource.data.ownerId);
     }
 
     match /communicationRequests/{requestId} {
