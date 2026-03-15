@@ -19,20 +19,28 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Button } from './ui/button';
+import { useUser } from '@/hooks/use-auth';
 
-const navItems = [
-  { href: '/admin/blog', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/blog/articles', label: 'Articles', icon: Newspaper },
-  { href: '/admin/blog/categories', label: 'Categories', icon: Folder },
-  // { href: '/admin/blog/tags', label: 'Tags', icon: Tags },
-  // { href: '/admin/blog/authors', label: 'Authors', icon: Users },
-  { href: '/admin/blog/settings', label: 'Settings', icon: Settings },
+const allNavItems = [
+  { href: '/admin/blog', label: 'Dashboard', icon: LayoutDashboard, roles: ['author', 'editor', 'admin'] },
+  { href: '/admin/blog/articles', label: 'Articles', icon: Newspaper, roles: ['author', 'editor', 'admin'] },
+  { href: '/admin/blog/categories', label: 'Categories', icon: Folder, roles: ['editor', 'admin'] },
+  // { href: '/admin/blog/tags', label: 'Tags', icon: Tags, roles: ['editor', 'admin'] },
+  // { href: '/admin/blog/authors', label: 'Authors', icon: Users, roles: ['editor', 'admin'] },
+  { href: '/admin/blog/settings', label: 'Settings', icon: Settings, roles: ['admin'] },
 ];
 
 export function AdminNav() {
   const pathname = usePathname();
   const { isMobile } = useSidebar();
+  const { profile } = useUser();
+
+  const hasRole = (allowedRoles: string[]): boolean => {
+    if (!profile?.roles) return false;
+    return allowedRoles.some(role => profile.roles[role as keyof typeof profile.roles]);
+  };
+
+  const visibleNavItems = allNavItems.filter(item => hasRole(item.roles));
 
   return (
     <>
@@ -46,7 +54,7 @@ export function AdminNav() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <SidebarMenuItem key={item.href}>
               <Link href={item.href} legacyBehavior passHref>
                 <SidebarMenuButton

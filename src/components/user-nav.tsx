@@ -36,6 +36,8 @@ export function UserNav() {
     return null;
   }
 
+  const canAccessAdmin = profile.adminAccess?.panelEnabled;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -62,11 +64,13 @@ export function UserNav() {
               Профіль
             </DropdownMenuItem>
           </Link>
-          <Link href="/admin/blog">
-            <DropdownMenuItem className="cursor-pointer">
-              Адмін панель
-            </DropdownMenuItem>
-          </Link>
+          {canAccessAdmin && (
+            <Link href="/admin/blog">
+              <DropdownMenuItem className="cursor-pointer">
+                Адмін панель
+              </DropdownMenuItem>
+            </Link>
+          )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">

@@ -94,7 +94,18 @@ export type UserProfile = {
   uid: string;
   name: string;
   email: string;
-  role?: 'admin' | 'editor' | 'author' | 'user';
+  roles: {
+    user: boolean;
+    expert: boolean;
+    author: boolean;
+    editor: boolean;
+    moderator: boolean;
+    admin: boolean;
+  };
+  adminAccess: {
+    isStaff: boolean;
+    panelEnabled: boolean;
+  };
   bio?: string;
   avatarUrl?: string;
   preferredLanguage?: string;

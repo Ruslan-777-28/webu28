@@ -12,150 +12,157 @@ service cloud.firestore {
     function isSelf(uid) {
       return isSignedIn() && request.auth.uid == uid;
     }
-
-    function getUserData(uid) {
-      return get(/databases/$(database)/documents/users/$(uid)).data;
+    
+    // Claim-based helpers
+    function hasClaim(claim) {
+      return isSignedIn() && request.auth.token[claim] == true;
     }
 
     function isAdmin() {
-      // check for role field to avoid errors on documents without it
-      return isSignedIn() && 'role' in getUserData(request.auth.uid) && getUserData(request.auth.uid).role == 'admin';
+      return hasClaim('admin');
     }
 
     function isEditor() {
-      return isSignedIn() && 'role' in getUserData(request.auth.uid) && (getUserData(request.auth.uid).role == 'editor' || isAdmin());
+      return isAdmin() || hasClaim('editor');
     }
-
+    
     function isAuthor() {
-      return isSignedIn() && 'role' in getUserData(request.auth.uid) && (getUserData(request.auth.uid).role == 'author' || isEditor());
+      return isEditor() || hasClaim('author');
     }
 
+    function isModerator() {
+      return isAdmin() || hasClaim('moderator');
+    }
+    
     // ---------- Users ----------
     match /users/{uid} {
       allow get, list: if isSignedIn();
       allow create: if isSelf(uid);
-      // User can update their own profile, but not their role. Admin can update anything.
-      allow update: if (isSelf(uid) && request.resource.data.role == resource.data.role) || isAdmin();
-      allow delete: if false;
+      // Only Admin can change roles. Others can update their own profile.
+      allow update: if (isSelf(uid) && request.resource.data.roles == resource.data.roles) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ---------- Posts (Blog and other types) ----------
+    match /posts/{postId} {
+        // Public can read published blog posts, and any non-blog posts (maintaining original open access for them)
+        allow get: if (resource.data.contentType == 'blog' && resource.data.status == 'published')
+                    || (resource.data.get('contentType', 'blog') != 'blog');
+        
+        allow list: if true; 
+
+        // Staff can read any post for the admin panel. Public can read published.
+        allow read: if isAuthor() || (resource.data.contentType == 'blog' && resource.data.status == 'published');
+        
+        // Authors can create posts
+        allow create: if isAuthor() && request.resource.data.authorId == request.auth.uid;
+
+        // Authors can update their own posts. Editors/Admins can update any post.
+        allow update: if (isAuthor() && resource.data.authorId == request.auth.uid) || isEditor();
+
+        // Editors/Admins can delete posts.
+        allow delete: if isEditor();
+
+        // Comments subcollection
+        match /comments/{commentId} {
+            allow read: if true;
+            allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+            allow update: if false;
+            allow delete: if isSignedIn() && (resource.data.uid == request.auth.uid || isModerator());
+        }
     }
 
     // ---------- Products ----------
     match /products/{productId} {
       allow get, list: if true;
-      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.authorId == request.auth.uid;
+      allow create, update, delete: if isEditor();
     }
 
-    // ---------- Notifications ----------
+    // ---------- Config Collections ----------
+    match /blogSettings/{docId} {
+      allow read: if true;
+      allow write: if isEditor();
+    }
+
+    match /siteSettings/{docId} {
+      allow read: if true;
+      allow write: if isEditor();
+    }
+
+    match /sitePages/{docId} {
+        allow read: if true;
+        allow write: if isEditor();
+    }
+
+    // ---------- Other App-Specific Collections (from original rules) ----------
     match /notifications/{notificationId} {
-      allow read: if isSignedIn() && resource.data.uid == request.auth.uid;
-      allow create, update, delete: if false;
+      allow read: if isSelf(resource.data.uid);
+      allow write: if false;
     }
 
-    // ---------- Wallet Ledger ----------
     match /walletLedger/{txId} {
-      allow get, list: if isSignedIn() && resource.data.uid == request.auth.uid;
-      allow create, update, delete: if false;
+      allow get, list: if isSelf(resource.data.uid);
+      allow write: if false;
     }
 
-    // ---------- Wallet Holds ----------
     match /walletHolds/{holdId} {
-      allow read: if isSignedIn() && resource.data.uid == request.auth.uid;
-      allow create, update, delete: if false;
+      allow read: if isSelf(resource.data.uid);
+      allow write: if false;
     }
 
-    // ---------- Communication Offers ----------
     match /communicationOffers/{offerId} {
       allow get, list: if isSignedIn();
-      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.authorId == request.auth.uid;
+      allow create: if isSelf(request.resource.data.ownerId);
+      allow update, delete: if isSelf(resource.data.authorId);
     }
 
-    // ---------- Communication Requests & Messages ----------
     match /communicationRequests/{requestId} {
       function isParticipant() {
         return isSignedIn() && (
-          resource.data.initiatorId == request.auth.uid || 
-          resource.data.authorId == request.auth.uid
+          isSelf(resource.data.initiatorId) || 
+          isSelf(resource.data.authorId)
         );
       }
-      
       allow read: if isParticipant();
-      allow create, update, delete: if false;
+      allow write: if false;
 
       match /messages/{messageId} {
-        allow read: if isSignedIn() && (
-          get(/databases/$(database)/documents/communicationRequests/$(requestId)).data.initiatorId == request.auth.uid || 
-          get(/databases/$(database)/documents/communicationRequests/$(requestId)).data.authorId == request.auth.uid
-        );
-        allow create, update, delete: if false;
+        allow read: if isParticipant();
+        allow write: if false;
       }
     }
 
-    // ---------- Posts ----------
-    match /posts/{postId} {
-      allow get, list: if true;
-
-      function isPostAuthor() {
-        return isSignedIn() && resource.data.authorId == request.auth.uid;
-      }
-
-      function isNewPostAuthor() {
-        return isSignedIn() && request.resource.data.authorId == request.auth.uid;
-      }
-
-      allow create: if isNewPostAuthor() && (request.resource.data.contentType != 'blog' || isAuthor());
-      allow update, delete: if isPostAuthor() || (resource.data.contentType == 'blog' && isEditor());
-
-      match /comments/{commentId} {
-        allow read: if true;
-        allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
-        allow update: if false;
-        allow delete: if isSignedIn() && request.resource.data.uid == request.auth.uid;
-      }
-    }
-
-    // ---------- Favorites ----------
     match /favorites/{favoriteId} {
       allow read: if isSignedIn();
-      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow create: if isSelf(request.resource.data.uid);
+      allow delete: if isSelf(resource.data.uid);
       allow update: if false;
     }
 
-    // ---------- Likes ----------
     match /likes/{likeId} {
       allow read: if isSignedIn();
-      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow create: if isSelf(request.resource.data.uid);
+      allow delete: if isSelf(resource.data.uid);
       allow update: if false;
     }
 
-    // ---------- Calls & Translations ----------
     match /calls/{callId} {
       function isCallParticipant() {
         return isSignedIn() && (
-          resource.data.callerId == request.auth.uid || 
-          resource.data.receiverId == request.auth.uid
+          isSelf(resource.data.callerId) || 
+          isSelf(resource.data.receiverId)
         );
       }
       allow read: if isCallParticipant();
-      allow create, update, delete: if false;
+      allow write: if false;
     }
 
     match /callTranslations/{callId} {
-      // Тимчасово дозволяємо доступ для всіх автентифікованих користувачів для тестування Batch 3.2
       allow read, write: if isSignedIn();
-
       match /segments/{segmentId} {
         allow read: if isSignedIn();
-        allow write: if false; // Запис лише через серверний API /api/translation/segment
+        allow write: if false;
       }
-    }
-    
-    match /blogSettings/{docId} {
-      allow read: if true;
-      allow write: if isAdmin();
     }
     
     match /{document=**} {

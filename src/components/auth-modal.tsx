@@ -92,6 +92,18 @@ export function AuthModal({ setOpen }: { setOpen?: (open: boolean) => void }) {
               status: 'available',
               until: null,
           },
+          roles: {
+            user: true,
+            expert: false,
+            author: false,
+            editor: false,
+            moderator: false,
+            admin: false,
+          },
+          adminAccess: {
+            isStaff: false,
+            panelEnabled: false,
+          },
           createdAt: serverTimestamp(),
       });
       toast({ title: "Реєстрація успішна!" });

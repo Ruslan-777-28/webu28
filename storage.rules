@@ -1,0 +1,39 @@
+
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function hasClaim(claim) {
+      return request.auth != null && request.auth.token[claim] == true;
+    }
+
+    function isAdmin() {
+      return hasClaim('admin');
+    }
+
+    function isEditor() {
+      return isAdmin() || hasClaim('editor');
+    }
+    
+    match /avatars/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if (request.auth != null && request.auth.uid == userId) || isAdmin();
+    }
+
+    match /posts/{path=**} {
+      allow read: if true;
+      allow write: if isEditor();
+    }
+
+    match /products/{path=**} {
+      allow read: if true;
+      allow write: if isEditor();
+    }
+
+    match /users/{path=**} {
+      allow read: if request.auth != null;
+      allow write: if isEditor();
+    }
+  }
+}
