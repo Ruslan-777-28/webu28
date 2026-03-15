@@ -42,7 +42,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col md:flex-row min-h-[100vh] w-full">
       {/* Left Block */}
-      <div className="relative w-full md:flex-1 bg-white flex flex-col border-b md:border-b-0">
+      <div className="relative w-full md:flex-1 bg-white flex flex-col md:border-b-0">
         <div className="sticky top-0 z-30 bg-white p-4 md:p-8">
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -74,12 +74,14 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="relative flex-grow flex flex-col">
-            <div className="flex-grow flex items-center justify-center pb-20 pt-8">
-                <div className="w-[92.61vmin] max-w-xl h-[92.61vmin] max-h-xl rounded-full border border-gray-200" />
+        <div className="flex-grow flex flex-col">
+            <div className="relative flex-grow flex flex-col justify-center items-center pt-[3%]" style={{minHeight: 'calc(100vh - 180px)'}}>
+                <div className="relative w-[97.24vmin] max-w-xl h-[97.24vmin] max-h-xl rounded-full border border-gray-200 flex items-center justify-center">
+                   <div className="w-[80%] h-[80%] rounded-full border border-gray-200"></div>
+                </div>
             </div>
             
-            <div className="relative text-center px-4 pb-8">
+            <div className="relative text-center px-4 pb-8 pt-4">
                 <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
  Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
                 </p>
@@ -91,14 +93,14 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-[13.89rem] bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky top-[59%] h-fit text-gray-500">
+      <div className="w-full md:w-24 bg-white flex justify-center p-8 md:p-0">
+         <div className="sticky top-[51%] h-fit text-gray-500">
             <CountdownTimer />
          </div>
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-3.5rem_0_3rem_-1.5rem_rgba(128,128,128,0.4)] flex flex-col">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-5rem_0_3.5rem_-1.5rem_rgba(128,128,128,0.4)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest">LECTOR</h2>
         </div>
