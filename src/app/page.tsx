@@ -46,8 +46,13 @@ export default function HomePage() {
         <div className="sticky top-0 z-30 bg-white p-4 md:p-8">
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <Link href="/" className={cn(pathname === '/' ? 'text-primary' : 'text-muted-foreground')}>
-                  <HomeIcon className={cn('h-5 w-5 hover:text-foreground transition-colors')} />
+              <Link href="/" className={cn(
+                'pb-1 border-b-2 transition-colors',
+                pathname === '/'
+                    ? 'border-primary text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                )}>
+                  <HomeIcon className='h-5 w-5' />
               </Link>
               <span className="text-xs text-muted-foreground ml-4">простір обміну цінностями</span>
             </div>
@@ -59,8 +64,10 @@ export default function HomePage() {
                       <Link
                       href={link.href}
                       className={cn(
-                          'text-sm font-normal text-foreground/80 hover:text-primary transition-colors',
-                          pathname.startsWith(link.href) && 'text-primary font-medium'
+                          'text-sm font-normal transition-colors pb-1 border-b-2',
+                          pathname.startsWith(link.href)
+                              ? 'text-foreground font-medium border-primary'
+                              : 'text-foreground/80 hover:text-foreground border-transparent'
                       )}
                       >
                       {link.label}
@@ -75,11 +82,13 @@ export default function HomePage() {
         </div>
 
         <div className="flex-grow flex flex-col">
-            <div className="relative flex-grow flex flex-col justify-center items-center pt-[3%]" style={{minHeight: 'calc(100vh - 180px)'}}>
-                <div className="relative w-[97.24vmin] max-w-xl h-[97.24vmin] max-h-xl rounded-full border border-gray-200 flex items-center justify-center">
-                   <div className="w-[80%] h-[80%] rounded-full border border-gray-200"></div>
-                </div>
-            </div>
+          <div className="relative flex-grow flex flex-col justify-center items-center pt-[3%]" style={{minHeight: 'calc(100vh - 180px)'}}>
+              <div className="relative w-[102.1vmin] max-w-2xl h-[102.1vmin] max-h-2xl rounded-full border border-gray-200 flex items-center justify-center">
+                  <div className="w-[80%] h-[80%] rounded-full border border-gray-200 flex items-center justify-center">
+                    <div className="w-[80%] h-[80%] rounded-full border border-gray-200"></div>
+                  </div>
+              </div>
+          </div>
             
             <div className="relative text-center px-4 pb-8 pt-4">
                 <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
@@ -93,14 +102,14 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-24 bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky top-[51%] h-fit text-gray-500">
+      <div className="w-full md:w-[26.25rem] bg-white flex justify-center p-8 md:p-0">
+         <div className="sticky top-[54%] h-fit text-gray-500">
             <CountdownTimer />
          </div>
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-5rem_0_3.5rem_-1.5rem_rgba(128,128,128,0.4)] flex flex-col">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-8rem_0_3.5rem_-1.5rem_rgba(128,128,128,0.4)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest">LECTOR</h2>
         </div>
