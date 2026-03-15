@@ -97,26 +97,27 @@ export default function HomePage() {
         
         {/* Main content area */}
         <div className="flex-grow flex flex-col items-center justify-center pt-8">
-            <div className="flex items-start justify-center gap-8 w-full pr-16">
-                <div className="relative" style={{ width: '544px', height: '544px' }}>
+            <div className="flex items-start justify-center gap-8 w-full">
+                <div className="relative" style={{ width: '350px', height: '350px' }}>
                     <div className="absolute inset-0 rounded-full border border-gray-200" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center text-sm text-muted-foreground max-w-[280px]">
+                            <p className="mb-4">
+                                Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
+                            </p>
+                            <p>
+                                Ідея платформи проста: коли час, компетенція, досвід  та знання об’єднуються у змістовній розмові, виникає справжня цінність для обох сторін. Для користувачів це можливість швидко і зручно звернутися до спеціалістів з усього світу та отримати індивідуальну консультацію. Для практиків — це простір, де можна ділитися своїм досвідом, розвивати особистий бренд і перетворювати знання на стабільну професійну діяльність . 4 типи комунікації з консультацій духовних практик з усіх куточків світу , без мовного бар'єру , 24/7.
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 <div className="flex-shrink-0">
-                    <div className="sticky top-1/2 -translate-y-1/2 flex h-full flex-col items-center justify-center p-8 text-center">
+                    <div className="mt-24 flex flex-col items-center justify-center p-8 text-center">
                         <p className="text-sm text-muted-foreground mb-2">час=енергія</p>
                         <CountdownTimer />
                         <p className="text-xs text-muted-foreground mt-2">до старту залишилось</p>
                     </div>
                 </div>
-            </div>
-
-            <div className="text-center px-8 pb-8 mt-8">
-                <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
-                    Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
-                </p>
-                <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-                    Ідея платформи проста: коли час, компетенція, досвід  та знання об’єднуються у змістовній розмові, виникає справжня цінність для обох сторін. Для користувачів це можливість швидко і зручно звернутися до спеціалістів з усього світу та отримати індивідуальну консультацію. Для практиків — це простір, де можна ділитися своїм досвідом, розвивати особистий бренд і перетворювати знання на стабільну професійну діяльність . 4 типи комунікації з консультацій духовних практик з усіх куточків світу , без мовного бар'єру , 24/7.
-                </p>
             </div>
         </div>
 
