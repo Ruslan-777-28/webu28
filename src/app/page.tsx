@@ -70,17 +70,24 @@ export default function HomePage() {
 
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
         
+        <div className="relative z-10 flex-grow flex flex-col justify-end items-center text-center pb-8">
+            <p className="text-sm text-muted-foreground max-w-2xl">
+            Це дуже допомагає SEO.
+ Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
+  Ідея платформи проста: коли час, компетенція, досвід  та знання об’єднуються у змістовній розмові, виникає справжня цінність для обох сторін. Для користувачів це можливість швидко і зручно звернутися до спеціалістів з усього світу та отримати індивідуальну консультацію. Для практиків — це простір, де можна ділитися своїм досвідом, розвивати особистий бренд і перетворювати знання на стабільну професійну діяльність . 4 типи комунікації з консультацій духовних практик з усіх куточків світу , без мовного бар'єру , 24/7.
+            </p>
+        </div>
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-[12%] bg-white flex items-center justify-center p-8 md:p-0">
+      <div className="w-full md:w-auto bg-white flex items-center justify-center p-8 md:p-0">
          <div className="text-gray-500">
             <CountdownTimer />
          </div>
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-lg md:shadow-[-16px_0px_24px_-16px_rgba(0,0,0,0.5),_-32px_0px_48px_-24px_rgba(0,0,0,0.3)]">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-16px_0px_24px_-16px_rgba(128,128,128,0.5),_-32px_0px_48px_-24px_rgba(128,128,128,0.3)]">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest">LECTOR</h2>
         </div>
