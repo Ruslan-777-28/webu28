@@ -75,7 +75,7 @@ export default function HomePage() {
         </div>
 
         <div className="relative flex-grow p-4 md:p-8 overflow-hidden">
-            <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
+            <div className="absolute top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
             
             <div className="relative z-10 h-full flex flex-col justify-end items-center text-center pb-8">
                 <p className="text-sm text-muted-foreground max-w-2xl mb-4">
@@ -89,8 +89,8 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-24 bg-white flex items-center justify-center p-8 md:p-0">
-         <div className="text-gray-500">
+      <div className="w-full md:w-24 bg-white flex justify-center p-8 md:p-0">
+         <div className="sticky top-[40%] h-fit text-gray-500">
             <CountdownTimer />
          </div>
       </div>
