@@ -35,7 +35,7 @@ export default function HomePage() {
       {/* Left Block */}
       <div className="relative w-full md:w-[68%] bg-white p-4 md:p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-black/20 overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vmin] h-[90vmin] rounded-full border border-gray-200" />
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="relative z-10 flex flex-wrap items-center gap-4">
           <Link href="/" className={cn(pathname === '/' ? 'text-primary' : 'text-muted-foreground')}>
               <HomeIcon className={cn('h-5 w-5 hover:text-foreground transition-colors')} />
           </Link>
@@ -59,7 +59,7 @@ export default function HomePage() {
           </nav>
         </div>
 
-        <div className="flex items-center mt-4 md:mt-0">
+        <div className="relative z-10 flex items-center mt-4 md:mt-0">
           {renderAuthControl()}
         </div>
       </div>
