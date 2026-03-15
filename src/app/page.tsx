@@ -95,7 +95,7 @@ export default function HomePage() {
           </div>
         </div>
         
-        <div className="relative flex-grow flex flex-col justify-end items-center pt-[5%]" style={{minHeight: 'calc(100vh - 220px)'}}>
+        <div className="relative flex-grow flex flex-col justify-end items-center" style={{paddingTop: 'calc(3% + 3%)', minHeight: 'calc(100vh - 220px)'}}>
             <div className="relative w-[174.3583545vmin] max-w-[calc(2.2rem+73.92726rem)] h-[174.3583545vmin] max-h-[calc(2.2rem+73.92726rem)] rounded-full border border-gray-200 flex items-center justify-center">
                 <div className="w-[80%] h-[80%] rounded-full border border-gray-200 flex items-center justify-center">
                 </div>
@@ -113,14 +113,14 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-[38.7796878rem] bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky h-fit text-gray-500" style={{top: 'calc(26% + 3%)'}}>
+      <div className="w-full md:w-auto bg-white flex justify-center p-8 md:p-0">
+         <div className="sticky h-fit text-gray-500" style={{top: 'calc(26% + 3% + 3%)'}}>
             <CountdownTimer />
          </div>
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-1.96608rem_0_0.786432rem_-0.393216rem_rgba(128,128,128,0.256)] flex flex-col">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-1.96608rem_0_0.786432rem_-0.393216rem_rgba(128,128,128,0.15)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest underline decoration-purple-500 underline-offset-4">LECTOR</h2>
           <div className="mt-4">
@@ -129,7 +129,7 @@ export default function HomePage() {
             </Button>
           </div>
         </div>
-        <div className="flex-grow flex justify-center pt-20">
+        <div className="flex-grow flex justify-center pt-8">
             <div className="flex flex-col items-start gap-5 text-white text-sm font-thin w-full px-4">
                 {esotericWords.map(({word, color, margin}) => (
                     <span key={word} className={cn(color, margin)}>{word}</span>
