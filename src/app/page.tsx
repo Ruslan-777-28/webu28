@@ -51,7 +51,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col md:flex-row min-h-[100vh] w-full">
       {/* Left Block */}
-      <div className="relative w-full md:flex-1 bg-white flex flex-col">
+      <div className="relative w-full md:flex-1 md:min-w-0 bg-white flex flex-col">
         <div className="sticky top-0 z-30 bg-white p-4 md:p-8">
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -95,7 +95,7 @@ export default function HomePage() {
           </div>
         </div>
         
-        <div className="relative flex-grow flex flex-col justify-center items-center pt-[6%]" style={{minHeight: 'calc(100vh - 220px)'}}>
+        <div className="relative flex-grow flex flex-col justify-end items-center pt-[5%]" style={{minHeight: 'calc(100vh - 220px)'}}>
             <div className="relative w-[174.3583545vmin] max-w-[calc(2.2rem+73.92726rem)] h-[174.3583545vmin] max-h-[calc(2.2rem+73.92726rem)] rounded-full border border-gray-200 flex items-center justify-center">
                 <div className="w-[80%] h-[80%] rounded-full border border-gray-200 flex items-center justify-center">
                 </div>
@@ -113,14 +113,14 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-[36.933036rem] bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky h-fit text-gray-500" style={{top: 'calc(29% + 3%)'}}>
+      <div className="w-full md:w-[38.7796878rem] bg-white flex justify-center p-8 md:p-0">
+         <div className="sticky h-fit text-gray-500" style={{top: 'calc(26% + 3%)'}}>
             <CountdownTimer />
          </div>
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-2.4576rem_0_0.98304rem_-0.49152rem_rgba(128,128,128,0.256)] flex flex-col">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-1.96608rem_0_0.786432rem_-0.393216rem_rgba(128,128,128,0.256)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest underline decoration-purple-500 underline-offset-4">LECTOR</h2>
           <div className="mt-4">
