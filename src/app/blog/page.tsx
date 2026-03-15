@@ -12,6 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { CreatePostModal } from '@/components/create-post-modal';
+import Footer from '@/components/layout/footer';
 
 // Using a component for article card to avoid repetition and for clarity
 const ArticleCard = ({ post, className, isFeatured = false }: { post: any, className?: string, isFeatured?: boolean }) => (
@@ -207,6 +208,7 @@ export default function BlogPage() {
         </section>
 
       </div>
+      <Footer />
     </div>
   );
 }

@@ -27,6 +27,7 @@ import {
   Zap
 } from 'lucide-react';
 import React from 'react';
+import Footer from '@/components/layout/footer';
 
 const forYouItems = [
     'астролог',
@@ -156,229 +157,232 @@ const faqItems = [
 
 export default function ProPage() {
   return (
-    <main className="flex flex-col w-full min-h-screen bg-background text-foreground">
-      <Navigation />
-      
-      {/* 1. HERO SECTION */}
-      <section className="py-20 md:py-32 text-center bg-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute h-full w-full bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        </div>
-        <div className="container mx-auto px-4 relative">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-            Монетизуйте свої знання без кордонів
-          </h1>
-          <p className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
-            Створюйте власні пропозиції, консультуйте клієнтів з усього світу та перетворюйте досвід, інтуїцію й експертність на реальний дохід у зручному для вас форматі.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button size="lg">Стати професіоналом</Button>
-            <Button size="lg" variant="outline">
-              Подивитися, як це працює
-            </Button>
+    <>
+      <main className="flex flex-col w-full min-h-screen bg-background text-foreground">
+        <Navigation />
+        
+        {/* 1. HERO SECTION */}
+        <section className="py-20 md:py-32 text-center bg-background relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute h-full w-full bg-[radial-gradient(hsl(var(--border))_1px,transparent_1px)] [background-size:16px_16px]"></div>
           </div>
-        </div>
-      </section>
-
-      {/* 2. SECTION “Це для вас, якщо ви...” */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Це для вас, якщо ви...
-          </h2>
-          <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {forYouItems.map((item, index) => (
-              <Card key={index} className="bg-background/70 shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-4 flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span className="font-medium text-sm">{item}</span>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 3. SECTION “Що ви отримуєте на платформі” */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Що ви отримуєте на платформі
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Все, що потрібно для того, щоб оформити свою цінність, вийти на аудиторію та перетворити знання на системну практику й дохід.
+          <div className="container mx-auto px-4 relative">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
+              Монетизуйте свої знання без кордонів
+            </h1>
+            <p className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
+              Створюйте власні пропозиції, консультуйте клієнтів з усього світу та перетворюйте досвід, інтуїцію й експертність на реальний дохід у зручному для вас форматі.
             </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Button size="lg">Стати професіоналом</Button>
+              <Button size="lg" variant="outline">
+                Подивитися, як це працює
+              </Button>
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {benefits.map((benefit, index) => (
-              <Card key={index} className="text-center border-none shadow-none">
-                <CardContent className="p-6">
-                  <div className="inline-flex items-center justify-center bg-muted/50 rounded-full p-3 mb-4">
-                    <benefit.icon className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
-                  <p className="text-muted-foreground">{benefit.text}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-      
-      {/* 4. SECTION “Як це працює” */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
-            Як це працює
-          </h2>
-          <div className="relative max-w-5xl mx-auto flex flex-col gap-12">
-             <div className="absolute left-6 top-0 hidden h-full w-0.5 bg-border md:block" />
-            {howItWorksSteps.map((item) => (
-              <div key={item.step} className="relative flex items-start gap-6 pl-12 md:pl-16">
-                 <div className="absolute left-0 top-1.5 flex h-12 w-12 items-center justify-center rounded-full bg-background border shadow-sm">
-                    <span className="text-xl font-bold text-primary">{item.step}</span>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                  <p className="text-muted-foreground max-w-2xl">{item.text}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      
-      {/* 5. SECTION “Формати роботи” */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Формати роботи на платформі
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Ви самі обираєте, як саме будувати взаємодію з клієнтами та аудиторією.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {workFormats.map((format, index) => (
-              <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow">
-                <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
-                    <div className="bg-muted/50 p-2 rounded-lg">
-                        <format.icon className="h-6 w-6 text-primary" />
-                    </div>
-                  <CardTitle className="text-lg">{format.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{format.text}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
 
-      {/* 6. SECTION “Чому це більше, ніж робота через соцмережі...” */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
+        {/* 2. SECTION “Це для вас, якщо ви...” */}
+        <section className="py-20 bg-backgroundAlt">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+              Це для вас, якщо ви...
+            </h2>
+            <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {forYouItems.map((item, index) => (
+                <Card key={index} className="bg-background shadow-sm hover:shadow-md transition-shadow">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-accent flex-shrink-0" />
+                    <span className="font-medium text-sm">{item}</span>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 3. SECTION “Що ви отримуєте на платформі” */}
+        <section className="py-20 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Більше, ніж хаотична робота через соцмережі
+                Що ви отримуєте на платформі
               </h2>
-              <p className="text-lg text-muted-foreground mb-8">
-                Платформа допомагає зібрати вашу присутність, взаємодію та цінність в одному місці.
-              </p>
-              <p className="text-md">
-                Замість розрізнених каналів, випадкових повідомлень і хаотичної присутності в різних сервісах ви отримуєте простір, де профіль, формати взаємодії, публічність і монетизація поєднані в одну зрозумілу систему. Це допомагає виглядати професійніше, працювати спокійніше й вибудовувати довшу довіру з аудиторією.
+              <p className="text-lg text-muted-foreground">
+                Все, що потрібно для того, щоб оформити свою цінність, вийти на аудиторію та перетворити знання на системну практику й дохід.
               </p>
             </div>
-            <div className="bg-card p-8 rounded-lg shadow-sm border space-y-4">
-              {comparisonPoints.map((point, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
-                  <p className="text-md font-medium">{point}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {benefits.map((benefit, index) => (
+                <Card key={index} className="text-center border-none shadow-none">
+                  <CardContent className="p-6">
+                    <div className="inline-flex items-center justify-center bg-backgroundAlt rounded-full p-3 mb-4">
+                      <benefit.icon className="h-8 w-8 text-accent" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
+                    <p className="text-muted-foreground">{benefit.text}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+        
+        {/* 4. SECTION “Як це працює” */}
+        <section className="py-20 bg-backgroundAlt">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+              Як це працює
+            </h2>
+            <div className="relative max-w-5xl mx-auto flex flex-col gap-12">
+              <div className="absolute left-6 top-0 hidden h-full w-0.5 bg-border md:block" />
+              {howItWorksSteps.map((item) => (
+                <div key={item.step} className="relative flex items-start gap-6 pl-12 md:pl-16">
+                  <div className="absolute left-0 top-1.5 flex h-12 w-12 items-center justify-center rounded-full bg-background border shadow-sm">
+                      <span className="text-xl font-bold text-accent">{item.step}</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                    <p className="text-muted-foreground max-w-2xl">{item.text}</p>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+        
+        {/* 5. SECTION “Формати роботи” */}
+        <section className="py-20 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Формати роботи на платформі
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Ви самі обираєте, як саме будувати взаємодію з клієнтами та аудиторією.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {workFormats.map((format, index) => (
+                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow">
+                  <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
+                      <div className="bg-backgroundAlt p-2 rounded-lg">
+                          <format.icon className="h-6 w-6 text-accent" />
+                      </div>
+                    <CardTitle className="text-lg">{format.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">{format.text}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
 
-      {/* 7. SECTION “Особистий бренд і довіра” */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 max-w-4xl text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Платформа для вашого імені, а не тільки для послуг
-          </h2>
-          <p className="text-lg text-muted-foreground mb-8">
-            Ваш профіль — це не просто сторінка. Це простір, де люди бачать ваш стиль, сенси, подачу, матеріали та формат роботи. Тут можна не лише пропонувати консультації, а й формувати власну присутність, яка працює на довіру, впізнаваність і довгострокову цінність.
-          </p>
-        </div>
-      </section>
+        {/* 6. SECTION “Чому це більше, ніж робота через соцмережі...” */}
+        <section className="py-20 bg-backgroundAlt">
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                  Більше, ніж хаотична робота через соцмережі
+                </h2>
+                <p className="text-lg text-muted-foreground mb-8">
+                  Платформа допомагає зібрати вашу присутність, взаємодію та цінність в одному місці.
+                </p>
+                <p className="text-md">
+                  Замість розрізнених каналів, випадкових повідомлень і хаотичної присутності в різних сервісах ви отримуєте простір, де профіль, формати взаємодії, публічність і монетизація поєднані в одну зрозумілу систему. Це допомагає виглядати професійніше, працювати спокійніше й вибудовувати довшу довіру з аудиторією.
+                </p>
+              </div>
+              <div className="bg-card p-8 rounded-lg shadow-sm border space-y-4">
+                {comparisonPoints.map((point, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+                    <p className="text-md font-medium">{point}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
 
-      {/* 8. SECTION “Монетизація” */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-12">
+        {/* 7. SECTION “Особистий бренд і довіра” */}
+        <section className="py-20 bg-background">
+          <div className="container mx-auto px-4 max-w-4xl text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Кілька шляхів монетизації в одній екосистемі
+              Платформа для вашого імені, а не тільки для послуг
             </h2>
-            <p className="text-lg text-muted-foreground">
-              Платформа підтримує не один спосіб заробітку, а кілька моделей, які можна поєднувати між собою.
+            <p className="text-lg text-muted-foreground mb-8">
+              Ваш профіль — це не просто сторінка. Це простір, де люди бачать ваш стиль, сенси, подачу, матеріали та формат роботи. Тут можна не лише пропонувати консультації, а й формувати власну присутність, яка працює на довіру, впізнаваність і довгострокову цінність.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {monetizationPaths.map((path, index) => (
-              <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow">
-                <CardHeader>
-                   <CardTitle className="flex items-center gap-3">
-                     <Zap className="h-5 w-5 text-primary" />
-                     {path.title}
-                   </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{path.text}</p>
-                </CardContent>
-              </Card>
-            ))}
+        </section>
+
+        {/* 8. SECTION “Монетизація” */}
+        <section className="py-20 bg-backgroundAlt">
+          <div className="container mx-auto px-4">
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Кілька шляхів монетизації в одній екосистемі
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Платформа підтримує не один спосіб заробітку, а кілька моделей, які можна поєднувати між собою.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {monetizationPaths.map((path, index) => (
+                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3">
+                      <Zap className="h-5 w-5 text-accent" />
+                      {path.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">{path.text}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* 9. FAQ SECTION */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 max-w-3xl">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Поширені запитання
-          </h2>
-          <Accordion type="single" collapsible className="w-full">
-            {faqItems.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline">
-                  {faq.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-base text-muted-foreground">
-                  {faq.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-      </section>
+        {/* 9. FAQ SECTION */}
+        <section className="py-20 bg-background">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+              Поширені запитання
+            </h2>
+            <Accordion type="single" collapsible className="w-full">
+              {faqItems.map((faq, index) => (
+                <AccordionItem key={index} value={`item-${index}`}>
+                  <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-base text-muted-foreground">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </section>
 
-      {/* 10. FINAL CTA SECTION */}
-      <section className="py-20 md:py-28 bg-muted/30">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ваші знання вже мають цінність
-          </h2>
-          <p className="max-w-xl mx-auto text-lg text-muted-foreground mb-8">
-            Дайте їм простір, аудиторію та правильний формат монетизації.
-          </p>
-          <Button size="lg">Приєднатися як професіонал</Button>
-        </div>
-      </section>
-    </main>
+        {/* 10. FINAL CTA SECTION */}
+        <section className="py-20 md:py-28 bg-backgroundAlt">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Ваші знання вже мають цінність
+            </h2>
+            <p className="max-w-xl mx-auto text-lg text-muted-foreground mb-8">
+              Дайте їм простір, аудиторію та правильний формат монетизації.
+            </p>
+            <Button size="lg">Приєднатися як професіонал</Button>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </>
   );
 }
