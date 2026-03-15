@@ -38,8 +38,8 @@ service cloud.firestore {
     match /users/{uid} {
       allow get, list: if isSignedIn();
       allow create: if isSelf(uid);
-      // Admin can change any field. Others can update their own profile but not roles.
-      allow update: if (isSelf(uid) && request.resource.data.roles == resource.data.roles) || isAdmin();
+      // Admin can change any field. Others can update their own profile but not roles or adminAccess.
+      allow update: if (isSelf(uid) && request.resource.data.roles == resource.data.roles && request.resource.data.adminAccess == resource.data.adminAccess) || isAdmin();
       allow delete: if isAdmin();
     }
 
@@ -49,11 +49,11 @@ service cloud.firestore {
         allow list, get: if (resource.data.contentType == 'blog' && resource.data.status == 'published')
                          || isAuthor();
         
-        // Authors can create posts for themselves.
-        allow create: if isAuthor() && request.resource.data.authorId == request.auth.uid;
+        // Authors can create blog posts for themselves.
+        allow create: if isAuthor() && request.resource.data.authorId == request.auth.uid && request.resource.data.contentType == 'blog';
 
-        // Authors can update their own posts. Editors/Admins can update any post.
-        allow update: if (isAuthor() && resource.data.authorId == request.auth.uid) || isEditor();
+        // Authors can update their own blog posts. Editors/Admins can update any post.
+        allow update: if (isAuthor() && resource.data.authorId == request.auth.uid && resource.data.contentType == 'blog') || isEditor();
 
         // Editors/Admins can delete posts.
         allow delete: if isEditor();
@@ -110,19 +110,21 @@ service cloud.firestore {
       allow create: if isSelf(request.resource.data.ownerId);
       allow update, delete: if isSelf(resource.data.ownerId);
     }
+    
+    function isRequestParticipant(requestId) {
+      let requestDoc = get(/databases/$(database)/documents/communicationRequests/$(requestId)).data;
+      return isSignedIn() && (
+        isSelf(requestDoc.initiatorId) || 
+        isSelf(requestDoc.authorId)
+      );
+    }
 
     match /communicationRequests/{requestId} {
-      function isParticipant() {
-        return isSignedIn() && (
-          isSelf(resource.data.initiatorId) || 
-          isSelf(resource.data.authorId)
-        );
-      }
-      allow read: if isParticipant();
+      allow read: if isRequestParticipant(requestId);
       allow write: if false;
 
       match /messages/{messageId} {
-        allow read: if isParticipant();
+        allow read: if isRequestParticipant(requestId);
         allow write: if false;
       }
     }
@@ -141,14 +143,16 @@ service cloud.firestore {
       allow update: if false;
     }
 
+    function isCallParticipant(callId) {
+      let callDoc = get(/databases/$(database)/documents/calls/$(callId)).data;
+      return isSignedIn() && (
+        isSelf(callDoc.callerId) || 
+        isSelf(callDoc.receiverId)
+      );
+    }
+    
     match /calls/{callId} {
-      function isCallParticipant() {
-        return isSignedIn() && (
-          isSelf(resource.data.callerId) || 
-          isSelf(resource.data.receiverId)
-        );
-      }
-      allow read: if isCallParticipant();
+      allow read: if isCallParticipant(callId);
       allow write: if false;
     }
 

@@ -36,6 +36,9 @@ export async function POST(req: NextRequest) {
                 isStaff = true;
             }
         });
+
+        // Ensure panelEnabled is only true if user is staff
+        const safePanelEnabled = isStaff && panelEnabled === true;
         
         // 4. Set custom claims on the user in Firebase Auth
         await adminAuth.setCustomUserClaims(uid, claims);
@@ -45,7 +48,7 @@ export async function POST(req: NextRequest) {
         await userRef.update({
             'roles': roles, // Update the entire roles map
             'adminAccess.isStaff': isStaff,
-            'adminAccess.panelEnabled': panelEnabled === true,
+            'adminAccess.panelEnabled': safePanelEnabled,
         });
         
         return NextResponse.json({ success: true, message: `Successfully updated roles and claims for user ${uid}.` });

@@ -44,5 +44,10 @@ service firebase.storage {
       allow read: if isSignedIn();
       allow write: if isEditor();
     }
+
+    // Deny all other routes
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
   }
 }

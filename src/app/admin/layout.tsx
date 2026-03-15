@@ -10,24 +10,25 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { profile, loading } = useUser();
+  const { profile, claims, loading } = useUser();
   const router = useRouter();
+
+  const isStaff = claims?.admin || claims?.editor || claims?.author || claims?.moderator;
 
   useEffect(() => {
     // This effect runs on the client after hydration.
     // It checks if the user data has loaded and if the user has panel access.
-    if (!loading && !profile?.adminAccess?.panelEnabled) {
-      // If the user is not staff or doesn't have panel access enabled in their profile,
-      // redirect them to the home page. This is a client-side guard for UI convenience.
+    if (!loading && (!isStaff || !profile?.adminAccess?.panelEnabled)) {
       // Real security is enforced by Firestore/Storage rules using custom claims.
+      // This is a client-side guard for UI convenience.
       router.replace('/');
     }
-  }, [loading, profile, router]);
+  }, [loading, profile, isStaff, router]);
 
 
   // While loading or if the user doesn't have access, show a loading/access check message.
   // This prevents a flash of admin content before the redirect happens.
-  if (loading || !profile?.adminAccess?.panelEnabled) {
+  if (loading || !isStaff || !profile?.adminAccess?.panelEnabled) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <p>Checking access...</p>
