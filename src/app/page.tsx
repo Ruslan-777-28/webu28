@@ -10,10 +10,13 @@ import { UserNav } from '@/components/user-nav';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CountdownTimer } from '@/components/ui/countdown-timer';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { AuthModal } from '@/components/auth-modal';
 
 export default function HomePage() {
   const pathname = usePathname();
   const { user, loading } = useUser();
+  const [isAuthModalOpen, setAuthModalOpen] = React.useState(false);
 
   const navLinks = [
     { href: '/pro', label: 'FOR EXPERTS' },
@@ -29,6 +32,27 @@ export default function HomePage() {
       return <UserNav />;
     }
     return null;
+  };
+
+  const renderRightBlockAuthControl = () => {
+    if (loading) {
+      return <Skeleton className="h-10 w-10 rounded-full" />;
+    }
+    if (user) {
+      return <UserNav />;
+    }
+    return (
+      <Dialog open={isAuthModalOpen} onOpenChange={setAuthModalOpen}>
+        <DialogTrigger asChild>
+          <Button variant="ghost" size="icon" className="text-white hover:bg-purple-500/20 hover:text-white animate-pulse">
+            <PowerIcon className="h-6 w-6" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <AuthModal setOpen={setAuthModalOpen} />
+        </DialogContent>
+      </Dialog>
+    );
   };
 
   const esotericWords = [
@@ -127,9 +151,7 @@ export default function HomePage() {
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest underline decoration-purple-500 underline-offset-4">LECTOR</h2>
           <div className="mt-4">
-            <Button variant="ghost" size="icon" className="text-white hover:bg-purple-500/20 hover:text-white animate-pulse">
-              <PowerIcon className="h-6 w-6" />
-            </Button>
+            {renderRightBlockAuthControl()}
           </div>
         </div>
         <div className="flex-grow flex justify-center items-start pt-12 overflow-y-auto">
