@@ -88,7 +88,7 @@ export default function HomePage() {
 
         <div className="flex-grow flex flex-col justify-between">
            <div className="relative flex-grow flex flex-col justify-center items-center pt-[3%]" style={{minHeight: 'calc(100vh - 220px)'}}>
-              <div className="relative w-[118.188vmin] max-w-[calc(2rem+50.4rem)] h-[118.188vmin] max-h-[calc(2rem+50.4rem)] rounded-full border border-gray-200 flex items-center justify-center">
+              <div className="relative w-[130.0069vmin] max-w-[calc(2.2rem+55.44rem)] h-[130.0069vmin] max-h-[calc(2.2rem+55.44rem)] rounded-full border border-gray-200 flex items-center justify-center">
                   <div className="w-[80%] h-[80%] rounded-full border border-gray-200 flex items-center justify-center">
                     <div className="w-[80%] h-[80%] rounded-full border border-gray-200"></div>
                   </div>
@@ -107,16 +107,16 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-[30.3849rem] bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky h-fit text-gray-500" style={{top: 'calc(47% + 3%)'}}>
+      <div className="w-full md:w-[31.904145rem] bg-white flex justify-center p-8 md:p-0">
+         <div className="sticky h-fit text-gray-500" style={{top: 'calc(42% + 3%)'}}>
             <CountdownTimer />
          </div>
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-8rem_0_3.2rem_-1.6rem_rgba(128,128,128,0.256)] flex flex-col">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-6.144rem_0_3.072rem_-1.536rem_rgba(128,128,128,0.256)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
-          <h2 className="text-white font-thin text-sm tracking-widest">LECTOR</h2>
+          <h2 className="text-white font-thin text-sm tracking-widest underline decoration-purple-500 underline-offset-4">LECTOR</h2>
         </div>
         <div className="flex-grow flex justify-center pt-16">
             <div className="flex flex-col items-start gap-4 text-white text-sm font-thin w-full px-4">
