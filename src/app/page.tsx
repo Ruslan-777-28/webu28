@@ -96,7 +96,7 @@ export default function HomePage() {
         </div>
         
         <div className="relative flex-grow flex flex-col justify-end items-center" style={{paddingTop: '2%', minHeight: 'calc(100vh - 220px)'}}>
-            <div className="relative w-[80vmin] max-w-[60rem] h-[80vmin] max-h-[60rem] rounded-full border border-gray-200 flex items-center justify-center">
+            <div className="relative w-full h-full rounded-full border border-gray-200 flex items-center justify-center">
             </div>
         </div>
             
@@ -111,11 +111,6 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-auto bg-white flex justify-center p-8 md:px-16 md:py-0">
-         <div className="sticky h-fit text-gray-500" style={{top: '70%'}}>
-            <CountdownTimer />
-         </div>
-      </div>
 
       {/* Right Block */}
       <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-1.2582912rem_0_0.50331648rem_-0.25165824rem_rgba(128,128,128,0.15)] flex flex-col">
