@@ -32,12 +32,20 @@ export default function HomePage() {
   };
 
   const esotericWords = [
-    { word: 'таро', color: 'text-gray-300', margin: 'ml-4' },
-    { word: 'шаман', color: 'text-gray-500', margin: 'ml-12' },
-    { word: 'ретрит', color: 'text-gray-200', margin: 'ml-2' },
-    { word: 'рейки', color: 'text-gray-400', margin: 'ml-8' },
-    { word: 'астрологія', color: 'text-gray-300', margin: 'ml-5' },
-    { word: 'нумерологія', color: 'text-gray-500', margin: 'ml-10' },
+    { word: 'Астрологія', color: 'text-gray-300', margin: 'ml-4' },
+    { word: 'Таро', color: 'text-gray-500', margin: 'ml-12' },
+    { word: 'Медитація', color: 'text-gray-200', margin: 'ml-2' },
+    { word: 'Психічні читання', color: 'text-gray-400', margin: 'ml-8' },
+    { word: 'Маніфестація', color: 'text-gray-300', margin: 'ml-5' },
+    { word: 'Нумерологія', color: 'text-gray-500', margin: 'ml-10' },
+    { word: 'Reiki', color: 'text-gray-200', margin: 'ml-3' },
+    { word: 'Тлумачення снів', color: 'text-gray-400', margin: 'ml-9' },
+    { word: 'Чакри / energy balance', color: 'text-gray-300', margin: 'ml-6' },
+    { word: 'Human Design', color: 'text-gray-500', margin: 'ml-1' },
+    { word: 'Feng Shui', color: 'text-gray-200', margin: 'ml-11' },
+    { word: 'Oracle cards', color: 'text-gray-400', margin: 'ml-7' },
+    { word: 'Хіромантія', color: 'text-gray-300', margin: 'ml-4' },
+    { word: 'Ритуали/ обряди', color: 'text-gray-500', margin: 'ml-12' },
   ];
 
   return (
@@ -86,15 +94,15 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-
+        
         <div className="flex-grow flex flex-col justify-between">
-           <div className="relative flex-grow flex flex-col justify-center items-center pt-[3%]" style={{minHeight: 'calc(100vh - 220px)'}}>
-              <div className="relative w-[143.507595vmin] max-w-[calc(2.2rem+61.2066rem)] h-[143.507595vmin] max-h-[calc(2.2rem+61.2066rem)] rounded-full border border-gray-200 flex items-center justify-center">
+          <div className="relative flex-grow flex flex-col justify-center items-center pt-[3%]" style={{minHeight: 'calc(100vh - 220px)'}}>
+              <div className="relative w-[158.507595vmin] max-w-[calc(2.2rem+67.2066rem)] h-[158.507595vmin] max-h-[calc(2.2rem+67.2066rem)] rounded-full border border-gray-200 flex items-center justify-center">
                   <div className="w-[80%] h-[80%] rounded-full border border-gray-200 flex items-center justify-center">
                   </div>
               </div>
           </div>
-            
+              
           <div className="relative text-center px-4 pb-8 pt-4">
               <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
 Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
@@ -107,14 +115,14 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-[33.49935225rem] bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky h-fit text-gray-500" style={{top: 'calc(37% + 3%)'}}>
+      <div className="w-full md:w-[35.17432rem] bg-white flex justify-center p-8 md:p-0">
+         <div className="sticky h-fit text-gray-500" style={{top: 'calc(29% + 3%)'}}>
             <CountdownTimer />
          </div>
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-4.9152rem_0_2.4576rem_-1.2288rem_rgba(128,128,128,0.256)] flex flex-col">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-4.9152rem_0_1.96608rem_-0.98304rem_rgba(128,128,128,0.256)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest underline decoration-purple-500 underline-offset-4">LECTOR</h2>
           <div className="mt-4">
