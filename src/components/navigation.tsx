@@ -45,7 +45,7 @@ export function Navigation() {
   };
 
   return (
-    <div className="p-4 md:p-8 flex justify-between items-center">
+    <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm p-4 md:p-8 flex justify-between items-center">
         <div className="flex items-center gap-4">
             <Link href="/" className={cn(
                 'pb-1 border-b-2 transition-colors',
