@@ -2,16 +2,20 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home as HomeIcon } from 'lucide-react';
+import { Home as HomeIcon, Power as PowerIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import React from 'react';
+import React, { useState } from 'react';
 import { useUser } from '@/hooks/use-auth';
 import { UserNav } from './user-nav';
 import { Skeleton } from './ui/skeleton';
+import { Button } from './ui/button';
+import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
+import { AuthModal } from './auth-modal';
 
 export function Navigation() {
   const pathname = usePathname();
   const { user, loading } = useUser();
+  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
 
   const navLinks = [
     { href: '/pro', label: 'FOR EXPERTS' },
@@ -26,16 +30,37 @@ export function Navigation() {
     if (user) {
       return <UserNav />;
     }
-    return null;
+    return (
+      <Dialog open={isAuthModalOpen} onOpenChange={setAuthModalOpen}>
+        <DialogTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <PowerIcon className="h-6 w-6 text-muted-foreground hover:text-foreground" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <AuthModal setOpen={setAuthModalOpen} />
+        </DialogContent>
+      </Dialog>
+    );
   };
 
   return (
     <div className="p-4 md:p-8 flex justify-between items-center">
         <div className="flex items-center gap-4">
-            <Link href="/" className={cn(pathname === '/' && 'border-b border-primary')}>
-                <HomeIcon className={cn('h-6 w-6 text-muted-foreground')} />
-            </Link>
-            <span className="text-xs text-muted-foreground">простір обміну ціностями</span>
+            <Link href="/" className={cn(
+                'pb-1 border-b-2 transition-colors',
+                pathname === '/'
+                    ? 'border-primary'
+                    : 'border-transparent'
+                )}>
+                  <HomeIcon className={cn(
+                      'h-5 w-5',
+                      pathname === '/'
+                        ? 'text-foreground'
+                        : 'text-muted-foreground hover:text-foreground'
+                      )} />
+              </Link>
+            <span className="text-xs text-muted-foreground">екосистема обміну ціностями</span>
         </div>
 
         <div className="flex-grow flex justify-center">
@@ -46,7 +71,7 @@ export function Navigation() {
                     href={link.href}
                     className={cn(
                         'hover:text-primary transition-colors',
-                        pathname === link.href && 'text-primary underline'
+                        pathname.startsWith(link.href) && 'text-primary underline'
                     )}
                     >
                     {link.label}
