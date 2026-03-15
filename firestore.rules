@@ -13,11 +13,29 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == uid;
     }
 
+    function getUserData(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data;
+    }
+
+    function isAdmin() {
+      // check for role field to avoid errors on documents without it
+      return isSignedIn() && 'role' in getUserData(request.auth.uid) && getUserData(request.auth.uid).role == 'admin';
+    }
+
+    function isEditor() {
+      return isSignedIn() && 'role' in getUserData(request.auth.uid) && (getUserData(request.auth.uid).role == 'editor' || isAdmin());
+    }
+
+    function isAuthor() {
+      return isSignedIn() && 'role' in getUserData(request.auth.uid) && (getUserData(request.auth.uid).role == 'author' || isEditor());
+    }
+
     // ---------- Users ----------
     match /users/{uid} {
       allow get, list: if isSignedIn();
       allow create: if isSelf(uid);
-      allow update: if isSelf(uid);
+      // User can update their own profile, but not their role. Admin can update anything.
+      allow update: if (isSelf(uid) && request.resource.data.role == resource.data.role) || isAdmin();
       allow delete: if false;
     }
 
@@ -77,9 +95,17 @@ service cloud.firestore {
     // ---------- Posts ----------
     match /posts/{postId} {
       allow get, list: if true;
-      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
-      allow update: if isSignedIn() && resource.data.authorId == request.auth.uid;
-      allow delete: if isSignedIn() && resource.data.authorId == request.auth.uid;
+
+      function isPostAuthor() {
+        return isSignedIn() && resource.data.authorId == request.auth.uid;
+      }
+
+      function isNewPostAuthor() {
+        return isSignedIn() && request.resource.data.authorId == request.auth.uid;
+      }
+
+      allow create: if isNewPostAuthor() && (request.resource.data.contentType != 'blog' || isAuthor());
+      allow update, delete: if isPostAuthor() || (resource.data.contentType == 'blog' && isEditor());
 
       match /comments/{commentId} {
         allow read: if true;
@@ -129,7 +155,7 @@ service cloud.firestore {
     
     match /blogSettings/{docId} {
       allow read: if true;
-      allow write: if isSignedIn(); // Allow authenticated users (admins) to write
+      allow write: if isAdmin();
     }
     
     match /{document=**} {
