@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home as HomeIcon } from 'lucide-react';
+import { Home as HomeIcon, Power as PowerIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { useUser } from '@/hooks/use-auth';
 import { UserNav } from '@/components/user-nav';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CountdownTimer } from '@/components/ui/countdown-timer';
+import { Button } from '@/components/ui/button';
 
 export default function HomePage() {
   const pathname = usePathname();
@@ -88,9 +89,8 @@ export default function HomePage() {
 
         <div className="flex-grow flex flex-col justify-between">
            <div className="relative flex-grow flex flex-col justify-center items-center pt-[3%]" style={{minHeight: 'calc(100vh - 220px)'}}>
-              <div className="relative w-[130.0069vmin] max-w-[calc(2.2rem+55.44rem)] h-[130.0069vmin] max-h-[calc(2.2rem+55.44rem)] rounded-full border border-gray-200 flex items-center justify-center">
+              <div className="relative w-[143.507595vmin] max-w-[calc(2.2rem+61.2066rem)] h-[143.507595vmin] max-h-[calc(2.2rem+61.2066rem)] rounded-full border border-gray-200 flex items-center justify-center">
                   <div className="w-[80%] h-[80%] rounded-full border border-gray-200 flex items-center justify-center">
-                    <div className="w-[80%] h-[80%] rounded-full border border-gray-200"></div>
                   </div>
               </div>
           </div>
@@ -107,16 +107,21 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-[31.904145rem] bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky h-fit text-gray-500" style={{top: 'calc(42% + 3%)'}}>
+      <div className="w-full md:w-[33.49935225rem] bg-white flex justify-center p-8 md:p-0">
+         <div className="sticky h-fit text-gray-500" style={{top: 'calc(37% + 3%)'}}>
             <CountdownTimer />
          </div>
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-6.144rem_0_3.072rem_-1.536rem_rgba(128,128,128,0.256)] flex flex-col">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-4.9152rem_0_2.4576rem_-1.2288rem_rgba(128,128,128,0.256)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest underline decoration-purple-500 underline-offset-4">LECTOR</h2>
+          <div className="mt-4">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-purple-500/20 hover:text-white animate-pulse">
+              <PowerIcon className="h-6 w-6" />
+            </Button>
+          </div>
         </div>
         <div className="flex-grow flex justify-center pt-16">
             <div className="flex flex-col items-start gap-4 text-white text-sm font-thin w-full px-4">
