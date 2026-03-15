@@ -40,7 +40,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="flex flex-col md:flex-row min-h-[120vh] w-full">
+    <div className="flex flex-col md:flex-row min-h-[100vh] w-full">
       {/* Left Block */}
       <div className="relative w-full md:flex-1 bg-white flex flex-col border-b md:border-b-0 md:border-r border-black/20">
         <div className="sticky top-0 z-30 bg-white p-4 md:p-8">
@@ -74,9 +74,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="relative flex-grow p-4 md:p-8 flex flex-col justify-end">
-            <div className="flex-grow flex items-center justify-center pb-10">
-                <div className="w-[80vmin] max-w-xl h-[80vmin] max-h-xl rounded-full border border-gray-200" />
+        <div className="relative flex-grow p-4 md:p-8 flex flex-col">
+            <div className="flex-grow flex items-center justify-center pb-2">
+                <div className="w-[84vmin] max-w-xl h-[84vmin] max-h-xl rounded-full border border-gray-200" />
             </div>
             
             <div className="relative text-center pb-8">
@@ -91,14 +91,14 @@ export default function HomePage() {
       </div>
       
       {/* Center Block */}
-      <div className="w-full md:w-[12rem] bg-white flex justify-center p-8 md:p-0">
-         <div className="sticky top-[55%] h-fit text-gray-500">
+      <div className="w-full md:w-[12.6rem] bg-white flex justify-center p-8 md:p-0">
+         <div className="sticky top-[65%] h-fit text-gray-500">
             <CountdownTimer />
          </div>
       </div>
 
       {/* Right Block */}
-      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-2rem_0_3rem_-1rem_rgba(128,128,128,0.4)] flex flex-col">
+      <div className="w-full md:w-1/5 bg-black relative z-10 shadow-[-2rem_0_3rem_-1.5rem_rgba(128,128,128,0.4)] flex flex-col">
         <div className="sticky top-0 z-20 bg-black p-4 text-center md:pt-8">
           <h2 className="text-white font-thin text-sm tracking-widest">LECTOR</h2>
         </div>
