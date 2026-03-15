@@ -4,8 +4,11 @@ import { useState, useEffect } from 'react';
 
 export function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+    
     // Set the date we're counting down to: 3 days from when the component mounts
     const countDownDate = new Date().getTime() + 3 * 24 * 60 * 60 * 1000;
 
@@ -35,6 +38,22 @@ export function CountdownTimer() {
   }, []);
 
   const formatTime = (time: number) => time.toString().padStart(2, '0');
+
+  if (!isClient) {
+      return (
+          <div className="text-center">
+              <div className="flex justify-center gap-1 text-xs font-bold tabular-nums text-muted-foreground">
+                  <span>00</span>
+                  <span>:</span>
+                  <span>00</span>
+                  <span>:</span>
+                  <span>00</span>
+                  <span>:</span>
+                  <span>00</span>
+              </div>
+          </div>
+      );
+  }
 
   return (
     <div className="text-center">
