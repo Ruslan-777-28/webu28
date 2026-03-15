@@ -51,7 +51,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col md:flex-row min-h-[100vh] w-full">
       {/* Left Block */}
-      <div className="relative w-full md:flex-grow md:min-w-0 bg-white flex flex-col">
+      <div className="relative w-full md:flex-grow md:min-w-0 bg-white flex flex-col md:pr-16">
         <div className="sticky top-0 z-30 bg-white p-4 md:p-8">
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -95,8 +95,9 @@ export default function HomePage() {
           </div>
         </div>
         
-        <div className="relative flex-grow flex flex-col justify-center items-center" style={{minHeight: 'calc(100vh - 220px)'}}>
-            <div className="relative w-full max-w-[85%] aspect-square">
+        {/* Circle container */}
+        <div className="relative flex flex-col items-center mb-[-6rem]">
+            <div className="relative w-full max-w-xl aspect-square">
                 <div className="absolute inset-0 rounded-full border border-gray-200" />
                 <div className="absolute inset-0 flex items-center justify-center">
                     <CountdownTimer />
@@ -104,7 +105,7 @@ export default function HomePage() {
             </div>
         </div>
             
-        <div className="relative text-center px-4 pb-8 pt-4 -mt-48">
+        <div className="relative text-center px-4 pb-8 pt-4">
             <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-4">
 Відповіді на важливі питання про стосунки, життєві рішення та власний шлях.  Такі розмови допомагають подивитися на ситуацію з іншого боку, отримати нове бачення та знайти власні рішення, краще зрозуміти події, цикли та внутрішні процеси людини.
             </p>
@@ -125,7 +126,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="flex-grow flex justify-center pt-48">
-            <div className="flex flex-col items-start gap-y-12 text-white text-sm font-thin w-full px-4" style={{paddingTop: '25rem'}}>
+            <div className="flex flex-col items-start gap-y-12 text-white text-sm font-thin w-full px-4" style={{paddingTop: '5rem'}}>
                 {esotericWords.map(({word, color, margin}) => (
                     <span key={word} className={cn(color, margin)}>{word}</span>
                 ))}
