@@ -96,7 +96,7 @@ export default function HomePage() {
         </div>
         
         <div className="relative flex-grow flex flex-col justify-end items-center" style={{paddingTop: '2%', minHeight: 'calc(100vh - 220px)'}}>
-            <div className="relative w-[35vmin] max-w-[31.5rem] h-[35vmin] max-h-[31.5rem] rounded-full border border-gray-200 flex items-center justify-center">
+            <div className="relative w-[80vmin] max-w-[60rem] h-[80vmin] max-h-[60rem] rounded-full border border-gray-200 flex items-center justify-center">
             </div>
         </div>
             
@@ -128,7 +128,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="flex-grow flex justify-center pt-24">
-            <div className="flex flex-col items-start gap-5 text-white text-sm font-thin w-full px-4">
+            <div className="flex flex-col items-start gap-5 text-white text-sm font-thin w-full px-4 pt-8">
                 {esotericWords.map(({word, color, margin}) => (
                     <span key={word} className={cn(color, margin)}>{word}</span>
                 ))}
