@@ -72,7 +72,7 @@ export default function HomePage() {
             </div>
           
             <div className="flex items-center gap-4">
-              <nav className="flex items-center gap-4 mr-4">
+              <nav className="flex items-center gap-4 mr-8">
                   {navLinks.map((link, index) => (
                   <React.Fragment key={link.href}>
                       <Link
@@ -98,12 +98,14 @@ export default function HomePage() {
         {/* Main content area */}
         <div className="flex-grow flex flex-col items-center pt-8">
             <div className="flex items-start justify-center gap-8 w-full pr-16">
-                <div className="relative mt-8" style={{ width: '571.55px', height: '571.55px' }}>
+                <div className="relative mt-8" style={{ width: '657.28px', height: '657.28px' }}>
                     <div className="absolute inset-0 rounded-full border border-gray-200" />
                 </div>
                 <div className="flex-shrink-0">
-                    <div className="sticky top-20 flex h-full flex-col items-center justify-center p-8 text-center" style={{height: '571.55px'}}>
+                    <div className="sticky top-20 flex h-full flex-col items-center justify-center p-8 text-center" style={{height: '657.28px'}}>
+                        <p className="text-sm text-muted-foreground mb-2">час=енергія</p>
                         <CountdownTimer />
+                        <p className="text-sm text-muted-foreground mt-2">до старту залишилось</p>
                     </div>
                 </div>
             </div>
