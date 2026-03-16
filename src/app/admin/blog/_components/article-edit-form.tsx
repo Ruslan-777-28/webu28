@@ -16,7 +16,8 @@ import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/fi
 import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import Image from 'next/image';
 
 const articleSchema = z.object({
     title: z.string().min(1, "Title is required"),
@@ -37,6 +38,8 @@ const articleSchema = z.object({
 
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
+    canonicalUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
+    ogImageUrl: z.string().url("Must be a valid URL.").optional().or(z.literal('')),
     noindex: z.boolean().default(false),
     nofollow: z.boolean().default(false),
 });
@@ -48,26 +51,59 @@ interface ArticleEditFormProps {
     categories: BlogCategory[];
 }
 
+// Helper to generate slug
+const generateSlug = (title: string) =>
+  title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .slice(0, 70);
+
+
 export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFormProps) {
     const router = useRouter();
     const { user, profile } = useUser();
     const { toast } = useToast();
+    const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(!!initialData?.slug);
     
     const isEditing = !!initialData;
     
     const form = useForm<ArticleFormValues>({
         resolver: zodResolver(articleSchema),
         defaultValues: {
-            ...initialData,
+            title: initialData?.title || '',
+            slug: initialData?.slug || '',
+            excerpt: initialData?.excerpt || '',
+            content: initialData?.content || '',
+            coverImageUrl: initialData?.coverImageUrl || '',
+            coverAlt: initialData?.coverAlt || '',
+            categoryId: initialData?.categoryId || '',
+            subcategoryId: initialData?.subcategoryId || '',
             tags: Array.isArray(initialData?.tags) ? initialData.tags.join(', ') : '',
+            status: initialData?.status || 'draft',
+            featured: initialData?.featured || false,
+            pinned: initialData?.pinned || false,
+            seoTitle: initialData?.seoTitle || '',
+            seoDescription: initialData?.seoDescription || '',
+            canonicalUrl: initialData?.canonicalUrl || '',
+            ogImageUrl: initialData?.ogImageUrl || '',
+            noindex: initialData?.noindex || false,
+            nofollow: initialData?.nofollow || false,
         },
         mode: "onChange",
     });
 
-    const watchedCategoryId = useWatch({
-        control: form.control,
-        name: 'categoryId',
-    });
+    const watchedTitle = useWatch({ control: form.control, name: 'title' });
+    const watchedCategoryId = useWatch({ control: form.control, name: 'categoryId' });
+    const watchedCoverImageUrl = useWatch({ control: form.control, name: 'coverImageUrl' });
+
+    // Auto-generate slug from title
+    useEffect(() => {
+        if (!isEditing && !isSlugManuallyEdited && watchedTitle) {
+            form.setValue('slug', generateSlug(watchedTitle), { shouldValidate: true });
+        }
+    }, [watchedTitle, isEditing, isSlugManuallyEdited, form]);
 
     const availableSubcategories = React.useMemo(() => {
         if (!watchedCategoryId) return [];
@@ -75,14 +111,13 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
         return selectedCategory?.subcategories || [];
     }, [watchedCategoryId, categories]);
 
-    React.useEffect(() => {
-        // Reset subcategory if category changes and the old subcategory is not valid anymore
-        if (isEditing && initialData?.subcategoryId) {
-            // This logic runs on first load, no need to reset
-        } else {
+    useEffect(() => {
+        const currentSubcategoryId = form.getValues('subcategoryId');
+        const isSubcategoryValid = availableSubcategories.some(s => s.id === currentSubcategoryId);
+        if (!isSubcategoryValid) {
              form.setValue('subcategoryId', '');
         }
-    }, [watchedCategoryId, form, isEditing, initialData]);
+    }, [watchedCategoryId, availableSubcategories, form]);
 
 
      async function onSubmit(data: ArticleFormValues) {
@@ -100,7 +135,7 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
             publishedAtValue = null;
         }
 
-        const postPayload: Omit<Post, 'id' | 'createdAt' | 'authorId' | 'authorName' | 'authorAvatarUrl' | 'views' | 'contentType'> & { updatedAt: any } = {
+        const postPayload = {
             ...data,
             tags: tagsArray,
             subcategoryId: data.subcategoryId || '',
@@ -114,7 +149,7 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
                 await updateDoc(postRef, postPayload);
                 toast({ title: "Article updated successfully!" });
             } else {
-                const newPostPayload: any = {
+                const newPostPayload = {
                     ...postPayload,
                     contentType: 'blog' as const,
                     authorId: user.uid,
@@ -133,8 +168,8 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
         }
     }
 
-    const handleSaveDraft = async () => {
-        form.setValue('status', 'draft');
+    const handleAction = async (status: 'draft' | 'published' | 'scheduled' | 'archived') => {
+        form.setValue('status', status);
         await form.handleSubmit(onSubmit)();
     };
 
@@ -142,11 +177,11 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
                  <div className="flex items-center justify-end gap-4 mb-8">
-                    <Button variant="outline" type="button" onClick={handleSaveDraft} disabled={form.formState.isSubmitting}>
+                    <Button variant="outline" type="button" onClick={() => handleAction('draft')} disabled={form.formState.isSubmitting}>
                         {form.formState.isSubmitting ? 'Saving...' : 'Save Draft'}
                     </Button>
                     <Button type="submit" disabled={form.formState.isSubmitting}>
-                        {form.formState.isSubmitting ? 'Publishing...' : 'Publish Article'}
+                        {form.formState.isSubmitting ? 'Saving...' : 'Save & Publish'}
                     </Button>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -164,7 +199,10 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
                                  <FormField control={form.control} name="slug" render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Slug</FormLabel>
-                                        <FormControl><Input placeholder="article-slug" {...field} /></FormControl>
+                                        <FormControl><Input placeholder="article-slug" {...field} onChange={(e) => {
+                                            field.onChange(e);
+                                            setIsSlugManuallyEdited(true);
+                                        }} /></FormControl>
                                         <FormDescription>The unique URL-friendly part of the address.</FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -199,6 +237,22 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
                                     <FormItem>
                                         <FormLabel>Meta Description</FormLabel>
                                         <FormControl><Textarea placeholder="SEO-friendly description for search engines" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
+                                 <FormField control={form.control} name="canonicalUrl" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Canonical URL</FormLabel>
+                                        <FormControl><Input placeholder="https://..." {...field} /></FormControl>
+                                         <FormDescription>The original source URL for this content.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
+                                <FormField control={form.control} name="ogImageUrl" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Open Graph Image URL</FormLabel>
+                                        <FormControl><Input placeholder="https://..." {...field} /></FormControl>
+                                        <FormDescription>Image for social media sharing (e.g., 1200x630px).</FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}/>
@@ -272,7 +326,7 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
                                 <FormField control={form.control} name="subcategoryId" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Subcategory</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value} disabled={availableSubcategories.length === 0}>
+                                    <Select onValueChange={field.onChange} value={field.value || ''} disabled={availableSubcategories.length === 0}>
                                     <FormControl><SelectTrigger><SelectValue placeholder="Select a subcategory" /></SelectTrigger></FormControl>
                                     <SelectContent>
                                         {availableSubcategories.map(sub => (
@@ -296,6 +350,11 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
                          <Card>
                             <CardHeader><CardTitle>Media</CardTitle></CardHeader>
                             <CardContent className="space-y-4">
+                                {watchedCoverImageUrl && (
+                                    <div className="relative aspect-video w-full">
+                                        <Image src={watchedCoverImageUrl} alt="Cover image preview" layout="fill" className="rounded-md object-cover" />
+                                    </div>
+                                )}
                                 <FormField control={form.control} name="coverImageUrl" render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Cover Image URL</FormLabel>
