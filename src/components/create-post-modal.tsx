@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
@@ -29,49 +29,118 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/hooks/use-auth";
+import { db } from "@/lib/firebase/client";
+import { addDoc, collection, doc, onSnapshot, serverTimestamp } from "firebase/firestore";
+import type { BlogSettings, BlogCategory } from "@/lib/types";
+import React, { useEffect, useState, useMemo } from "react";
 
 const postSchema = z.object({
   title: z.string().min(5, { message: "Заголовок має містити щонайменше 5 символів." }),
-  description: z.string().min(10, { message: "Опис має містити щонайменше 10 символів." }),
   content: z.string().min(20, { message: "Вміст має містити щонайменше 20 символів." }),
-  category: z.string({ required_error: "Будь ласка, оберіть категорію." }),
-  author: z.string().min(2, { message: "Ім'я автора має містити щонайменше 2 символи." }),
-  imageUrl: z.string().url({ message: "Будь ласка, введіть дійсну URL-адресу зображення." }).optional().or(z.literal('')),
+  categoryId: z.string({ required_error: "Будь ласка, оберіть категорію." }),
+  subcategoryId: z.string().optional(),
+  // coverImageUrl: z.string().url({ message: "Будь ласка, введіть дійсну URL-адресу зображення." }).optional().or(z.literal('')),
 });
 
-const categories = [
-    { value: 'taro', label: 'таро' },
-    { value: 'astrology', label: 'астрологія' },
-    { value: 'shaman', label: 'шаман' },
-    { value: 'retreat', label: 'ретрит' },
-    { value: 'divination', label: 'гадання' },
-    { value: 'numerology', label: 'нумерологія' },
-    { value: 'practices', label: 'Практики' },
-    { value: 'advice', label: 'Поради' },
-    { value: 'analytics', label: 'Аналітика' },
-];
+type PostFormValues = z.infer<typeof postSchema>;
 
-export function CreatePostModal() {
+export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void }) {
+  const { user, profile } = useUser();
   const { toast } = useToast();
-  const form = useForm<z.infer<typeof postSchema>>({
+  const [settings, setSettings] = useState<BlogSettings | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const settingsRef = doc(db, 'blogSettings', 'main');
+    const unsubscribe = onSnapshot(settingsRef, (doc) => {
+      if (doc.exists()) {
+        setSettings(doc.data() as BlogSettings);
+      }
+      setIsLoading(false);
+    }, (error) => {
+      console.error("Error fetching blog settings:", error);
+      setIsLoading(false);
+    });
+    
+    return () => unsubscribe();
+  }, []);
+
+  const form = useForm<PostFormValues>({
     resolver: zodResolver(postSchema),
     defaultValues: {
       title: "",
-      description: "",
       content: "",
-      author: "",
-      imageUrl: "",
+      categoryId: "",
+      subcategoryId: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof postSchema>) {
-    console.log("New Post:", values);
-    // Here you would typically handle the form submission,
-    // e.g., send the data to your backend or add it to a state.
-    toast({
-        title: "Публікація створена!",
-        description: "Ваш матеріал було успішно надіслано на розгляд.",
-    });
+  const watchedCategoryId = useWatch({
+      control: form.control,
+      name: 'categoryId',
+  });
+
+  const availableSubcategories = useMemo(() => {
+      if (!watchedCategoryId || !settings) return [];
+      const selectedCategory = settings.categories.find(c => c.id === watchedCategoryId);
+      return selectedCategory?.subcategories || [];
+  }, [watchedCategoryId, settings]);
+
+  async function onSubmit(values: PostFormValues) {
+    if (!user || !profile) {
+      toast({ variant: "destructive", title: "Помилка автентифікації", description: "Ви повинні увійти, щоб створити пост." });
+      return;
+    }
+
+    const newPostPayload = {
+      // Core content
+      title: values.title,
+      content: values.content,
+      slug: values.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 70), // Simple slug generation
+      contentType: 'post' as const,
+
+      // Author
+      authorId: user.uid,
+      authorName: profile.name || user.email || '',
+      authorAvatarUrl: profile.avatarUrl || '',
+
+      // Taxonomy
+      categoryId: values.categoryId,
+      subcategoryId: values.subcategoryId || '',
+
+      // Platform fields
+      sourcePlatform: 'site' as const,
+      showInAuthorProfile: true,
+      allowSitePublication: true,
+
+      // Moderation fields
+      editorialStatus: 'submitted' as const,
+      sitePublished: false,
+
+      // Timestamps
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+
+      // Default status for blog-related features
+      status: 'draft' as const,
+    };
+
+    try {
+      await addDoc(collection(db, "posts"), newPostPayload);
+      toast({
+        title: "Матеріал надіслано!",
+        description: "Ваш пост було надіслано на розгляд і скоро з'явиться у вашому профілі.",
+      });
+      setOpen(false);
+    } catch (error: any) {
+      console.error("Error creating post:", error);
+      toast({
+        variant: "destructive",
+        title: "Помилка створення поста",
+        description: error.message || "Не вдалося зберегти ваш пост. Спробуйте ще раз.",
+      });
+    }
   }
 
   return (
@@ -79,7 +148,7 @@ export function CreatePostModal() {
       <DialogHeader>
         <DialogTitle>Створити нову публікацію</DialogTitle>
         <DialogDescription>
-          Заповніть форму нижче, щоб додати новий матеріал у блог. Після перевірки модератором він з'явиться на сайті.
+          Заповніть форму нижче, щоб додати новий матеріал. Після перевірки модератором він може з'явитися на сайті.
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
@@ -92,19 +161,6 @@ export function CreatePostModal() {
                 <FormLabel>Заголовок</FormLabel>
                 <FormControl>
                   <Input placeholder="Як читати карти Таро..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Короткий опис</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Відкрийте для себе світ Таро..." {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -126,19 +182,19 @@ export function CreatePostModal() {
            <div className="grid grid-cols-2 gap-4">
              <FormField
                 control={form.control}
-                name="category"
+                name="categoryId"
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>Категорія</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
                     <FormControl>
                         <SelectTrigger>
                         <SelectValue placeholder="Оберіть категорію" />
                         </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                        {categories.map(cat => (
-                            <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                        {settings?.categories?.map(cat => (
+                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                         ))}
                     </SelectContent>
                     </Select>
@@ -147,34 +203,28 @@ export function CreatePostModal() {
                 )}
             />
             <FormField
-                control={form.control}
-                name="author"
-                render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Автор</FormLabel>
-                    <FormControl>
-                    <Input placeholder="Олена П." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-                )}
-            />
-           </div>
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
+              control={form.control}
+              name="subcategoryId"
+              render={({ field }) => (
               <FormItem>
-                <FormLabel>URL зображення (необов'язково)</FormLabel>
-                <FormControl>
-                  <Input placeholder="https://picsum.photos/seed/..." {...field} />
-                </FormControl>
-                <FormMessage />
+                  <FormLabel>Підкатегорія</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value} disabled={availableSubcategories.length === 0}>
+                  <FormControl><SelectTrigger><SelectValue placeholder="Оберіть підкатегорію" /></SelectTrigger></FormControl>
+                  <SelectContent>
+                      {availableSubcategories.map(sub => (
+                          <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
+                      ))}
+                  </SelectContent>
+                  </Select>
+                  <FormMessage />
               </FormItem>
-            )}
-          />
+              )}/>
+           </div>
           <DialogFooter>
-            <Button type="submit">Надіслати на розгляд</Button>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Скасувати</Button>
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? 'Надсилання...' : 'Надіслати на розгляд'}
+            </Button>
           </DialogFooter>
         </form>
       </Form>

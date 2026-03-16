@@ -20,12 +20,12 @@ import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Newspaper } from 'lucide-react';
 import Image from 'next/image';
 import { Checkbox } from '@/components/ui/checkbox';
-import type { BlogPost, BlogCategory } from '@/lib/types';
+import type { Post, BlogCategory } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const statusColors: Record<BlogPost['status'], string> = {
+const statusColors: Record<Post['status'], string> = {
     published: 'bg-green-500',
     draft: 'bg-yellow-500',
     scheduled: 'bg-blue-500',
@@ -38,7 +38,7 @@ export function AllArticlesTable({
   isLoading,
   showFilters = true 
 }: { 
-  posts: BlogPost[],
+  posts: Post[],
   categories: BlogCategory[],
   isLoading: boolean,
   showFilters?: boolean 

@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
-import type { BlogPost, BlogSettings } from "@/lib/types";
+import type { Post, BlogSettings } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -13,7 +13,7 @@ export default function EditArticlePage() {
   const params = useParams();
   const id = params?.id as string;
   
-  const [article, setArticle] = useState<BlogPost | null>(null);
+  const [article, setArticle] = useState<Post | null>(null);
   const [settings, setSettings] = useState<BlogSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export default function EditArticlePage() {
             ]);
 
             if (articleSnap.exists()) {
-                setArticle({ id: articleSnap.id, ...articleSnap.data() } as BlogPost);
+                setArticle({ id: articleSnap.id, ...articleSnap.data() } as Post);
             } else {
                 setError("Article not found.");
             }
@@ -92,7 +92,7 @@ export default function EditArticlePage() {
       </div>
       {article ? (
         <ArticleEditForm 
-            initialData={article as BlogPost & { id: string }} 
+            initialData={article as Post & { id: string }} 
             categories={settings?.categories || []}
         />
       ) : (

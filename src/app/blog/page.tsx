@@ -13,11 +13,11 @@ import { CreatePostModal } from '@/components/create-post-modal';
 import Footer from '@/components/layout/footer';
 import { db } from '@/lib/firebase/client';
 import { collection, onSnapshot, query, where, getDoc, doc } from 'firebase/firestore';
-import type { BlogPost, BlogSettings } from '@/lib/types';
+import type { Post, BlogSettings } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const ArticleCard = ({ post, categoryName, subcategoryName, className, isFeatured = false }: { post: BlogPost, categoryName: string, subcategoryName: string, className?: string, isFeatured?: boolean }) => (
+const ArticleCard = ({ post, categoryName, subcategoryName, className, isFeatured = false }: { post: Post, categoryName: string, subcategoryName: string, className?: string, isFeatured?: boolean }) => (
   <Card className={cn("overflow-hidden flex flex-col h-full shadow-md hover:shadow-xl transition-shadow duration-300", className)}>
     <div className="relative w-full">
       <Image 
@@ -45,8 +45,9 @@ const ArticleCard = ({ post, categoryName, subcategoryName, className, isFeature
 
 export default function BlogPage() {
   const [settings, setSettings] = useState<BlogSettings | null>(null);
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPostModalOpen, setPostModalOpen] = useState(false);
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('all');
@@ -66,7 +67,7 @@ export default function BlogPage() {
         where("status", "==", "published")
     );
     const unsubPosts = onSnapshot(postsQuery, (snapshot) => {
-        const fetchedPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as BlogPost));
+        const fetchedPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
         setPosts(fetchedPosts);
         setIsLoading(false);
     }, (error) => {
@@ -224,11 +225,11 @@ export default function BlogPage() {
         </section>
 
         <section className="my-20 text-center">
-            <Dialog>
+            <Dialog open={isPostModalOpen} onOpenChange={setPostModalOpen}>
                 <DialogTrigger asChild>
                     <Button size="lg">хочу опублікувати контент</Button>
                 </DialogTrigger>
-                <CreatePostModal />
+                <CreatePostModal setOpen={setPostModalOpen} />
             </Dialog>
         </section>
 

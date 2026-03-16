@@ -4,13 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Newspaper, BookMarked, Users, PenSquare } from "lucide-react";
 import { AllArticlesTable } from "./_components/all-articles-table";
 import { useEffect, useState } from "react";
-import type { BlogPost, UserProfile, BlogSettings } from "@/lib/types";
+import type { Post, UserProfile, BlogSettings } from "@/lib/types";
 import { collection, onSnapshot, query, where, doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BlogAdminDashboard() {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [authors, setAuthors] = useState<UserProfile[]>([]);
   const [settings, setSettings] = useState<BlogSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +38,7 @@ export default function BlogAdminDashboard() {
     });
 
     const unsubPosts = onSnapshot(postsQuery, (snapshot) => {
-      const fetchedPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as BlogPost));
+      const fetchedPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
       setPosts(fetchedPosts);
       postsLoaded = true;
       checkLoading();

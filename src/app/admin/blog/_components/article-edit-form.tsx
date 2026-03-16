@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/hooks/use-auth';
 import { db } from '@/lib/firebase/client';
-import type { BlogPost, BlogCategory } from '@/lib/types';
+import type { Post, BlogCategory } from '@/lib/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
@@ -44,7 +44,7 @@ const articleSchema = z.object({
 export type ArticleFormValues = z.infer<typeof articleSchema>;
 
 interface ArticleEditFormProps {
-    initialData?: Partial<BlogPost> & { id: string };
+    initialData?: Partial<Post> & { id: string };
     categories: BlogCategory[];
 }
 
@@ -100,7 +100,7 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
             publishedAtValue = null;
         }
 
-        const postPayload: Omit<BlogPost, 'id' | 'createdAt' | 'authorId' | 'authorName' | 'authorAvatarUrl' | 'views' | 'contentType'> & { updatedAt: any } = {
+        const postPayload: Omit<Post, 'id' | 'createdAt' | 'authorId' | 'authorName' | 'authorAvatarUrl' | 'views' | 'contentType'> & { updatedAt: any } = {
             ...data,
             tags: tagsArray,
             subcategoryId: data.subcategoryId || '',
@@ -114,7 +114,7 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
                 await updateDoc(postRef, postPayload);
                 toast({ title: "Article updated successfully!" });
             } else {
-                const newPostPayload = {
+                const newPostPayload: any = {
                     ...postPayload,
                     contentType: 'blog' as const,
                     authorId: user.uid,

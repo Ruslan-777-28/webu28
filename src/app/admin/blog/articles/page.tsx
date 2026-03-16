@@ -5,12 +5,12 @@ import { AllArticlesTable } from "../_components/all-articles-table";
 import Link from "next/link";
 import { PlusCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { BlogPost, BlogSettings } from "@/lib/types";
+import type { Post, BlogSettings } from "@/lib/types";
 import { collection, onSnapshot, query, where, doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 
 export default function AllArticlesPage() {
-    const [posts, setPosts] = useState<BlogPost[]>([]);
+    const [posts, setPosts] = useState<Post[]>([]);
     const [settings, setSettings] = useState<BlogSettings | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -30,7 +30,7 @@ export default function AllArticlesPage() {
                 const fetchedPosts = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
-                } as BlogPost));
+                } as Post));
                 setPosts(fetchedPosts);
                 setIsLoading(false);
             }, (error) => {

@@ -1,10 +1,13 @@
-export type ArticleStatus = 'draft' | 'scheduled' | 'published' | 'archived';
+export type PostStatus = 'draft' | 'scheduled' | 'published' | 'archived';
+export type PostContentType = 'blog' | 'post';
+export type EditorialStatus = 'submitted' | 'published' | 'rejected' | 'revision';
+export type SourcePlatform = 'site' | 'app' | 'admin';
 
-export type BlogPost = {
+export type Post = {
   id: string; // Firestore document ID
   
   // Core Content
-  contentType: 'blog';
+  contentType: PostContentType;
   title: string;
   slug: string;
   excerpt?: string;
@@ -13,6 +16,7 @@ export type BlogPost = {
   // Media
   coverImageUrl?: string;
   coverAlt?: string;
+  ogImageUrl?: string;
 
   // Author
   authorId: string;
@@ -24,14 +28,15 @@ export type BlogPost = {
   subcategoryId?: string;
   tags?: string[];
 
-  // Status & Visibility
-  status: ArticleStatus;
+  // Status & Visibility (Primarily for 'blog' contentType)
+  status: PostStatus;
   featured?: boolean;
   pinned?: boolean;
   
   // SEO & Metadata
   seoTitle?: string;
   seoDescription?: string;
+  canonicalUrl?: string;
   noindex?: boolean;
   nofollow?: boolean;
   
@@ -41,8 +46,27 @@ export type BlogPost = {
   // Timestamps
   createdAt: any; // Firestore Timestamp
   updatedAt: any; // Firestore Timestamp
-  publishedAt?: any | null; // Firestore Timestamp
-  scheduledAt?: any | null; // Firestore Timestamp
+  publishedAt?: any | null; // Firestore Timestamp for 'blog'
+  scheduledAt?: any | null; // Firestore Timestamp for 'blog'
+
+  // --- New Platform-wide Fields ---
+  sourcePlatform?: SourcePlatform;
+  showInAuthorProfile?: boolean;
+
+  // Site Publication Control
+  allowSitePublication?: boolean;
+  sitePublished?: boolean;
+  sitePublishedAt?: any | null; // Firestore Timestamp for when a 'post' is published on site
+  publishedBy?: string; // UID of admin/editor who published it
+
+  // Editorial/Moderation Flow
+  editorialStatus?: EditorialStatus;
+  moderationNotes?: string;
+  moderationUpdatedAt?: any | null;
+  moderationUpdatedBy?: string; // UID of admin/moderator
+  revisionRequested?: boolean;
+  revisionMessage?: string;
+  revisionSubmittedAt?: any | null;
 };
 
 
