@@ -30,10 +30,14 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/hooks/use-auth";
-import { db } from "@/lib/firebase/client";
-import { addDoc, collection, doc, onSnapshot, serverTimestamp } from "firebase/firestore";
+import { db, storage } from "@/lib/firebase/client";
+import { addDoc, collection, doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import type { BlogSettings } from "@/lib/types";
 import React, { useEffect, useState, useMemo } from "react";
+import Image from "next/image";
+import { Image as ImageIcon, Upload, X } from 'lucide-react';
+import { Progress } from "./ui/progress";
 
 const postSchema = z.object({
   title: z.string().min(5, { message: "Заголовок має містити щонайменше 5 символів." }),
@@ -50,6 +54,11 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
   const { toast } = useToast();
   const [settings, setSettings] = useState<BlogSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
+  const [newPostId, setNewPostId] = useState<string | null>(null);
 
   useEffect(() => {
     const settingsRef = doc(db, 'blogSettings', 'main');
@@ -88,17 +97,91 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
       return selectedCategory?.subcategories || [];
   }, [watchedCategoryId, settings]);
 
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            toast({ variant: 'destructive', title: 'Invalid file type', description: 'Please select a PNG, JPG, or WEBP image.' });
+            return;
+        }
+
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            toast({ variant: 'destructive', title: 'File too large', description: 'Image size should not exceed 5MB.' });
+            return;
+        }
+
+        handleImageUpload(file);
+        e.target.value = '';
+    };
+
+    const handleImageUpload = (file: File) => {
+        let postId = newPostId;
+        if (!postId) {
+            postId = doc(collection(db, "posts")).id;
+            setNewPostId(postId);
+        }
+
+        setIsUploading(true);
+        const storageRef = ref(storage, `posts/${postId}/cover-${Date.now()}-${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setUploadProgress(progress);
+            },
+            (error) => {
+                console.error("Upload error:", error);
+                toast({ variant: 'destructive', title: 'Upload failed', description: error.message });
+                setIsUploading(false);
+            },
+            () => {
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                    if (coverImageUrl) {
+                        const oldImageRef = ref(storage, coverImageUrl);
+                        deleteObject(oldImageRef).catch(err => console.warn("Could not delete old image:", err));
+                    }
+                    setCoverImageUrl(downloadURL);
+                    setIsUploading(false);
+                    toast({ title: 'Image uploaded!' });
+                });
+            }
+        );
+    };
+
+    const handleImageRemove = async () => {
+        if (!coverImageUrl) return;
+        const imageRef = ref(storage, coverImageUrl);
+        try {
+            await deleteObject(imageRef);
+            setCoverImageUrl(null);
+            toast({ title: 'Image removed.' });
+        } catch (error: any) {
+            console.error("Error removing image:", error);
+            if (error.code === 'storage/object-not-found') {
+                setCoverImageUrl(null);
+            } else {
+                toast({ variant: 'destructive', title: 'Error removing image', description: error.message });
+            }
+        }
+    };
+
   async function onSubmit(values: PostFormValues) {
     if (!user || !profile) {
       toast({ variant: "destructive", title: "Помилка автентифікації", description: "Ви повинні увійти, щоб створити пост." });
       return;
     }
+    
+    const docRef = newPostId ? doc(db, "posts", newPostId) : doc(collection(db, "posts"));
 
     const newPostPayload = {
       // Core content
       title: values.title,
       content: values.content,
-      coverImageUrl: values.coverImageUrl || '',
+      coverImageUrl: coverImageUrl || '',
       slug: values.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 70),
       contentType: 'post' as const,
 
@@ -129,7 +212,7 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
     };
 
     try {
-      await addDoc(collection(db, "posts"), newPostPayload);
+      await setDoc(docRef, newPostPayload);
       toast({
         title: "Матеріал надіслано!",
         description: "Ваш пост було надіслано на розгляд і скоро з'явиться у вашому профілі.",
@@ -181,19 +264,48 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="coverImageUrl"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>URL-адреса зображення обкладинки</FormLabel>
-                <FormControl>
-                    <Input placeholder="https://example.com/image.png" {...field} />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
+
+          <div className="space-y-2">
+            <FormLabel>Зображення обкладинки</FormLabel>
+            {coverImageUrl ? (
+                <div className="relative group">
+                    <Image src={coverImageUrl} alt="Cover image preview" width={400} height={225} className="rounded-md object-cover w-full aspect-video" />
+                    <Button size="icon" variant="destructive" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={handleImageRemove}>
+                        <X className="h-4 w-4" />
+                    </Button>
+                </div>
+            ) : (
+                <div className="border-2 border-dashed border-muted rounded-lg p-6 text-center">
+                    {isUploading ? (
+                        <>
+                            <Progress value={uploadProgress} className="w-full" />
+                            <p className="text-sm mt-2 text-muted-foreground">{Math.round(uploadProgress)}%</p>
+                        </>
+                    ) : (
+                          <>
+                            <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
+                            <label htmlFor="cover-image-upload-create" className="mt-4 inline-block cursor-pointer">
+                                <Button asChild variant="outline">
+                                    <span><Upload className="mr-2 h-4 w-4" /> Завантажити</span>
+                                </Button>
+                            </label>
+                            <input id="cover-image-upload-create" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={handleFileSelect} />
+                            <p className="text-xs text-muted-foreground mt-2">PNG, JPG, WEBP до 5MB.</p>
+                          </>
+                    )}
+                </div>
             )}
+             <FormField
+                control={form.control}
+                name="coverImageUrl"
+                render={({ field }) => (
+                    <FormItem className="hidden">
+                        <FormControl><Input {...field} value={coverImageUrl || ''} /></FormControl>
+                    </FormItem>
+                )}
             />
+          </div>
+          
            <div className="grid grid-cols-2 gap-4">
              <FormField
                 control={form.control}
@@ -223,7 +335,7 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
               render={({ field }) => (
               <FormItem>
                   <FormLabel>Підкатегорія</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value} disabled={availableSubcategories.length === 0}>
+                  <Select onValueChange={field.onChange} value={field.value || ""} disabled={availableSubcategories.length === 0}>
                   <FormControl><SelectTrigger><SelectValue placeholder="Оберіть підкатегорію" /></SelectTrigger></FormControl>
                   <SelectContent>
                       {availableSubcategories.map(sub => (
@@ -237,7 +349,7 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
            </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Скасувати</Button>
-            <Button type="submit" disabled={form.formState.isSubmitting}>
+            <Button type="submit" disabled={form.formState.isSubmitting || isUploading}>
                 {form.formState.isSubmitting ? 'Надсилання...' : 'Надіслати на розгляд'}
             </Button>
           </DialogFooter>
