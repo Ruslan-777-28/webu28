@@ -186,7 +186,7 @@ export default function BlogPage() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">Всі категорії</SelectItem>
-                            {settings?.categories.map(cat => (
+                            {settings?.categories.filter(cat => cat.id && cat.name).map(cat => (
                                 <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                             ))}
                         </SelectContent>
@@ -197,7 +197,7 @@ export default function BlogPage() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">Всі підкатегорії</SelectItem>
-                             {availableSubcategories.map(sub => (
+                             {availableSubcategories.filter(sub => sub.id && sub.name).map(sub => (
                                 <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
                             ))}
                         </SelectContent>

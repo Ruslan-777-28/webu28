@@ -394,7 +394,7 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl><SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger></FormControl>
                                     <SelectContent>
-                                        {categories.length > 0 ? categories.map(cat => (
+                                        {categories.length > 0 ? categories.filter(cat => cat.id && cat.name).map(cat => (
                                             <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                                         )) : <SelectItem value="-" disabled>No categories found</SelectItem>}
                                     </SelectContent>
@@ -408,7 +408,7 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
                                     <Select onValueChange={field.onChange} value={field.value || ''} disabled={availableSubcategories.length === 0}>
                                     <FormControl><SelectTrigger><SelectValue placeholder="Select a subcategory" /></SelectTrigger></FormControl>
                                     <SelectContent>
-                                        {availableSubcategories.map(sub => (
+                                        {availableSubcategories.filter(sub => sub.id && sub.name).map(sub => (
                                             <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
                                         ))}
                                     </SelectContent>
