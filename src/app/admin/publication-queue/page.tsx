@@ -1,9 +1,6 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
 import { SubmissionsTable } from "./_components/submissions-table";
-import Link from "next/link";
-import { PlusCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Post, BlogSettings } from "@/lib/types";
 import { collection, onSnapshot, query, where, doc, getDoc } from "firebase/firestore";

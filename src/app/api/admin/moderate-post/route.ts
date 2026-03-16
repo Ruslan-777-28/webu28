@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
-import type { EditorialStatus, Post } from '@/lib/types';
+import type { EditorialStatus } from '@/lib/types';
 
 interface ModeratePostRequestBody {
     postId: string;
