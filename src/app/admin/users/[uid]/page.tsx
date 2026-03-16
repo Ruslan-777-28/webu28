@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import type { UserProfile } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,27 +27,21 @@ export default function EditUserPage() {
       return;
     };
 
-    const fetchData = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            const userRef = doc(db, "users", uid);
-            const userSnap = await getDoc(userRef);
-
-            if (userSnap.exists()) {
-                setUserProfile({ uid: userSnap.id, ...userSnap.data() } as UserProfile);
-            } else {
-                setError("User not found.");
-            }
-        } catch (err: any) {
-            console.error("Error fetching user data:", err);
-            setError(err.message || "Failed to fetch user data.");
-        } finally {
-            setIsLoading(false);
+    const userRef = doc(db, "users", uid);
+    const unsubscribe = onSnapshot(userRef, (doc) => {
+        if (doc.exists()) {
+            setUserProfile({ uid: doc.id, ...doc.data() } as UserProfile);
+        } else {
+            setError("User not found.");
         }
-    };
+        setIsLoading(false);
+    }, (err: any) => {
+        console.error("Error fetching user data:", err);
+        setError(err.message || "Failed to fetch user data.");
+        setIsLoading(false);
+    });
     
-    fetchData();
+    return () => unsubscribe();
   }, [uid]);
   
   if (isLoading) {

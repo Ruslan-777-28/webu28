@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { UserProfile, UserAccountStatus } from "@/lib/types";
 import { useUser } from '@/hooks/use-auth';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -26,6 +27,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Input } from '@/components/ui/input';
+import { Shield } from 'lucide-react';
 
 
 async function updateUser(uid: string, action: string, payload: any, token: string) {
@@ -55,6 +57,7 @@ export function UserAdminView({ userProfile }: { userProfile: UserProfile }) {
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
     const [suspensionReason, setSuspensionReason] = useState('');
     const [suspensionDays, setSuspensionDays] = useState('7');
+    const [banReason, setBanReason] = useState('');
 
     const handleUpdateStatus = async (status: UserAccountStatus, reason?: string, until?: Date | null) => {
         if (!adminUser) {
@@ -71,7 +74,7 @@ export function UserAdminView({ userProfile }: { userProfile: UserProfile }) {
             
             await updateUser(userProfile.uid, 'SET_STATUS', payload, token);
             toast({ title: 'User status updated successfully!' });
-            // Note: UI will update via Firestore listener on the parent page
+            // UI will update via Firestore listener on the parent page
         } catch (error: any) {
             toast({ variant: "destructive", title: "Error updating status", description: error.message });
         } finally {
@@ -97,6 +100,10 @@ export function UserAdminView({ userProfile }: { userProfile: UserProfile }) {
     };
 
     const handleSuspend = () => {
+        if (!suspensionReason) {
+            toast({ variant: 'destructive', title: 'Reason is required for suspension' });
+            return;
+        }
         const days = parseInt(suspensionDays, 10);
         if (isNaN(days) || days <= 0) {
             toast({ variant: 'destructive', title: 'Invalid number of days' });
@@ -108,11 +115,15 @@ export function UserAdminView({ userProfile }: { userProfile: UserProfile }) {
     };
 
     const handleBan = () => {
-        handleUpdateStatus('banned', 'User permanently banned by admin.');
+        if (!banReason) {
+            toast({ variant: 'destructive', title: 'Reason is required for banning' });
+            return;
+        }
+        handleUpdateStatus('banned', banReason);
     };
     
-    const handleUnsuspend = () => {
-        handleUpdateStatus('active', 'Suspension lifted by admin.');
+    const handleRestore = () => {
+        handleUpdateStatus('active', 'Account restored by admin.');
     };
 
     return (
@@ -123,16 +134,23 @@ export function UserAdminView({ userProfile }: { userProfile: UserProfile }) {
                         <CardTitle>User Information</CardTitle>
                         <CardDescription>Main profile and platform details.</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-4 text-sm">
                         <p><strong>Email:</strong> {userProfile.email}</p>
                         <p><strong>UID:</strong> <code>{userProfile.uid}</code></p>
                         <p><strong>Created At:</strong> {userProfile.createdAt?.toDate().toLocaleString()}</p>
                          <div>
                             <strong>Roles:</strong>
                             <div className="flex flex-wrap gap-2 mt-2">
-                                {userProfile.roles && Object.entries(userProfile.roles).map(([role, active]) => 
-                                    active && <Badge key={role} variant="secondary">{role}</Badge>
+                                {userProfile.roles && Object.entries(userProfile.roles).filter(([, active]) => active).map(([role]) => 
+                                    <Badge key={role} variant="secondary">{role}</Badge>
                                 )}
+                            </div>
+                        </div>
+                        <div>
+                            <strong>Admin Access:</strong>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {userProfile.adminAccess?.isStaff && <Badge variant="outline">Is Staff</Badge>}
+                                {userProfile.adminAccess?.panelEnabled && <Badge><Shield className="w-3 h-3 mr-1"/> Panel Access</Badge>}
                             </div>
                         </div>
                     </CardContent>
@@ -149,9 +167,14 @@ export function UserAdminView({ userProfile }: { userProfile: UserProfile }) {
                             onChange={(e) => setNotes(e.target.value)}
                             className="min-h-48"
                         />
+                         {userProfile.adminMeta?.lastReviewedAt && (
+                            <p className="text-xs text-muted-foreground mt-2">
+                                Last saved at {userProfile.adminMeta.lastReviewedAt.toDate().toLocaleString()}
+                            </p>
+                        )}
                     </CardContent>
                     <CardFooter>
-                        <Button onClick={handleSaveNotes} disabled={isSavingNotes}>
+                        <Button onClick={handleSaveNotes} disabled={isSavingNotes || notes === (userProfile.adminMeta?.notes || '')}>
                             {isSavingNotes ? 'Saving...' : 'Save Notes'}
                         </Button>
                     </CardFooter>
@@ -163,9 +186,16 @@ export function UserAdminView({ userProfile }: { userProfile: UserProfile }) {
                         <CardTitle>Platform Status</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                        <div className="flex items-center gap-2">
+                            <span>Status:</span> 
+                            <Badge variant={userProfile.accountStatus === 'banned' || userProfile.accountStatus === 'suspended' ? 'destructive' : 'default'} className="capitalize">
+                                {userProfile.accountStatus || 'active'}
+                            </Badge>
+                        </div>
                         <Select 
                             value={userProfile.accountStatus || 'active'} 
                             onValueChange={(value) => handleUpdateStatus(value as UserAccountStatus)}
+                            disabled={isUpdatingStatus || userProfile.accountStatus === 'suspended' || userProfile.accountStatus === 'banned'}
                         >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select status" />
@@ -173,8 +203,6 @@ export function UserAdminView({ userProfile }: { userProfile: UserProfile }) {
                             <SelectContent>
                                 <SelectItem value="active">Active</SelectItem>
                                 <SelectItem value="limited">Limited</SelectItem>
-                                <SelectItem value="suspended" disabled>Suspended</SelectItem>
-                                <SelectItem value="banned" disabled>Banned</SelectItem>
                             </SelectContent>
                         </Select>
 
@@ -182,13 +210,15 @@ export function UserAdminView({ userProfile }: { userProfile: UserProfile }) {
                             <div className="p-3 bg-orange-50 border border-orange-200 rounded-md text-sm">
                                 <p className="font-bold text-orange-800">Suspended</p>
                                 <p><strong>Reason:</strong> {userProfile.suspension.reason}</p>
-                                <p><strong>Until:</strong> {userProfile.suspension.until?.toDate().toLocaleString()}</p>
+                                <p><strong>Until:</strong> {userProfile.suspension.until?.toDate().toLocaleString() || 'Permanent'}</p>
+                                <p className="text-xs mt-1">Set at: {userProfile.suspension.setAt?.toDate().toLocaleString()}</p>
                             </div>
                         )}
                          {userProfile.accountStatus === 'banned' && (
                             <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm">
                                 <p className="font-bold text-red-800">Banned</p>
-                                <p>This user is permanently banned.</p>
+                                {userProfile.suspension?.reason && <p><strong>Reason:</strong> {userProfile.suspension.reason}</p>}
+                                <p className="text-xs mt-1">Set at: {userProfile.suspension?.setAt?.toDate().toLocaleString()}</p>
                             </div>
                         )}
                     </CardContent>
@@ -199,64 +229,69 @@ export function UserAdminView({ userProfile }: { userProfile: UserProfile }) {
                     </CardHeader>
                     <CardContent className="flex flex-col gap-2">
                         {userProfile.accountStatus === 'suspended' || userProfile.accountStatus === 'banned' ? (
-                            <Button onClick={handleUnsuspend} disabled={isUpdatingStatus} variant="secondary">
-                                Unsuspend / Unban
+                            <Button onClick={handleRestore} disabled={isUpdatingStatus} variant="secondary">
+                                Restore to Active
                             </Button>
                         ) : (
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" disabled={isUpdatingStatus}>Suspend User</Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Suspend User</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            This will temporarily restrict the user's account. Please provide a reason and duration.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <div className="space-y-4">
-                                        <Input 
-                                            placeholder="Reason for suspension" 
-                                            value={suspensionReason}
-                                            onChange={(e) => setSuspensionReason(e.target.value)}
-                                        />
-                                        <div className="flex items-center gap-2">
-                                            <Input
-                                                type="number"
-                                                placeholder="7"
-                                                value={suspensionDays}
-                                                onChange={(e) => setSuspensionDays(e.target.value)}
-                                                className="w-20"
+                            <>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="destructive" disabled={isUpdatingStatus}>Suspend User</Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Suspend User</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This will temporarily restrict the user's account. Please provide a reason and duration.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <div className="space-y-4">
+                                            <Input 
+                                                placeholder="Reason for suspension (required)" 
+                                                value={suspensionReason}
+                                                onChange={(e) => setSuspensionReason(e.target.value)}
                                             />
-                                            <span>days</span>
+                                            <div className="flex items-center gap-2">
+                                                <Input
+                                                    type="number"
+                                                    placeholder="7"
+                                                    value={suspensionDays}
+                                                    onChange={(e) => setSuspensionDays(e.target.value)}
+                                                    className="w-20"
+                                                />
+                                                <span>days</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleSuspend}>Confirm Suspension</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        )}
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={handleSuspend}>Confirm Suspension</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
 
-                        {userProfile.accountStatus !== 'banned' && (
-                             <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" outline disabled={isUpdatingStatus}>Ban User</Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            This action is permanent and will ban the user from the platform indefinitely.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleBan}>Confirm Ban</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="destructive" outline disabled={isUpdatingStatus}>Ban User</Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This action is permanent and will ban the user from the platform indefinitely. Please provide a reason.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                         <Input 
+                                            placeholder="Reason for ban (required)" 
+                                            value={banReason}
+                                            onChange={(e) => setBanReason(e.target.value)}
+                                        />
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={handleBan}>Confirm Ban</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </>
                         )}
                     </CardContent>
                 </Card>

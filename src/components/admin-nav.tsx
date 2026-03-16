@@ -34,16 +34,14 @@ const allNavItems = [
 export function AdminNav() {
   const pathname = usePathname();
   const { isMobile, state } = useSidebar();
-  const { profile } = useUser();
+  const { claims } = useUser();
 
   const hasRole = (allowedRoles: string[]): boolean => {
-    if (!profile?.roles) return false;
-    return allowedRoles.some(role => profile.roles[role as keyof typeof profile.roles]);
+    if (!claims) return false;
+    return allowedRoles.some(role => claims[role]);
   };
 
   const visibleNavItems = allNavItems.filter(item => hasRole(item.roles));
-
-  const isBlogSectionActive = pathname.startsWith('/admin/blog');
 
   return (
     <>
@@ -62,14 +60,7 @@ export function AdminNav() {
               <Link href={item.href} legacyBehavior passHref>
                 <SidebarMenuButton
                   asChild
-                  isActive={
-                    pathname.startsWith(item.href) && 
-                    (
-                      pathname === item.href || 
-                      (item.href !== '/admin/blog' && pathname.length > item.href.length) ||
-                      (item.href === '/admin/blog' && isBlogSectionActive && (pathname.startsWith('/admin/blog/articles') || pathname.startsWith('/admin/blog/categories') || pathname.startsWith('/admin/blog/settings')))
-                    )
-                  }
+                  isActive={pathname.startsWith(item.href)}
                   tooltip={item.label}
                 >
                   <a>

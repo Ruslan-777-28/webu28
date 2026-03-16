@@ -27,20 +27,14 @@ export type BlogPost = {
   status: ArticleStatus;
   featured?: boolean;
   pinned?: boolean;
-  showInLatest?: boolean;
-  showInPopular?: boolean;
-
+  
   // SEO & Metadata
   seoTitle?: string;
   seoDescription?: string;
-  canonicalUrl?: string;
-  ogImageUrl?: string;
   noindex?: boolean;
   nofollow?: boolean;
   
   // Analytics
-  readingTime?: number; // in minutes
-  wordCount?: number;
   views?: number;
 
   // Timestamps

@@ -10,19 +10,19 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, User, Shield } from 'lucide-react';
+import { MoreHorizontal, User, Shield, UserX } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UserProfile, UserAccountStatus } from '@/lib/types';
 import { useState, useMemo } from 'react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 const statusColors: Record<UserAccountStatus, string> = {
     active: 'bg-green-500',
@@ -47,18 +47,28 @@ const RoleBadge = ({ role, active }: { role: string, active: boolean }) => {
 
 export function UsersTable({ users, isLoading }: { users: UserProfile[], isLoading: boolean }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [accessFilter, setAccessFilter] = useState<string>('all');
 
   const filteredUsers = useMemo(() => {
-    if (!searchTerm) return users;
-    return users.filter(user => 
-        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.uid?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [users, searchTerm]);
+    return users.filter(user => {
+        const searchMatch = !searchTerm || 
+            user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.uid?.toLowerCase().includes(searchTerm.toLowerCase());
+
+        const statusMatch = statusFilter === 'all' || (user.accountStatus || 'active') === statusFilter;
+        
+        const accessMatch = accessFilter === 'all' || 
+            (accessFilter === 'staff' && user.adminAccess?.isStaff) ||
+            (accessFilter === 'panel' && user.adminAccess?.panelEnabled);
+
+        return searchMatch && statusMatch && accessMatch;
+    });
+  }, [users, searchTerm, statusFilter, accessFilter]);
 
   const renderSkeleton = () => (
-    Array.from({ length: 5 }).map((_, i) => (
+    Array.from({ length: 8 }).map((_, i) => (
       <TableRow key={`skeleton-${i}`}>
         <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
         <TableCell><Skeleton className="h-6 w-48" /></TableCell>
@@ -66,7 +76,7 @@ export function UsersTable({ users, isLoading }: { users: UserProfile[], isLoadi
         <TableCell><Skeleton className="h-6 w-24" /></TableCell>
         <TableCell><Skeleton className="h-6 w-24" /></TableCell>
         <TableCell><Skeleton className="h-6 w-24" /></TableCell>
-        <TableCell className="text-right"><Skeleton className="h-8 w-8" /></TableCell>
+        <TableCell className="text-right"><Skeleton className="h-8 w-20" /></TableCell>
       </TableRow>
     ))
   );
@@ -75,8 +85,8 @@ export function UsersTable({ users, isLoading }: { users: UserProfile[], isLoadi
     <TableRow>
       <TableCell colSpan={7} className="h-24 text-center">
         <div className="flex flex-col items-center gap-2">
-            <User className="h-8 w-8 text-muted-foreground" />
-            <p className="text-muted-foreground">No users found.</p>
+            <UserX className="h-8 w-8 text-muted-foreground" />
+            <p className="text-muted-foreground">No users match the current filters.</p>
         </div>
       </TableCell>
     </TableRow>
@@ -91,7 +101,28 @@ export function UsersTable({ users, isLoading }: { users: UserProfile[], isLoadi
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
-            {/* Filters would go here */}
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-48">
+                    <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="limited">Limited</SelectItem>
+                    <SelectItem value="suspended">Suspended</SelectItem>
+                    <SelectItem value="banned">Banned</SelectItem>
+                </SelectContent>
+            </Select>
+            <Select value={accessFilter} onValueChange={setAccessFilter}>
+                <SelectTrigger className="w-48">
+                    <SelectValue placeholder="Filter by access" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Access Levels</SelectItem>
+                    <SelectItem value="staff">Any Staff Role</SelectItem>
+                    <SelectItem value="panel">Panel Access</SelectItem>
+                </SelectContent>
+            </Select>
         </div>
       <div className="rounded-md border">
         <Table>

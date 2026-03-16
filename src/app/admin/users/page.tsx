@@ -1,8 +1,6 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
 import { UsersTable } from "./_components/users-table";
-import { PlusCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { UserProfile } from "@/lib/types";
 import { collection, onSnapshot, query } from "firebase/firestore";
