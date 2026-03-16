@@ -3,51 +3,56 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // ---------- Helpers ----------
     function isSignedIn() {
       return request.auth != null;
-    }
-
-    function hasClaim(claim) {
-      return isSignedIn() && request.auth.token[claim] == true;
-    }
-
-    function isAdmin() {
-      return hasClaim('admin');
-    }
-
-    function isEditor() {
-      return isAdmin() || hasClaim('editor');
     }
 
     function isSelf(uid) {
       return isSignedIn() && request.auth.uid == uid;
     }
-    
-    // ---------- Rules ----------
-    match /avatars/{userId}/{fileName} {
-      allow read: if true;
-      allow write: if isSelf(userId) || isAdmin();
+
+    function isImageUpload(maxSizeMB) {
+      return request.resource != null
+        && request.resource.size < maxSizeMB * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
     }
 
-    match /posts/{postId}/{fileName} {
+    // Avatar files: avatars/{userId}/...
+    match /avatars/{userId}/{allPaths=**} {
       allow read: if true;
-      // Allow any signed-in user to write. Security is enforced by Firestore rules
-      // on who can create/update the post document containing the URL.
-      allow write: if isSignedIn();
+      allow create, update: if isSelf(userId) && isImageUpload(5);
+      allow delete: if isSelf(userId);
     }
 
-    match /products/{path=**} {
+    // Profile cover and other user-owned files: users/{userId}/...
+    match /users/{userId}/{allPaths=**} {
       allow read: if true;
-      allow write: if isEditor();
+      allow create, update: if isSelf(userId) && isImageUpload(5);
+      allow delete: if isSelf(userId);
     }
 
-    match /users/{path=**} {
+    // Post images: posts/{userId}/...
+    match /posts/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isSelf(userId) && isImageUpload(10);
+      allow delete: if isSelf(userId);
+    }
+
+    // Product images: products/{userId}/...
+    match /products/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isSelf(userId) && isImageUpload(10);
+      allow delete: if isSelf(userId);
+    }
+
+    // Communication request uploads
+    match /uploads/{uid}/{allPaths=**} {
       allow read: if isSignedIn();
-      allow write: if isEditor();
+      allow create, update: if isSelf(uid) && isImageUpload(10);
+      allow delete: if isSelf(uid);
     }
 
-    // Deny all other routes
+    // Deny all other paths
     match /{allPaths=**} {
       allow read, write: if false;
     }
