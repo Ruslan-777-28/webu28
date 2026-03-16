@@ -176,119 +176,120 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6 py-4">
-          
-          <FormItem>
-              <FormLabel>Аватар</FormLabel>
-              <div className="flex items-center gap-4">
-                  <Avatar className="h-20 w-20">
-                      <AvatarImage src={watchedAvatarUrl || undefined} alt={profile.name} />
-                      <AvatarFallback>{profile.name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  {isUploadingAvatar ? (
-                      <div className="w-full">
-                           <p className="text-sm text-muted-foreground mb-2">Завантажуємо аватар...</p>
-                          <Progress value={avatarUploadProgress} className="w-full" />
-                          <p className="text-sm mt-2 text-muted-foreground">{Math.round(avatarUploadProgress)}%</p>
-                      </div>
-                  ) : (
-                      <div className="flex items-center gap-2">
-                          <label htmlFor="avatar-upload-edit">
-                              <Button asChild variant="outline">
-                                  <span><Upload className="mr-2 h-4 w-4" /> Завантажити</span>
-                              </Button>
-                          </label>
-                          {watchedAvatarUrl && (
-                              <Button variant="ghost" size="icon" onClick={() => handleImageRemove('avatar')}>
-                                  <X className="h-4 w-4" />
-                              </Button>
-                          )}
-                      </div>
-                  )}
-              </div>
-              <input id="avatar-upload-edit" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={(e) => handleFileSelect(e, 'avatar')} disabled={isUploading} />
-              <FormField
-                  control={form.control}
-                  name="avatarUrl"
-                  render={({ field }) => ( <FormItem className="hidden"><FormControl><Input {...field} /></FormControl></FormItem> )}
-              />
-          </FormItem>
-          
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Ім'я</FormLabel>
-                <FormControl>
-                  <Input placeholder="Ваше ім'я" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="bio"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Про себе</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Розкажіть трохи про себе..." className="min-h-[100px]" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-           <div className="space-y-2">
-            <FormLabel>Фон профілю</FormLabel>
-            <FormDescription>Завантажте фонове зображення для вашого публічного профілю.</FormDescription>
-            {watchedCoverUrl ? (
-                <div className="relative group">
-                    <Image src={watchedCoverUrl} alt="Попередній перегляд фону" width={400} height={225} className="rounded-md object-cover w-full aspect-video" />
-                    <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <label htmlFor="cover-url-upload-edit">
-                            <Button asChild size="icon" variant="secondary" className="h-7 w-7 cursor-pointer">
-                                <span><Upload className="h-4 w-4" /></span>
-                            </Button>
-                        </label>
-                        <Button size="icon" variant="destructive" className="h-7 w-7" onClick={() => handleImageRemove('cover')}>
-                            <X className="h-4 w-4" />
-                        </Button>
-                    </div>
-                </div>
-            ) : (
-                <div className="border-2 border-dashed border-muted rounded-lg p-6 text-center">
-                    {isUploadingCover ? (
-                        <>
-                            <p className="text-sm text-muted-foreground mb-2">Завантажуємо зображення...</p>
-                            <Progress value={coverUploadProgress} className="w-full" />
-                            <p className="text-sm mt-2 text-muted-foreground">{Math.round(coverUploadProgress)}%</p>
-                        </>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-6">
+            <FormItem>
+                <FormLabel>Аватар</FormLabel>
+                <div className="flex items-center gap-4">
+                    <Avatar className="h-20 w-20">
+                        <AvatarImage src={watchedAvatarUrl || undefined} alt={profile.name} />
+                        <AvatarFallback>{profile.name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    {isUploadingAvatar ? (
+                        <div className="w-full">
+                            <p className="text-sm text-muted-foreground mb-2">Завантажуємо аватар...</p>
+                            <Progress value={avatarUploadProgress} className="w-full" />
+                            <p className="text-sm mt-2 text-muted-foreground">{Math.round(avatarUploadProgress)}%</p>
+                        </div>
                     ) : (
-                        <>
-                            <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-                            <label htmlFor="cover-url-upload-edit" className="mt-4 inline-block cursor-pointer">
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="avatar-upload-edit">
                                 <Button asChild variant="outline">
-                                    <span><Upload className="mr-2 h-4 w-4" /> Завантажити фон</span>
+                                    <span><Upload className="mr-2 h-4 w-4" /> Завантажити</span>
                                 </Button>
                             </label>
-                            <p className="text-xs text-muted-foreground mt-2">Підтримуються JPG, PNG, WEBP. Макс. розмір 5MB.</p>
-                        </>
+                            {watchedAvatarUrl && (
+                                <Button variant="ghost" size="icon" onClick={() => handleImageRemove('avatar')}>
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            )}
+                        </div>
                     )}
                 </div>
-            )}
-            <input id="cover-url-upload-edit" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={(e) => handleFileSelect(e, 'cover')} disabled={isUploading} />
+                <input id="avatar-upload-edit" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={(e) => handleFileSelect(e, 'avatar')} disabled={isUploading} />
+                <FormField
+                    control={form.control}
+                    name="avatarUrl"
+                    render={({ field }) => ( <FormItem className="hidden"><FormControl><Input {...field} /></FormControl></FormItem> )}
+                />
+            </FormItem>
+            
             <FormField
-                control={form.control}
-                name="coverUrl"
-                render={({ field }) => ( <FormItem className="hidden"><FormControl><Input {...field} /></FormControl></FormItem> )}
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ім'я</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ваше ім'я" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
+
+            <FormField
+              control={form.control}
+              name="bio"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Про себе</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Розкажіть трохи про себе..." className="min-h-[100px]" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="space-y-2">
+              <FormLabel>Фон профілю</FormLabel>
+              <FormDescription>Завантажте фонове зображення для вашого публічного профілю.</FormDescription>
+              {watchedCoverUrl ? (
+                  <div className="relative group">
+                      <Image src={watchedCoverUrl} alt="Попередній перегляд фону" width={400} height={225} className="rounded-md object-cover w-full aspect-video" />
+                      <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <label htmlFor="cover-url-upload-edit">
+                              <Button asChild size="icon" variant="secondary" className="h-7 w-7 cursor-pointer">
+                                  <span><Upload className="h-4 w-4" /></span>
+                              </Button>
+                          </label>
+                          <Button size="icon" variant="destructive" className="h-7 w-7" onClick={() => handleImageRemove('cover')}>
+                              <X className="h-4 w-4" />
+                          </Button>
+                      </div>
+                  </div>
+              ) : (
+                  <div className="border-2 border-dashed border-muted rounded-lg p-6 text-center">
+                      {isUploadingCover ? (
+                          <>
+                              <p className="text-sm text-muted-foreground mb-2">Завантажуємо зображення...</p>
+                              <Progress value={coverUploadProgress} className="w-full" />
+                              <p className="text-sm mt-2 text-muted-foreground">{Math.round(coverUploadProgress)}%</p>
+                          </>
+                      ) : (
+                          <>
+                              <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
+                              <label htmlFor="cover-url-upload-edit" className="mt-4 inline-block cursor-pointer">
+                                  <Button asChild variant="outline">
+                                      <span><Upload className="mr-2 h-4 w-4" /> Завантажити фон</span>
+                                  </Button>
+                              </label>
+                              <p className="text-xs text-muted-foreground mt-2">Підтримуються JPG, PNG, WEBP. Макс. розмір 5MB.</p>
+                          </>
+                      )}
+                  </div>
+              )}
+              <input id="cover-url-upload-edit" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={(e) => handleFileSelect(e, 'cover')} disabled={isUploading} />
+              <FormField
+                  control={form.control}
+                  name="coverUrl"
+                  render={({ field }) => ( <FormItem className="hidden"><FormControl><Input {...field} /></FormControl></FormItem> )}
+              />
+            </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Скасувати</Button>
             <Button type="submit" disabled={isUploading}>
                 {isUploading ? 'Завантаження...' : 'Зберегти зміни'}
