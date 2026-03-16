@@ -2,6 +2,7 @@
 
 import {
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
@@ -12,14 +13,14 @@ import {
 import {
   LayoutDashboard,
   Newspaper,
-  Tags,
-  Users,
-  Settings,
   Folder,
+  Settings,
+  Languages,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@/hooks/use-auth';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const allNavItems = [
   { href: '/admin/blog', label: 'Dashboard', icon: LayoutDashboard, roles: ['author', 'editor', 'admin'] },
@@ -32,7 +33,7 @@ const allNavItems = [
 
 export function AdminNav() {
   const pathname = usePathname();
-  const { isMobile } = useSidebar();
+  const { isMobile, state } = useSidebar();
   const { profile } = useUser();
 
   const hasRole = (allowedRoles: string[]): boolean => {
@@ -72,6 +73,22 @@ export function AdminNav() {
           ))}
         </SidebarMenu>
       </SidebarContent>
+      <SidebarFooter>
+        {state === 'expanded' && (
+           <Select defaultValue="uk">
+              <SelectTrigger className="w-full">
+                  <div className="flex items-center gap-2">
+                    <Languages />
+                    <SelectValue placeholder="Мова" />
+                  </div>
+              </SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="uk">Українська</SelectItem>
+                  <SelectItem value="ru">Русский</SelectItem>
+              </SelectContent>
+          </Select>
+        )}
+      </SidebarFooter>
     </>
   );
 }
