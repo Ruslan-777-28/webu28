@@ -9,7 +9,15 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Inbox } from 'lucide-react';
+import { 
+    Inbox,
+    FileText,
+    Send,
+    Search,
+    FilePen,
+    CheckCircle2,
+    XCircle,
+} from 'lucide-react';
 import Image from 'next/image';
 import type { Post, BlogCategory, EditorialStatus } from '@/lib/types';
 import { Input } from '@/components/ui/input';
@@ -20,30 +28,36 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 
-const statusInfo: Record<EditorialStatus, { label: string; className: string }> = {
+const statusInfo: Record<EditorialStatus, { label: string; className: string; icon: React.ElementType }> = {
   draft: {
     label: 'Чернетка',
     className: 'bg-[#F1F1EE] text-[#5E5E5A] border-[#D9D9D3]',
+    icon: FileText
   },
   submitted: {
     label: 'Нове звернення',
     className: 'bg-[#F3F2F7] text-[#4F4B5C] border-[#D7D2E2]',
+    icon: Send
   },
   under_review: {
     label: 'У роботі',
     className: 'bg-[#ECECEC] text-[#2F2F32] border-[#CFCFCF]',
+    icon: Search
   },
   changes_requested: {
     label: 'Очікує правок',
     className: 'bg-[#F5F1EC] text-[#6A5848] border-[#DDD2C6]',
+    icon: FilePen
   },
   published: {
     label: 'Опубліковано',
     className: 'bg-[#EEF2EE] text-[#415043] border-[#CDD8CE]',
+    icon: CheckCircle2
   },
   rejected: {
     label: 'Відхилено',
     className: 'bg-[#F3EEEE] text-[#6B5252] border-[#DCCACA]',
+    icon: XCircle
   },
 };
 
@@ -185,10 +199,11 @@ export function SubmissionsTable({
                     <Badge 
                       variant="outline"
                       className={cn(
-                        "font-normal normal-case hover:bg-inherit",
+                        "font-normal normal-case hover:bg-inherit flex items-center gap-1.5",
                         statusInfo[post.editorialStatus].className
                       )}
                     >
+                      <statusInfo[post.editorialStatus].icon className="w-3.5 h-3.5" />
                       {statusInfo[post.editorialStatus].label}
                     </Badge>
                   )}

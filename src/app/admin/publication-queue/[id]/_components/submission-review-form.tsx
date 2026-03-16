@@ -9,20 +9,26 @@ import { Post, BlogCategory, EditorialStatus } from "@/lib/types";
 import { useUser } from '@/hooks/use-auth';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { AlertCircle, CheckCircle, Clock, FileText, Send, User, XCircle, FileWarning } from 'lucide-react';
+import {
+    CheckCircle2,
+    Clock,
+    FileText,
+    Send,
+    User,
+    XCircle,
+    Search,
+    FilePen,
+} from 'lucide-react';
 
 const statusInfo: Record<EditorialStatus, { icon: React.ElementType, label: string, description: string }> = {
     draft: { icon: FileText, label: 'Чернетка', description: 'Цей пост є чернеткою і не поданий на розгляд.' },
     submitted: { icon: Send, label: 'Нове звернення', description: 'Цей пост очікує на розгляд.' },
-    under_review: { icon: FileWarning, label: 'У роботі', description: 'Цей пост зараз переглядається.' },
-    changes_requested: { icon: AlertCircle, label: 'Очікує правок', description: 'Автор має внести зміни, перш ніж це можна буде опублікувати.' },
+    under_review: { icon: Search, label: 'У роботі', description: 'Цей пост зараз переглядається.' },
+    changes_requested: { icon: FilePen, label: 'Очікує правок', description: 'Автор має внести зміни, перш ніж це можна буде опублікувати.' },
     rejected: { icon: XCircle, label: 'Відхилено', description: 'Цей пост було відхилено і не буде опубліковано.' },
-    published: { icon: CheckCircle, label: 'Опубліковано', description: 'Цей пост опубліковано на сайті.' },
+    published: { icon: CheckCircle2, label: 'Опубліковано', description: 'Цей пост опубліковано на сайті.' },
 };
 
 
