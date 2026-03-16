@@ -16,6 +16,7 @@ import {
   Folder,
   Settings,
   Languages,
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -23,11 +24,10 @@ import { useUser } from '@/hooks/use-auth';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const allNavItems = [
-  { href: '/admin/blog', label: 'Dashboard', icon: LayoutDashboard, roles: ['author', 'editor', 'admin'] },
+  { href: '/admin/users', label: 'Users', icon: Users, roles: ['moderator', 'admin'] },
+  { href: '/admin/blog', label: 'Blog Dashboard', icon: LayoutDashboard, roles: ['author', 'editor', 'admin'] },
   { href: '/admin/blog/articles', label: 'Articles', icon: Newspaper, roles: ['author', 'editor', 'admin'] },
   { href: '/admin/blog/categories', label: 'Categories', icon: Folder, roles: ['editor', 'admin'] },
-  // { href: '/admin/blog/tags', label: 'Tags', icon: Tags, roles: ['editor', 'admin'] },
-  // { href: '/admin/blog/authors', label: 'Authors', icon: Users, roles: ['editor', 'admin'] },
   { href: '/admin/blog/settings', label: 'Settings', icon: Settings, roles: ['admin'] },
 ];
 
@@ -42,6 +42,8 @@ export function AdminNav() {
   };
 
   const visibleNavItems = allNavItems.filter(item => hasRole(item.roles));
+
+  const isBlogSectionActive = pathname.startsWith('/admin/blog');
 
   return (
     <>
@@ -60,7 +62,14 @@ export function AdminNav() {
               <Link href={item.href} legacyBehavior passHref>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname.startsWith(item.href) && (pathname === item.href || (item.href !== '/admin/blog' && pathname.length > item.href.length))}
+                  isActive={
+                    pathname.startsWith(item.href) && 
+                    (
+                      pathname === item.href || 
+                      (item.href !== '/admin/blog' && pathname.length > item.href.length) ||
+                      (item.href === '/admin/blog' && isBlogSectionActive && (pathname.startsWith('/admin/blog/articles') || pathname.startsWith('/admin/blog/categories') || pathname.startsWith('/admin/blog/settings')))
+                    )
+                  }
                   tooltip={item.label}
                 >
                   <a>

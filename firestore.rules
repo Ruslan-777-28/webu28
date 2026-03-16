@@ -38,9 +38,22 @@ service cloud.firestore {
     match /users/{uid} {
       allow get, list: if isSignedIn();
       allow create: if isSelf(uid);
-      // Admin can change any field. Others can update their own profile but not roles or adminAccess.
-      allow update: if (isSelf(uid) && request.resource.data.roles == resource.data.roles && request.resource.data.adminAccess == resource.data.adminAccess) || isAdmin();
+      allow update: if isSelf(uid) &&
+                     // A user can update their own profile, but not service/role fields.
+                     // Service fields are updated via the protected backend API which bypasses these rules.
+                     request.resource.data.roles == resource.data.roles &&
+                     request.resource.data.adminAccess == resource.data.adminAccess &&
+                     request.resource.data.accountStatus == resource.data.accountStatus &&
+                     request.resource.data.adminMeta == resource.data.adminMeta &&
+                     request.resource.data.suspension == resource.data.suspension;
       allow delete: if isAdmin();
+    }
+
+    // ---------- Admin Actions (Audit Trail) ----------
+    match /adminActions/{actionId} {
+      allow list, get: if isModerator();
+      allow create: if isModerator(); // Actions are created by server-side logic under mod/admin privileges
+      allow update, delete: if false; // Immutable logs
     }
 
     // ---------- Posts (Blog and other types) ----------
@@ -50,10 +63,15 @@ service cloud.firestore {
                          || isAuthor();
         
         // Authors can create blog posts for themselves.
-        allow create: if isAuthor() && request.resource.data.authorId == request.auth.uid && request.resource.data.contentType == 'blog';
+        allow create: if isAuthor() && 
+                         request.resource.data.authorId == request.auth.uid && 
+                         request.resource.data.contentType == 'blog';
 
-        // Authors can update their own blog posts. Editors/Admins can update any post.
-        allow update: if (isAuthor() && resource.data.authorId == request.auth.uid && resource.data.contentType == 'blog') || isEditor();
+        // Authors can update their own blog posts (if contentType is blog). Editors/Admins can update any post.
+        allow update: if (isAuthor() && 
+                          resource.data.authorId == request.auth.uid &&
+                          resource.data.contentType == 'blog'
+                         ) || isEditor();
 
         // Editors/Admins can delete posts.
         allow delete: if isEditor();

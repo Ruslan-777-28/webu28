@@ -90,6 +90,8 @@ export type BlogSettings = {
     tags?: string[];
 };
 
+export type UserAccountStatus = 'active' | 'limited' | 'suspended' | 'banned';
+
 export type UserProfile = {
   uid: string;
   name: string;
@@ -114,4 +116,31 @@ export type UserProfile = {
     until?: import('firebase/firestore').Timestamp | null;
   };
   createdAt: import('firebase/firestore').Timestamp;
+
+  // Platform Admin Fields
+  accountStatus?: UserAccountStatus;
+  adminMeta?: {
+    notes?: string;
+    lastReviewedAt?: import('firebase/firestore').Timestamp;
+    lastReviewedBy?: string; // UID of admin
+  };
+  suspension?: {
+    isSuspended: boolean;
+    reason?: string;
+    until?: import('firebase/firestore').Timestamp | null;
+    setAt: import('firebase/firestore').Timestamp;
+    setBy: string; // UID of admin
+  };
+};
+
+export type AdminActionLog = {
+  id?: string;
+  targetType: 'user' | 'post' | 'product';
+  targetId: string;
+  action: string; // e.g., "setStatus", "updateNotes", "suspend", "ban"
+  reason?: string;
+  payload?: any;
+  createdAt: any; // Firestore Timestamp
+  createdBy: string; // UID of admin
+  createdByName: string; // Denormalized admin name
 };
