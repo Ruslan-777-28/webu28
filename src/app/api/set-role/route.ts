@@ -15,13 +15,10 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, message: 'Unauthorized: No token provided.' }, { status: 401 });
         }
 
-        // --- TEMPORARILY DISABLED FOR FIRST ADMIN SETUP ---
-        // This check should be re-enabled after the first admin is created.
-        // const decodedToken = await adminAuth.verifyIdToken(idToken);
-        // if (decodedToken.admin !== true) {
-        //     return NextResponse.json({ success: false, message: 'Unauthorized: Caller is not an admin.' }, { status: 403 });
-        // }
-        // --- END TEMPORARY ---
+        const decodedToken = await adminAuth.verifyIdToken(idToken);
+        if (decodedToken.admin !== true) {
+            return NextResponse.json({ success: false, message: 'Unauthorized: Caller is not an admin.' }, { status: 403 });
+        }
 
         // 2. Parse request body
         const { uid, roles, panelEnabled } = await req.json();
