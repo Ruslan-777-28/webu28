@@ -143,8 +143,10 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
                     const oldUrl = form.getValues('coverImageUrl');
                     if (oldUrl) {
-                        const oldImageRef = ref(storage, oldUrl);
-                        deleteObject(oldImageRef).catch(err => console.warn("Could not delete old image:", err));
+                        try {
+                          const oldImageRef = ref(storage, oldUrl);
+                          deleteObject(oldImageRef).catch(err => console.warn("Could not delete old image:", err));
+                        } catch(e) { console.error(e) }
                     }
                     form.setValue('coverImageUrl', downloadURL, { shouldValidate: true });
                     setIsUploading(false);
@@ -240,134 +242,136 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Заголовок</FormLabel>
-                <FormControl>
-                  <Input placeholder="Як читати карти Таро..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="content"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Повний текст статті</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Почніть писати свою статтю тут..." className="min-h-[150px]" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="space-y-2">
-            <FormLabel>Зображення обкладинки</FormLabel>
-            <FormDescription>Додайте зображення, яке буде відображатися як обкладинка вашого поста.</FormDescription>
-            {watchedCoverImageUrl ? (
-                <div className="relative group">
-                    <Image src={watchedCoverImageUrl} alt="Cover image preview" width={400} height={225} className="rounded-md object-cover w-full aspect-video" />
-                    <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <label htmlFor="cover-image-upload-create">
-                            <Button asChild size="icon" variant="secondary" className="h-7 w-7 cursor-pointer">
-                                <span><Upload className="h-4 w-4" /></span>
-                            </Button>
-                        </label>
-                        <Button size="icon" variant="destructive" className="h-7 w-7" onClick={handleImageRemove}>
-                            <X className="h-4 w-4" />
-                        </Button>
-                    </div>
-                </div>
-            ) : (
-                <div className="border-2 border-dashed border-muted rounded-lg p-6 text-center">
-                    {isUploading ? (
-                        <>
-                            <Progress value={uploadProgress} className="w-full" />
-                            <p className="text-sm mt-2 text-muted-foreground">{Math.round(uploadProgress)}%</p>
-                        </>
-                    ) : (
-                          <>
-                            <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-                            <label htmlFor="cover-image-upload-create" className="mt-4 inline-block cursor-pointer">
-                                <Button asChild variant="outline">
-                                    <span><Upload className="mr-2 h-4 w-4" /> Завантажити зображення</span>
-                                </Button>
-                            </label>
-                            <p className="text-xs text-muted-foreground mt-2">Підтримуються JPG, PNG, WEBP. Рекомендовано горизонтальне зображення хорошої якості.</p>
-                          </>
-                    )}
-                </div>
-            )}
-            <input id="cover-image-upload-create" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={handleFileSelect} disabled={isUploading} />
-             <FormField
-                control={form.control}
-                name="coverImageUrl"
-                render={({ field }) => ( <FormItem className="hidden"><FormControl><Input {...field} /></FormControl></FormItem> )}
-            />
-          </div>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-4 py-4">
             <FormField
               control={form.control}
-              name="coverAlt"
+              name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Опис зображення</FormLabel>
+                  <FormLabel>Заголовок</FormLabel>
                   <FormControl>
-                    <Input placeholder="Коротко опишіть, що зображено на обкладинці" {...field} />
+                    <Input placeholder="Як читати карти Таро..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          
-           <div className="grid grid-cols-2 gap-4">
-             <FormField
+            <FormField
+              control={form.control}
+              name="content"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Повний текст статті</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Почніть писати свою статтю тут..." className="min-h-[150px]" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="space-y-2">
+              <FormLabel>Зображення обкладинки</FormLabel>
+              <FormDescription>Додайте зображення, яке буде відображатися як обкладинка вашого поста.</FormDescription>
+              {watchedCoverImageUrl ? (
+                  <div className="relative group">
+                      <Image src={watchedCoverImageUrl} alt="Cover image preview" width={400} height={225} className="rounded-md object-cover w-full aspect-video" />
+                      <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <label htmlFor="cover-image-upload-create">
+                              <Button asChild size="icon" variant="secondary" className="h-7 w-7 cursor-pointer">
+                                  <span><Upload className="h-4 w-4" /></span>
+                              </Button>
+                          </label>
+                          <Button size="icon" variant="destructive" className="h-7 w-7" onClick={handleImageRemove}>
+                              <X className="h-4 w-4" />
+                          </Button>
+                      </div>
+                  </div>
+              ) : (
+                  <div className="border-2 border-dashed border-muted rounded-lg p-6 text-center">
+                      {isUploading ? (
+                          <>
+                              <Progress value={uploadProgress} className="w-full" />
+                              <p className="text-sm mt-2 text-muted-foreground">{Math.round(uploadProgress)}%</p>
+                          </>
+                      ) : (
+                            <>
+                              <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
+                              <label htmlFor="cover-image-upload-create" className="mt-4 inline-block cursor-pointer">
+                                  <Button asChild variant="outline">
+                                      <span><Upload className="mr-2 h-4 w-4" /> Завантажити зображення</span>
+                                  </Button>
+                              </label>
+                              <p className="text-xs text-muted-foreground mt-2">Підтримуються JPG, PNG, WEBP. Рекомендовано горизонтальне зображення хорошої якості.</p>
+                            </>
+                      )}
+                  </div>
+              )}
+              <input id="cover-image-upload-create" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={handleFileSelect} disabled={isUploading} />
+              <FormField
+                  control={form.control}
+                  name="coverImageUrl"
+                  render={({ field }) => ( <FormItem className="hidden"><FormControl><Input {...field} /></FormControl></FormItem> )}
+              />
+            </div>
+              <FormField
                 control={form.control}
-                name="categoryId"
+                name="coverAlt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Опис зображення</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Коротко опишіть, що зображено на обкладинці" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                  control={form.control}
+                  name="categoryId"
+                  render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Категорія</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+                      <FormControl>
+                          <SelectTrigger>
+                          <SelectValue placeholder="Оберіть категорію" />
+                          </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                          {settings?.categories?.map(cat => (
+                              <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                          ))}
+                      </SelectContent>
+                      </Select>
+                      <FormMessage />
+                  </FormItem>
+                  )}
+              />
+              <FormField
+                control={form.control}
+                name="subcategoryId"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel>Категорія</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
-                    <FormControl>
-                        <SelectTrigger>
-                        <SelectValue placeholder="Оберіть категорію" />
-                        </SelectTrigger>
-                    </FormControl>
+                    <FormLabel>Підкатегорія</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || ""} disabled={availableSubcategories.length === 0}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Оберіть підкатегорію" /></SelectTrigger></FormControl>
                     <SelectContent>
-                        {settings?.categories?.map(cat => (
-                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                        {availableSubcategories.map(sub => (
+                            <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
                         ))}
                     </SelectContent>
                     </Select>
                     <FormMessage />
                 </FormItem>
-                )}
-            />
-            <FormField
-              control={form.control}
-              name="subcategoryId"
-              render={({ field }) => (
-              <FormItem>
-                  <FormLabel>Підкатегорія</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value || ""} disabled={availableSubcategories.length === 0}>
-                  <FormControl><SelectTrigger><SelectValue placeholder="Оберіть підкатегорію" /></SelectTrigger></FormControl>
-                  <SelectContent>
-                      {availableSubcategories.map(sub => (
-                          <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
-                      ))}
-                  </SelectContent>
-                  </Select>
-                  <FormMessage />
-              </FormItem>
-              )}/>
-           </div>
-          <DialogFooter>
+                )}/>
+            </div>
+          </div>
+          <DialogFooter className="pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Скасувати</Button>
             <Button type="submit" disabled={form.formState.isSubmitting || isUploading}>
                 {form.formState.isSubmitting ? 'Надсилання...' : 'Надіслати на розгляд'}
