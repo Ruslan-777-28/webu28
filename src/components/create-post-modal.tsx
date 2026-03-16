@@ -121,8 +121,12 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
     };
 
     const handleImageUpload = (file: File) => {
+        if (!user) {
+            toast({ variant: 'destructive', title: 'Authentication Error' });
+            return;
+        }
         setIsUploading(true);
-        const storageRef = ref(storage, `posts/${newPostId}/cover-${Date.now()}-${file.name}`);
+        const storageRef = ref(storage, `posts/${user.uid}/${newPostId}/cover-${Date.now()}-${file.name}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
 
         uploadTask.on('state_changed',

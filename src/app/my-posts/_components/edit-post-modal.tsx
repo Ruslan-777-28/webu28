@@ -32,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/hooks/use-auth";
 import { db, storage } from "@/lib/firebase/client";
 import { doc, onSnapshot, serverTimestamp, updateDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
@@ -59,6 +60,7 @@ interface EditPostModalProps {
 
 export function EditPostModal({ post, isOpen, setOpen }: EditPostModalProps) {
   const { toast } = useToast();
+  const { user } = useUser();
   const [settings, setSettings] = useState<BlogSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -136,10 +138,13 @@ export function EditPostModal({ post, isOpen, setOpen }: EditPostModalProps) {
     };
 
     const handleImageUpload = (file: File) => {
-        if (!post.id) return;
+        if (!post.id || !user) {
+             toast({ variant: 'destructive', title: 'You must be logged in to upload images.' });
+             return;
+        };
 
         setIsUploading(true);
-        const storageRef = ref(storage, `posts/${post.id}/cover-${Date.now()}-${file.name}`);
+        const storageRef = ref(storage, `posts/${user.uid}/${post.id}/cover-${Date.now()}-${file.name}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
 
         uploadTask.on('state_changed',

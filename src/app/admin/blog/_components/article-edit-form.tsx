@@ -145,8 +145,12 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
     };
 
     const handleImageUpload = (file: File) => {
+        if (!user) {
+            toast({ variant: 'destructive', title: 'Authentication Error' });
+            return;
+        }
         setIsUploading(true);
-        const storageRef = ref(storage, `posts/${postId}/cover-${Date.now()}-${file.name}`);
+        const storageRef = ref(storage, `posts/${user.uid}/${postId}/cover-${Date.now()}-${file.name}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
 
         uploadTask.on('state_changed',
