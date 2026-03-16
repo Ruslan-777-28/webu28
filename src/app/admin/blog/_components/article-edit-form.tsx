@@ -7,177 +7,190 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { useUser } from '@/hooks/use-auth';
+import { db } from '@/lib/firebase/client';
 import type { BlogPost } from '@/lib/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-
 const articleSchema = z.object({
-    // Core Content
     title: z.string().min(1, "Title is required"),
-    slug: z.string().min(1, "Slug is required"),
+    slug: z.string().min(1, "Slug is required").regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug can only contain lowercase letters, numbers, and hyphens."),
     excerpt: z.string().optional(),
     content: z.string().optional(),
     
-    // Media
-    coverImageUrl: z.string().url().optional().or(z.literal('')),
+    coverImageUrl: z.string().url("Must be a valid URL.").optional().or(z.literal('')),
     coverAlt: z.string().optional(),
 
-    // Taxonomy
     category: z.string().min(1, "Category is required"),
-    tags: z.string().optional(), // Comma-separated tags
+    tags: z.string().optional(),
 
-    // Status & Visibility
     status: z.enum(['draft', 'published', 'scheduled', 'archived']),
-    featured: z.boolean(),
-    pinned: z.boolean(),
+    featured: z.boolean().default(false),
+    pinned: z.boolean().default(false),
 
-    // SEO
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
-    noindex: z.boolean(),
-    nofollow: z.boolean(),
+    noindex: z.boolean().default(false),
+    nofollow: z.boolean().default(false),
 });
 
-type ArticleFormValues = z.infer<typeof articleSchema>;
+export type ArticleFormValues = z.infer<typeof articleSchema>;
 
-const defaultValues: Partial<ArticleFormValues> = {
-    title: '',
-    slug: '',
-    status: 'draft',
-    featured: false,
-    pinned: false,
-    noindex: false,
-    nofollow: false,
-};
+interface ArticleEditFormProps {
+    initialData?: Partial<BlogPost> & { id: string };
+    categories: string[];
+}
 
-export function ArticleEditForm({ initialData }: { initialData?: Partial<ArticleFormValues>}) {
+export function ArticleEditForm({ initialData, categories }: ArticleEditFormProps) {
+    const router = useRouter();
+    const { user, profile } = useUser();
+    const { toast } = useToast();
+    
+    const isEditing = !!initialData;
+    
     const form = useForm<ArticleFormValues>({
         resolver: zodResolver(articleSchema),
-        defaultValues: initialData || defaultValues,
+        defaultValues: {
+            ...initialData,
+            tags: Array.isArray(initialData?.tags) ? initialData.tags.join(', ') : '',
+        },
         mode: "onChange",
     });
 
-     function onSubmit(data: ArticleFormValues) {
-        // In a real app, you would add authorId, authorName, contentType
-        // and handle timestamps before saving to Firestore.
-        const postData = {
+     async function onSubmit(data: ArticleFormValues) {
+        if (!user || !profile) {
+            toast({ variant: "destructive", title: "Authentication Error", description: "You must be logged in to perform this action." });
+            return;
+        }
+
+        const tagsArray = data.tags?.split(',').map(tag => tag.trim()).filter(Boolean) || [];
+        
+        let publishedAtValue = initialData?.publishedAt || null;
+        if (data.status === 'published' && initialData?.status !== 'published') {
+            publishedAtValue = serverTimestamp();
+        } else if (data.status !== 'published') {
+            publishedAtValue = null;
+        }
+
+        const postPayload = {
             ...data,
-            tags: data.tags?.split(',').map(tag => tag.trim()).filter(Boolean),
-            contentType: 'blog',
+            tags: tagsArray,
+            updatedAt: serverTimestamp(),
+            publishedAt: publishedAtValue,
         };
-        console.log(postData);
+
+        try {
+            if (isEditing) {
+                const postRef = doc(db, 'posts', initialData.id);
+                await updateDoc(postRef, postPayload);
+                toast({ title: "Article updated successfully!" });
+            } else {
+                const newPostPayload = {
+                    ...postPayload,
+                    contentType: 'blog' as const,
+                    authorId: user.uid,
+                    authorName: profile.name || user.email,
+                    authorAvatarUrl: profile.avatarUrl || '',
+                    createdAt: serverTimestamp(),
+                    views: 0,
+                };
+                const docRef = await addDoc(collection(db, 'posts'), newPostPayload);
+                toast({ title: "Article created successfully!" });
+                router.push(`/admin/blog/articles/${docRef.id}`);
+            }
+        } catch (error: any) {
+            console.error("Form submission error:", error);
+            toast({ variant: "destructive", title: "An error occurred", description: error.message });
+        }
     }
+
+    const handleSaveDraft = async () => {
+        form.setValue('status', 'draft');
+        await form.handleSubmit(onSubmit)();
+    };
 
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
                  <div className="flex items-center justify-end gap-4 mb-8">
-                    <Button variant="outline" type="button">Save Draft</Button>
-                    <Button type="submit">Publish Article</Button>
+                    <Button variant="outline" type="button" onClick={handleSaveDraft} disabled={form.formState.isSubmitting}>
+                        {form.formState.isSubmitting ? 'Saving...' : 'Save Draft'}
+                    </Button>
+                    <Button type="submit" disabled={form.formState.isSubmitting}>
+                        {form.formState.isSubmitting ? 'Publishing...' : 'Publish Article'}
+                    </Button>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
                          <Card>
                             <CardHeader><CardTitle>Content</CardTitle></CardHeader>
                             <CardContent className="space-y-4">
-                                <FormField
-                                    control={form.control}
-                                    name="title"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Title</FormLabel>
-                                            <FormControl><Input placeholder="Article Title" {...field} /></FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                 <FormField
-                                    control={form.control}
-                                    name="slug"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Slug</FormLabel>
-                                            <FormControl><Input placeholder="article-slug" {...field} /></FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="excerpt"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Excerpt</FormLabel>
-                                            <FormControl><Textarea placeholder="Short summary of the article..." {...field} /></FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                 <FormField
-                                    control={form.control}
-                                    name="content"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Main Content</FormLabel>
-                                            <FormControl><Textarea className="min-h-64" placeholder="Write your article here..." {...field} /></FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <FormField control={form.control} name="title" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Title</FormLabel>
+                                        <FormControl><Input placeholder="Article Title" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
+                                 <FormField control={form.control} name="slug" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Slug</FormLabel>
+                                        <FormControl><Input placeholder="article-slug" {...field} /></FormControl>
+                                        <FormDescription>The unique URL-friendly part of the address.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
+                                <FormField control={form.control} name="excerpt" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Excerpt</FormLabel>
+                                        <FormControl><Textarea placeholder="Short summary of the article..." {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
+                                 <FormField control={form.control} name="content" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Main Content (Markdown supported)</FormLabel>
+                                        <FormControl><Textarea className="min-h-64" placeholder="Write your article here..." {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
                             </CardContent>
                         </Card>
                          <Card>
                             <CardHeader><CardTitle>SEO & Social</CardTitle></CardHeader>
                             <CardContent className="space-y-4">
-                                 <FormField
-                                    control={form.control}
-                                    name="seoTitle"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>SEO Title</FormLabel>
-                                            <FormControl><Input placeholder="SEO-friendly Title" {...field} /></FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                 <FormField
-                                    control={form.control}
-                                    name="seoDescription"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Meta Description</FormLabel>
-                                            <FormControl><Textarea placeholder="SEO-friendly description for search engines" {...field} /></FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                 <FormField control={form.control} name="seoTitle" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>SEO Title</FormLabel>
+                                        <FormControl><Input placeholder="SEO-friendly Title" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
+                                 <FormField control={form.control} name="seoDescription" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Meta Description</FormLabel>
+                                        <FormControl><Textarea placeholder="SEO-friendly description for search engines" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
                                 <div className="flex gap-8">
-                                    <FormField
-                                        control={form.control}
-                                        name="noindex"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-row items-center gap-2 space-y-0">
-                                                <FormControl>
-                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                                </FormControl>
-                                                <FormLabel>No Index</FormLabel>
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="nofollow"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-row items-center gap-2 space-y-0">
-                                                <FormControl>
-                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                                </FormControl>
-                                                <FormLabel>No Follow</FormLabel>
-                                            </FormItem>
-                                        )}
-                                    />
+                                    <FormField control={form.control} name="noindex" render={({ field }) => (
+                                        <FormItem className="flex flex-row items-center gap-2 space-y-0">
+                                            <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                            <FormLabel>No Index</FormLabel>
+                                        </FormItem>
+                                    )}/>
+                                    <FormField control={form.control} name="nofollow" render={({ field }) => (
+                                        <FormItem className="flex flex-row items-center gap-2 space-y-0">
+                                            <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                            <FormLabel>No Follow</FormLabel>
+                                        </FormItem>
+                                    )}/>
                                 </div>
                             </CardContent>
                         </Card>
@@ -186,18 +199,11 @@ export function ArticleEditForm({ initialData }: { initialData?: Partial<Article
                         <Card>
                             <CardHeader><CardTitle>Settings</CardTitle></CardHeader>
                             <CardContent className="space-y-4">
-                                <FormField
-                                    control={form.control}
-                                    name="status"
-                                    render={({ field }) => (
+                                <FormField control={form.control} name="status" render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Status</FormLabel>
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                            <SelectValue placeholder="Select status" />
-                                            </SelectTrigger>
-                                        </FormControl>
+                                        <FormControl><SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger></FormControl>
                                         <SelectContent>
                                             <SelectItem value="draft">Draft</SelectItem>
                                             <SelectItem value="published">Published</SelectItem>
@@ -207,106 +213,65 @@ export function ArticleEditForm({ initialData }: { initialData?: Partial<Article
                                         </Select>
                                         <FormMessage />
                                     </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="featured"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                                            <div className="space-y-0.5">
-                                                <FormLabel>Featured Article</FormLabel>
-                                            </div>
-                                            <FormControl>
-                                                <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                            </FormControl>
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="pinned"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                                            <div className="space-y-0.5">
-                                                <FormLabel>Pinned Article</FormLabel>
-                                            </div>
-                                            <FormControl>
-                                                <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                            </FormControl>
-                                        </FormItem>
-                                    )}
-                                />
+                                )}/>
+                                <FormField control={form.control} name="featured" render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                        <FormLabel>Featured Article</FormLabel>
+                                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                    </FormItem>
+                                )}/>
+                                <FormField control={form.control} name="pinned" render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                        <FormLabel>Pinned Article</FormLabel>
+                                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                    </FormItem>
+                                )}/>
                             </CardContent>
                         </Card>
                          <Card>
                             <CardHeader><CardTitle>Taxonomy</CardTitle></CardHeader>
                              <CardContent className="space-y-4">
-                                 <FormField
-                                    control={form.control}
-                                    name="category"
-                                    render={({ field }) => (
+                                 <FormField control={form.control} name="category" render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Category</FormLabel>
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                            <SelectValue placeholder="Select a category" />
-                                            </SelectTrigger>
-                                        </FormControl>
+                                        <FormControl><SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger></FormControl>
                                         <SelectContent>
-                                            {/* In a real app, these would be fetched from blogSettings/main */}
-                                            <SelectItem value="таро">таро</SelectItem>
-                                            <SelectItem value="астрологія">астрологія</SelectItem>
-                                            <SelectItem value="шаман">шаман</SelectItem>
-                                            <SelectItem value="ретрит">ретрит</SelectItem>
-                                            <SelectItem value="гадання">гадання</SelectItem>
-                                            <SelectItem value="нумерологія">нумерологія</SelectItem>
+                                            {categories.length > 0 ? categories.map(cat => (
+                                                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                                            )) : <SelectItem value="-" disabled>No categories found</SelectItem>}
                                         </SelectContent>
                                         </Select>
                                         <FormMessage />
                                     </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="tags"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Tags</FormLabel>
-                                            <FormControl><Input placeholder="tag1, tag2, tag3" {...field} /></FormControl>
-                                            <FormDescription>Comma-separated values.</FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                    )}/>
+                                <FormField control={form.control} name="tags" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Tags</FormLabel>
+                                        <FormControl><Input placeholder="tag1, tag2, tag3" {...field} /></FormControl>
+                                        <FormDescription>Comma-separated values.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
                              </CardContent>
                         </Card>
                          <Card>
                             <CardHeader><CardTitle>Media</CardTitle></CardHeader>
                             <CardContent className="space-y-4">
-                                <FormField
-                                    control={form.control}
-                                    name="coverImageUrl"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Cover Image URL</FormLabel>
-                                            <FormControl><Input placeholder="https://..." {...field} /></FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="coverAlt"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Cover Image Alt Text</FormLabel>
-                                            <FormControl><Input placeholder="A description of the image" {...field} /></FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <FormField control={form.control} name="coverImageUrl" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Cover Image URL</FormLabel>
+                                        <FormControl><Input placeholder="https://..." {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
+                                <FormField control={form.control} name="coverAlt" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Cover Image Alt Text</FormLabel>
+                                        <FormControl><Input placeholder="A description of the image" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
                             </CardContent>
                         </Card>
                     </div>

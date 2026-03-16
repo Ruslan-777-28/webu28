@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Newspaper, LayoutList, Users, BookMarked, PenSquare } from "lucide-react";
+import { Newspaper, BookMarked, Users, PenSquare } from "lucide-react";
 import { AllArticlesTable } from "./_components/all-articles-table";
 import { useEffect, useState } from "react";
 import type { BlogPost, UserProfile } from "@/lib/types";
@@ -21,6 +21,8 @@ export default function BlogAdminDashboard() {
     const unsubPosts = onSnapshot(postsQuery, (snapshot) => {
       const fetchedPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as BlogPost));
       setPosts(fetchedPosts);
+      // We set loading to false here, even if authors are not loaded yet,
+      // to show post data as soon as it's available.
       setIsLoading(false);
     }, (error) => {
       console.error("Error fetching posts:", error);
@@ -50,8 +52,8 @@ export default function BlogAdminDashboard() {
   const statCards = [
     { title: "Total Articles", value: stats.total, icon: Newspaper },
     { title: "Published", value: stats.published, icon: BookMarked },
-    { title: "Drafts", value: stats.drafts, icon: LayoutList },
-    { title: "Total Authors", value: stats.authors, icon: Users },
+    { title: "Drafts", value: stats.drafts, icon: PenSquare },
+    { title: "Registered Authors", value: stats.authors, icon: Users },
   ];
 
   return (
