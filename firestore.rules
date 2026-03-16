@@ -1,10 +1,8 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ---------- Helpers ----------
     function isSignedIn() {
       return request.auth != null;
     }
@@ -12,200 +10,127 @@ service cloud.firestore {
     function isSelf(uid) {
       return isSignedIn() && request.auth.uid == uid;
     }
-    
-    // Claim-based helpers
-    function hasClaim(claim) {
-      return isSignedIn() && request.auth.token[claim] == true;
-    }
 
-    function isAdmin() {
-      return hasClaim('admin');
-    }
-
-    function isEditor() {
-      return isAdmin() || hasClaim('editor');
-    }
-    
-    function isAuthor() {
-      return isEditor() || hasClaim('author');
-    }
-
-    function isModerator() {
-      return isAdmin() || hasClaim('moderator');
-    }
-    
     // ---------- Users ----------
     match /users/{uid} {
       allow get, list: if isSignedIn();
       allow create: if isSelf(uid);
-      allow update: if isSelf(uid) &&
-                     // A user can update their own profile, but not service/role fields.
-                     // Service fields are updated via the protected backend API which bypasses these rules.
-                     request.resource.data.roles == resource.data.roles &&
-                     request.resource.data.adminAccess == resource.data.adminAccess &&
-                     request.resource.data.accountStatus == resource.data.accountStatus &&
-                     request.resource.data.adminMeta == resource.data.adminMeta &&
-                     request.resource.data.suspension == resource.data.suspension;
-      allow delete: if isAdmin();
-    }
-
-    // ---------- Admin Actions (Audit Trail) ----------
-    match /adminActions/{actionId} {
-      allow list, get: if isModerator();
-      allow create: if isModerator(); // Actions are created by server-side logic under mod/admin privileges
-      allow update, delete: if false; // Immutable logs
-    }
-
-    // ---------- Posts (Blog and other types) ----------
-    match /posts/{postId} {
-        // Public can list and get published blog posts. Staff can get any post.
-        // An author can read their own posts regardless of status.
-        allow get, list: if (resource.data.contentType == 'blog' && resource.data.status == 'published')
-                         || isAuthor()
-                         || (isSignedIn() && resource.data.authorId == request.auth.uid);
-        
-        allow create: if (isAuthor() && request.resource.data.authorId == request.auth.uid && request.resource.data.contentType == 'blog')
-                      || (isSignedIn() && request.resource.data.authorId == request.auth.uid && request.resource.data.contentType == 'post');
-
-        // Function to check if a user is the author of a document
-        function isPostAuthor() {
-          return resource.data.authorId == request.auth.uid;
-        }
-
-        // Function to check which fields are being updated for a 'post' contentType
-        function canUpdateOwnPost() {
-            let mutableFields = ['title', 'content', 'excerpt', 'coverImageUrl', 'coverAlt', 'categoryId', 'subcategoryId', 'tags'];
-            // When just saving, authors can only update content fields and the updatedAt timestamp.
-            return request.resource.data.diff(resource.data).affectedKeys().hasOnly(mutableFields.concat(['updatedAt']));
-        }
-        
-        // Function to check fields on resubmission
-        function canResubmitOwnPost() {
-            let resubmitFields = ['title', 'content', 'excerpt', 'coverImageUrl', 'coverAlt', 'categoryId', 'subcategoryId', 'tags', 'updatedAt', 'editorialStatus', 'revisionRequested', 'revisionSubmittedAt'];
-            // On resubmission, authors can update content fields and specific status fields.
-            return resource.data.editorialStatus == 'changes_requested' &&
-                   request.resource.data.editorialStatus == 'submitted' &&
-                   request.resource.data.revisionRequested == false &&
-                   request.resource.data.diff(resource.data).affectedKeys().hasOnly(resubmitFields);
-        }
-
-        allow update: if 
-            // Editors/Admins can update any post.
-            isEditor() || 
-            // Authors can update their own blog posts.
-            (isAuthor() && isPostAuthor() && resource.data.contentType == 'blog') ||
-            // Users can update their own user-generated posts under specific conditions.
-            (isSignedIn() && isPostAuthor() && resource.data.contentType == 'post' && (canUpdateOwnPost() || canResubmitOwnPost()));
-
-        // Editors/Admins can delete posts. Authors can delete their own posts.
-        allow delete: if isEditor() || (isAuthor() && isPostAuthor());
-
-        // Comments subcollection
-        match /comments/{commentId} {
-            allow read: if true;
-            allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
-            allow update: if false; // Comments are immutable
-            allow delete: if isSignedIn() && (resource.data.uid == request.auth.uid || isModerator());
-        }
+      allow update: if isSelf(uid);
+      allow delete: if false;
     }
 
     // ---------- Products ----------
     match /products/{productId} {
       allow get, list: if true;
-      allow create, update, delete: if isEditor();
+      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.authorId == request.auth.uid;
     }
 
-    // ---------- Config Collections ----------
-    match /blogSettings/{docId} {
-      allow read: if true;
-      allow write: if isEditor();
-    }
-
-    match /siteSettings/{docId} {
-      allow read: if true;
-      allow write: if isEditor();
-    }
-
-    match /sitePages/{docId} {
-        allow read: if true;
-        allow write: if isEditor();
-    }
-
-    // ---------- Other App-Specific Collections (Kept from original rules) ----------
+    // ---------- Notifications ----------
     match /notifications/{notificationId} {
-      allow read: if isSelf(resource.data.uid);
-      allow write: if false;
+      allow read: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow create, update, delete: if false;
     }
 
+    // ---------- Wallet Ledger ----------
     match /walletLedger/{txId} {
-      allow get, list: if isSelf(resource.data.uid);
-      allow write: if false;
+      allow get, list: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow create, update, delete: if false;
     }
 
+    // ---------- Wallet Holds ----------
     match /walletHolds/{holdId} {
-      allow read: if isSelf(resource.data.uid);
-      allow write: if false;
+      allow read: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow create, update, delete: if false;
     }
 
+    // ---------- Communication Offers ----------
     match /communicationOffers/{offerId} {
       allow get, list: if isSignedIn();
-      allow create: if isSelf(request.resource.data.ownerId);
-      allow update, delete: if isSelf(resource.data.ownerId);
-    }
-    
-    function isRequestParticipant(requestId) {
-      let requestDoc = get(/databases/$(database)/documents/communicationRequests/$(requestId)).data;
-      return isSignedIn() && (
-        isSelf(requestDoc.initiatorId) || 
-        isSelf(requestDoc.authorId)
-      );
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.authorId == request.auth.uid;
     }
 
+    // ---------- Communication Requests & Messages ----------
     match /communicationRequests/{requestId} {
-      allow read: if isRequestParticipant(requestId);
-      allow write: if false;
+      function isParticipant() {
+        return isSignedIn() && (
+          resource.data.initiatorId == request.auth.uid ||
+          resource.data.authorId == request.auth.uid
+        );
+      }
+
+      allow read: if isParticipant();
+      allow create, update, delete: if false;
 
       match /messages/{messageId} {
-        allow read: if isRequestParticipant(requestId);
-        allow write: if false;
+        allow read: if isSignedIn() && (
+          get(/databases/$(database)/documents/communicationRequests/$(requestId)).data.initiatorId == request.auth.uid ||
+          get(/databases/$(database)/documents/communicationRequests/$(requestId)).data.authorId == request.auth.uid
+        );
+        allow create, update, delete: if false;
       }
     }
 
+    // ---------- Posts ----------
+    match /posts/{postId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.authorId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.authorId == request.auth.uid;
+
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+        allow update: if false;
+        allow delete: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      }
+    }
+
+    // ---------- Favorites ----------
     match /favorites/{favoriteId} {
       allow read: if isSignedIn();
-      allow create: if isSelf(request.resource.data.uid);
-      allow delete: if isSelf(resource.data.uid);
+      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
       allow update: if false;
     }
 
+    // ---------- Likes ----------
     match /likes/{likeId} {
       allow read: if isSignedIn();
-      allow create: if isSelf(request.resource.data.uid);
-      allow delete: if isSelf(resource.data.uid);
+      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
       allow update: if false;
     }
 
-    function isCallParticipant(callId) {
-      let callDoc = get(/databases/$(database)/documents/calls/$(callId)).data;
-      return isSignedIn() && (
-        isSelf(callDoc.callerId) || 
-        isSelf(callDoc.receiverId)
-      );
-    }
-    
+    // ---------- Calls & Translations ----------
     match /calls/{callId} {
-      allow read: if isCallParticipant(callId);
-      allow write: if false;
+      function isCallParticipant() {
+        return isSignedIn() && (
+          resource.data.callerId == request.auth.uid ||
+          resource.data.receiverId == request.auth.uid
+        );
+      }
+      allow read: if isCallParticipant();
+      allow create, update, delete: if false;
     }
 
     match /callTranslations/{callId} {
       allow read, write: if isSignedIn();
+
       match /segments/{segmentId} {
         allow read: if isSignedIn();
         allow write: if false;
       }
     }
-    
+
+    // ---------- Blog Settings ----------
+    match /blogSettings/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // ---------- Default deny ----------
     match /{document=**} {
       allow read, write: if false;
     }
