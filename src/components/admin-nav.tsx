@@ -19,6 +19,7 @@ import {
   Languages,
   Users,
   ExternalLink,
+  Inbox,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -27,6 +28,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 const allNavItems = [
   { href: '/admin/users', label: 'Users', icon: Users, roles: ['moderator', 'admin'] },
+  { href: '/admin/publication-queue', label: 'Publication Queue', icon: Inbox, roles: ['moderator', 'editor', 'admin'] },
   { href: '/admin/blog', label: 'Blog Dashboard', icon: LayoutDashboard, roles: ['author', 'editor', 'admin'] },
   { href: '/admin/blog/articles', label: 'Articles', icon: Newspaper, roles: ['author', 'editor', 'admin'] },
   { href: '/admin/blog/categories', label: 'Categories', icon: Folder, roles: ['editor', 'admin'] },

@@ -1,6 +1,6 @@
 export type PostStatus = 'draft' | 'scheduled' | 'published' | 'archived';
 export type PostContentType = 'blog' | 'post';
-export type EditorialStatus = 'submitted' | 'published' | 'rejected' | 'revision';
+export type EditorialStatus = 'submitted' | 'under_review' | 'published' | 'rejected' | 'revision';
 export type SourcePlatform = 'site' | 'app' | 'admin';
 
 export type Post = {
@@ -47,7 +47,6 @@ export type Post = {
   createdAt: any; // Firestore Timestamp
   updatedAt: any; // Firestore Timestamp
   publishedAt?: any | null; // Firestore Timestamp for 'blog'
-  scheduledAt?: any | null; // Firestore Timestamp for 'blog'
 
   // --- New Platform-wide Fields ---
   sourcePlatform?: SourcePlatform;
