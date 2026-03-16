@@ -1,19 +1,36 @@
+'use client';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-
-const categories = [
-    { name: 'таро', slug: 'taro' },
-    { name: 'астрологія', slug: 'astrology' },
-    { name: 'шаман', slug: 'shaman' },
-    { name: 'ретрит', slug: 'retreat' },
-    { name: 'гадання', slug: 'divination' },
-    { name: 'нумерологія', slug: 'numerology' },
-];
+import { ArrowRight, Folder } from "lucide-react";
+import { useEffect, useState } from "react";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { BlogSettings } from "@/lib/types";
 
 export default function CategoriesPage() {
+    const [categories, setCategories] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const settingsRef = doc(db, 'blogSettings', 'main');
+        const unsubscribe = onSnapshot(settingsRef, (doc) => {
+            if (doc.exists()) {
+                const settings = doc.data() as BlogSettings;
+                setCategories(settings.categories || []);
+            }
+            setIsLoading(false);
+        }, (error) => {
+            console.error("Error fetching categories:", error);
+            setIsLoading(false);
+        });
+        
+        return () => unsubscribe();
+    }, []);
+
     return (
         <div className="space-y-8">
             <div className="flex items-center justify-between">
@@ -38,17 +55,39 @@ export default function CategoriesPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Name</TableHead>
-                                <TableHead>Slug</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {/* This data should be fetched from blogSettings/main in a real app */}
-                            {categories.map((cat) => (
-                                <TableRow key={cat.slug}>
-                                    <TableCell className="font-medium">{cat.name}</TableCell>
-                                    <TableCell>{cat.slug}</TableCell>
+                            {isLoading ? (
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <TableRow key={`skel-${i}`}>
+                                        <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                                        <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+                                    </TableRow>
+                                ))
+                            ) : categories.length > 0 ? (
+                                categories.map((cat) => (
+                                    <TableRow key={cat}>
+                                        <TableCell className="font-medium capitalize">{cat}</TableCell>
+                                        <TableCell className="text-right">
+                                            {/* Future actions can go here */}
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={2} className="h-24 text-center">
+                                         <div className="flex flex-col items-center gap-2">
+                                            <Folder className="h-8 w-8 text-muted-foreground" />
+                                            <p className="text-muted-foreground">No categories found.</p>
+                                            <Link href="/admin/blog/settings">
+                                                <Button variant="outline" size="sm">Add Categories</Button>
+                                            </Link>
+                                        </div>
+                                    </TableCell>
                                 </TableRow>
-                            ))}
+                            )}
                         </TableBody>
                     </Table>
                 </CardContent>

@@ -17,81 +17,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Newspaper } from 'lucide-react';
 import Image from 'next/image';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { BlogPost } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
-
-// Updated placeholder data to match the new BlogPost type
-const placeholderPosts: BlogPost[] = [
-  {
-    id: '1',
-    contentType: 'blog',
-    title: 'Як читати карти Таро: Посібник для початківців',
-    slug: 'yak-chitati-karti-taro',
-    excerpt: 'Відкрийте для себе світ Таро та навчіться...',
-    status: 'published',
-    authorId: 'user1',
-    authorName: 'Олена П.',
-    category: 'таро',
-    featured: true,
-    publishedAt: '2024-07-15',
-    updatedAt: '2024-07-16',
-    coverImageUrl: 'https://picsum.photos/seed/taro1/80/45',
-    createdAt: new Date('2024-07-15').toISOString(),
-  },
-  {
-    id: '2',
-    contentType: 'blog',
-    title: 'Астрологічний прогноз на серпень 2024',
-    slug: 'astrologichniy-prognoz-serpen-2024',
-    excerpt: 'Що зірки готують для вашого знаку зодіаку...',
-    status: 'published',
-    authorId: 'user2',
-    authorName: 'Максим К.',
-    category: 'астрологія',
-    featured: false,
-    publishedAt: '2024-07-14',
-    updatedAt: '2024-07-14',
-    coverImageUrl: 'https://picsum.photos/seed/astro1/80/45',
-    createdAt: new Date('2024-07-14').toISOString(),
-  },
-  {
-    id: '3',
-    contentType: 'blog',
-    title: 'Сила шаманських практик',
-    slug: 'sila-shamanskih-praktik',
-    excerpt: 'Подорож до витоків давніх знань...',
-    status: 'draft',
-    authorId: 'user3',
-    authorName: 'Анонім',
-    category: 'шаман',
-    featured: false,
-    publishedAt: null,
-    updatedAt: '2024-07-12',
-    coverImageUrl: 'https://picsum.photos/seed/shaman1/80/45',
-    createdAt: new Date('2024-07-12').toISOString(),
-  },
-   {
-    id: '4',
-    contentType: 'blog',
-    title: 'Цифрова нумерологія: значення чисел',
-    slug: 'cifrova-numerologiya',
-    excerpt: 'Як дата народження та ім\'я впливають на вашу долю...',
-    status: 'scheduled',
-    authorId: 'user4',
-    authorName: 'Ірина В.',
-    category: 'нумерологія',
-    featured: false,
-    publishedAt: '2024-08-01',
-    updatedAt: '2024-07-10',
-    coverImageUrl: 'https://picsum.photos/seed/numero1/80/45',
-    scheduledAt: '2024-08-01',
-    createdAt: new Date('2024-07-10').toISOString(),
-  },
-];
+import { Skeleton } from '@/components/ui/skeleton';
 
 const statusColors: Record<BlogPost['status'], string> = {
     published: 'bg-green-500',
@@ -100,7 +32,46 @@ const statusColors: Record<BlogPost['status'], string> = {
     archived: 'bg-gray-500',
 }
 
-export function AllArticlesTable({ showFilters = true }: { showFilters?: boolean }) {
+export function AllArticlesTable({ 
+  posts,
+  isLoading,
+  showFilters = true 
+}: { 
+  posts: BlogPost[],
+  isLoading: boolean,
+  showFilters?: boolean 
+}) {
+
+  const renderSkeleton = () => (
+    Array.from({ length: 5 }).map((_, i) => (
+      <TableRow key={`skeleton-${i}`}>
+        <TableCell className="px-2 py-1 h-auto"><Skeleton className="h-4 w-4" /></TableCell>
+        <TableCell><Skeleton className="h-[45px] w-[80px] rounded-md" /></TableCell>
+        <TableCell><Skeleton className="h-6 w-48" /></TableCell>
+        <TableCell><Skeleton className="h-6 w-24" /></TableCell>
+        <TableCell><Skeleton className="h-6 w-20" /></TableCell>
+        <TableCell><Skeleton className="h-6 w-24" /></TableCell>
+        <TableCell><Skeleton className="h-6 w-12" /></TableCell>
+        <TableCell><Skeleton className="h-6 w-24" /></TableCell>
+        <TableCell className="text-right"><Skeleton className="h-8 w-8" /></TableCell>
+      </TableRow>
+    ))
+  );
+
+  const renderEmptyState = () => (
+    <TableRow>
+      <TableCell colSpan={9} className="h-24 text-center">
+        <div className="flex flex-col items-center gap-2">
+            <Newspaper className="h-8 w-8 text-muted-foreground" />
+            <p className="text-muted-foreground">No articles found.</p>
+            <Link href="/admin/blog/articles/new">
+                <Button variant="outline" size="sm">Create First Article</Button>
+            </Link>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+
   return (
     <div className="space-y-4">
         {showFilters && (
@@ -127,13 +98,22 @@ export function AllArticlesTable({ showFilters = true }: { showFilters?: boolean
             </TableRow>
           </TableHeader>
           <TableBody>
-            {placeholderPosts.map((post) => (
+            {isLoading ? (
+              renderSkeleton()
+            ) : posts.length > 0 ? (
+              posts.map((post) => (
               <TableRow key={post.id}>
                 <TableCell className="px-2 py-1 h-auto">
                   <Checkbox aria-label={`Select row ${post.id}`} />
                 </TableCell>
                 <TableCell>
-                    {post.coverImageUrl && <Image src={post.coverImageUrl} alt={post.title} width={80} height={45} className="rounded-md object-cover" />}
+                    {post.coverImageUrl ? (
+                      <Image src={post.coverImageUrl} alt={post.title} width={80} height={45} className="rounded-md object-cover" />
+                    ) : (
+                      <div className="w-20 h-[45px] bg-muted rounded-md flex items-center justify-center text-muted-foreground">
+                        <Newspaper className="w-4 h-4"/>
+                      </div>
+                    )}
                 </TableCell>
                 <TableCell className="font-medium">{post.title}</TableCell>
                 <TableCell>
@@ -154,7 +134,7 @@ export function AllArticlesTable({ showFilters = true }: { showFilters?: boolean
                   )}
                 </TableCell>
                 <TableCell>
-                  {new Date(post.updatedAt).toLocaleDateString()}
+                  {post.updatedAt?.toDate().toLocaleDateString() || 'N/A'}
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -179,7 +159,10 @@ export function AllArticlesTable({ showFilters = true }: { showFilters?: boolean
                   </DropdownMenu>
                 </TableCell>
               </TableRow>
-            ))}
+            ))
+            ) : (
+              renderEmptyState()
+            )}
           </TableBody>
         </Table>
       </div>

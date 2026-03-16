@@ -46,8 +46,8 @@ export function AdminNav() {
     <>
       <SidebarHeader>
         <div className="flex items-center justify-between">
-          <Link href="/" className="font-bold text-lg text-sidebar-primary">
-            AWE28
+          <Link href="/admin" className="font-bold text-lg text-sidebar-primary">
+            LECTOR Admin
           </Link>
           {isMobile && <SidebarTrigger />}
         </div>
