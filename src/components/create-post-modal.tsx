@@ -32,7 +32,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/hooks/use-auth";
 import { db } from "@/lib/firebase/client";
 import { addDoc, collection, doc, onSnapshot, serverTimestamp } from "firebase/firestore";
-import type { BlogSettings, BlogCategory } from "@/lib/types";
+import type { BlogSettings } from "@/lib/types";
 import React, { useEffect, useState, useMemo } from "react";
 
 const postSchema = z.object({
@@ -40,7 +40,6 @@ const postSchema = z.object({
   content: z.string().min(20, { message: "Вміст має містити щонайменше 20 символів." }),
   categoryId: z.string({ required_error: "Будь ласка, оберіть категорію." }),
   subcategoryId: z.string().optional(),
-  // coverImageUrl: z.string().url({ message: "Будь ласка, введіть дійсну URL-адресу зображення." }).optional().or(z.literal('')),
 });
 
 type PostFormValues = z.infer<typeof postSchema>;
@@ -97,7 +96,7 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
       // Core content
       title: values.title,
       content: values.content,
-      slug: values.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 70), // Simple slug generation
+      slug: values.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 70),
       contentType: 'post' as const,
 
       // Author
@@ -121,8 +120,8 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
       // Timestamps
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-
-      // Default status for blog-related features
+      
+      // Default blog status
       status: 'draft' as const,
     };
 

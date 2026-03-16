@@ -103,7 +103,7 @@ export default function BlogPage() {
   const getCategoryName = (categoryId: string) => settings?.categories.find(c => c.id === categoryId)?.name || categoryId;
   const getSubcategoryName = (categoryId: string, subcategoryId: string) => {
       const category = settings?.categories.find(c => c.id === categoryId);
-      return category?.subcategories.find(s => s.id === subcategoryId)?.name || subcategoryId;
+      return category?.subcategories?.find(s => s.id === subcategoryId)?.name || subcategoryId;
   }
 
   if (isLoading) {
