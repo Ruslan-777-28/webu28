@@ -38,6 +38,7 @@ import React, { useEffect, useState, useMemo } from "react";
 const postSchema = z.object({
   title: z.string().min(5, { message: "Заголовок має містити щонайменше 5 символів." }),
   content: z.string().min(20, { message: "Вміст має містити щонайменше 20 символів." }),
+  coverImageUrl: z.string().url({ message: "Будь ласка, введіть дійсну URL-адресу." }).optional().or(z.literal('')),
   categoryId: z.string({ required_error: "Будь ласка, оберіть категорію." }),
   subcategoryId: z.string().optional(),
 });
@@ -70,6 +71,7 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
     defaultValues: {
       title: "",
       content: "",
+      coverImageUrl: "",
       categoryId: "",
       subcategoryId: "",
     },
@@ -96,6 +98,7 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
       // Core content
       title: values.title,
       content: values.content,
+      coverImageUrl: values.coverImageUrl || '',
       slug: values.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 70),
       contentType: 'post' as const,
 
@@ -178,6 +181,19 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="coverImageUrl"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>URL-адреса зображення обкладинки</FormLabel>
+                <FormControl>
+                    <Input placeholder="https://example.com/image.png" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
            <div className="grid grid-cols-2 gap-4">
              <FormField
                 control={form.control}
