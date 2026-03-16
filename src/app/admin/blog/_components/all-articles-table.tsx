@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Newspaper } from 'lucide-react';
 import Image from 'next/image';
 import { Checkbox } from '@/components/ui/checkbox';
-import type { BlogPost } from '@/lib/types';
+import type { BlogPost, BlogCategory } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -34,13 +34,27 @@ const statusColors: Record<BlogPost['status'], string> = {
 
 export function AllArticlesTable({ 
   posts,
+  categories,
   isLoading,
   showFilters = true 
 }: { 
   posts: BlogPost[],
+  categories: BlogCategory[],
   isLoading: boolean,
   showFilters?: boolean 
 }) {
+
+  const getCategoryPath = (categoryId?: string, subcategoryId?: string) => {
+    if (!categoryId || !categories) return 'N/A';
+    const category = categories.find(c => c.id === categoryId);
+    if (!category) return categoryId;
+    
+    if (subcategoryId) {
+        const subcategory = category.subcategories?.find(s => s.id === subcategoryId);
+        return subcategory ? `${category.name} / ${subcategory.name}` : `${category.name} / ${subcategoryId}`;
+    }
+    return category.name;
+  };
 
   const renderSkeleton = () => (
     Array.from({ length: 5 }).map((_, i) => (
@@ -49,7 +63,7 @@ export function AllArticlesTable({
         <TableCell><Skeleton className="h-[45px] w-[80px] rounded-md" /></TableCell>
         <TableCell><Skeleton className="h-6 w-48" /></TableCell>
         <TableCell><Skeleton className="h-6 w-24" /></TableCell>
-        <TableCell><Skeleton className="h-6 w-20" /></TableCell>
+        <TableCell><Skeleton className="h-6 w-32" /></TableCell>
         <TableCell><Skeleton className="h-6 w-24" /></TableCell>
         <TableCell><Skeleton className="h-6 w-12" /></TableCell>
         <TableCell><Skeleton className="h-6 w-24" /></TableCell>
@@ -123,7 +137,7 @@ export function AllArticlesTable({
                     </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline">{post.category}</Badge>
+                  <Badge variant="outline">{getCategoryPath(post.categoryId, post.subcategoryId)}</Badge>
                 </TableCell>
                 <TableCell>{post.authorName}</TableCell>
                 <TableCell>

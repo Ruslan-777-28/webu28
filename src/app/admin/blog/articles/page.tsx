@@ -5,31 +5,43 @@ import { AllArticlesTable } from "../_components/all-articles-table";
 import Link from "next/link";
 import { PlusCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { BlogPost } from "@/lib/types";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import type { BlogPost, BlogSettings } from "@/lib/types";
+import { collection, onSnapshot, query, where, doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 
 export default function AllArticlesPage() {
     const [posts, setPosts] = useState<BlogPost[]>([]);
+    const [settings, setSettings] = useState<BlogSettings | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const postsRef = collection(db, "posts");
-        const q = query(postsRef, where("contentType", "==", "blog"));
+        const fetchData = async () => {
+            setIsLoading(true);
+            const settingsRef = doc(db, 'blogSettings', 'main');
+            const settingsSnap = await getDoc(settingsRef);
+            if (settingsSnap.exists()) {
+                setSettings(settingsSnap.data() as BlogSettings);
+            }
 
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const fetchedPosts = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            } as BlogPost));
-            setPosts(fetchedPosts);
-            setIsLoading(false);
-        }, (error) => {
-            console.error("Error fetching posts:", error);
-            setIsLoading(false);
-        });
+            const postsRef = collection(db, "posts");
+            const q = query(postsRef, where("contentType", "==", "blog"));
 
-        return () => unsubscribe();
+            const unsubscribe = onSnapshot(q, (snapshot) => {
+                const fetchedPosts = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                } as BlogPost));
+                setPosts(fetchedPosts);
+                setIsLoading(false);
+            }, (error) => {
+                console.error("Error fetching posts:", error);
+                setIsLoading(false);
+            });
+            
+            return () => unsubscribe();
+        };
+        
+        fetchData();
     }, []);
 
     return (
@@ -43,7 +55,11 @@ export default function AllArticlesPage() {
                     </Button>
                 </Link>
             </div>
-            <AllArticlesTable posts={posts} isLoading={isLoading} />
+            <AllArticlesTable 
+                posts={posts} 
+                categories={settings?.categories || []}
+                isLoading={isLoading} 
+            />
         </div>
     );
 }

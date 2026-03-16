@@ -20,7 +20,8 @@ export type BlogPost = {
   authorAvatarUrl?: string; // Denormalized for convenience
 
   // Taxonomy
-  category: string;
+  categoryId: string;
+  subcategoryId?: string;
   tags?: string[];
 
   // Status & Visibility
@@ -45,13 +46,15 @@ export type BlogPost = {
 };
 
 
+export type Subcategory = {
+  id: string;
+  name: string;
+};
+
 export type BlogCategory = {
   id: string;
   name: string;
-  slug: string;
-  description?: string;
-  articlesCount: number;
-  isVisible: boolean;
+  subcategories: Subcategory[];
 };
 
 export type BlogSettings = {
@@ -80,7 +83,7 @@ export type BlogSettings = {
     showCategoriesSection: boolean;
     showAuthorsSection: boolean;
     showSubscribeBlock: boolean;
-    categories?: string[];
+    categories: BlogCategory[];
     tags?: string[];
 };
 

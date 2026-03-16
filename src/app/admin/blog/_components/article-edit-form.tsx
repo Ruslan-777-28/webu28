@@ -10,12 +10,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/hooks/use-auth';
 import { db } from '@/lib/firebase/client';
-import type { BlogPost } from '@/lib/types';
+import type { BlogPost, BlogCategory } from '@/lib/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
+import React from 'react';
 
 const articleSchema = z.object({
     title: z.string().min(1, "Title is required"),
@@ -26,7 +27,8 @@ const articleSchema = z.object({
     coverImageUrl: z.string().url("Must be a valid URL.").optional().or(z.literal('')),
     coverAlt: z.string().optional(),
 
-    category: z.string().min(1, "Category is required"),
+    categoryId: z.string().min(1, "Category is required"),
+    subcategoryId: z.string().optional(),
     tags: z.string().optional(),
 
     status: z.enum(['draft', 'published', 'scheduled', 'archived']),
@@ -43,10 +45,10 @@ export type ArticleFormValues = z.infer<typeof articleSchema>;
 
 interface ArticleEditFormProps {
     initialData?: Partial<BlogPost> & { id: string };
-    categories: string[];
+    categories: BlogCategory[];
 }
 
-export function ArticleEditForm({ initialData, categories }: ArticleEditFormProps) {
+export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFormProps) {
     const router = useRouter();
     const { user, profile } = useUser();
     const { toast } = useToast();
@@ -61,6 +63,27 @@ export function ArticleEditForm({ initialData, categories }: ArticleEditFormProp
         },
         mode: "onChange",
     });
+
+    const watchedCategoryId = useWatch({
+        control: form.control,
+        name: 'categoryId',
+    });
+
+    const availableSubcategories = React.useMemo(() => {
+        if (!watchedCategoryId) return [];
+        const selectedCategory = categories.find(c => c.id === watchedCategoryId);
+        return selectedCategory?.subcategories || [];
+    }, [watchedCategoryId, categories]);
+
+    React.useEffect(() => {
+        // Reset subcategory if category changes and the old subcategory is not valid anymore
+        if (isEditing && initialData?.subcategoryId) {
+            // This logic runs on first load, no need to reset
+        } else {
+             form.setValue('subcategoryId', '');
+        }
+    }, [watchedCategoryId, form, isEditing, initialData]);
+
 
      async function onSubmit(data: ArticleFormValues) {
         if (!user || !profile) {
@@ -77,9 +100,10 @@ export function ArticleEditForm({ initialData, categories }: ArticleEditFormProp
             publishedAtValue = null;
         }
 
-        const postPayload = {
+        const postPayload: Omit<BlogPost, 'id' | 'createdAt' | 'authorId' | 'authorName' | 'authorAvatarUrl' | 'views' | 'contentType'> & { updatedAt: any } = {
             ...data,
             tags: tagsArray,
+            subcategoryId: data.subcategoryId || '',
             updatedAt: serverTimestamp(),
             publishedAt: publishedAtValue,
         };
@@ -231,20 +255,34 @@ export function ArticleEditForm({ initialData, categories }: ArticleEditFormProp
                          <Card>
                             <CardHeader><CardTitle>Taxonomy</CardTitle></CardHeader>
                              <CardContent className="space-y-4">
-                                 <FormField control={form.control} name="category" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Category</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl><SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger></FormControl>
-                                        <SelectContent>
-                                            {categories.length > 0 ? categories.map(cat => (
-                                                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                                            )) : <SelectItem value="-" disabled>No categories found</SelectItem>}
-                                        </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                    )}/>
+                                <FormField control={form.control} name="categoryId" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Category</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl><SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger></FormControl>
+                                    <SelectContent>
+                                        {categories.length > 0 ? categories.map(cat => (
+                                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                                        )) : <SelectItem value="-" disabled>No categories found</SelectItem>}
+                                    </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                                )}/>
+                                <FormField control={form.control} name="subcategoryId" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Subcategory</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value} disabled={availableSubcategories.length === 0}>
+                                    <FormControl><SelectTrigger><SelectValue placeholder="Select a subcategory" /></SelectTrigger></FormControl>
+                                    <SelectContent>
+                                        {availableSubcategories.map(sub => (
+                                            <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                                )}/>
                                 <FormField control={form.control} name="tags" render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Tags</FormLabel>

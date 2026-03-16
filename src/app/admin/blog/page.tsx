@@ -4,29 +4,48 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Newspaper, BookMarked, Users, PenSquare } from "lucide-react";
 import { AllArticlesTable } from "./_components/all-articles-table";
 import { useEffect, useState } from "react";
-import type { BlogPost, UserProfile } from "@/lib/types";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import type { BlogPost, UserProfile, BlogSettings } from "@/lib/types";
+import { collection, onSnapshot, query, where, doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BlogAdminDashboard() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [authors, setAuthors] = useState<UserProfile[]>([]);
+  const [settings, setSettings] = useState<BlogSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const settingsRef = doc(db, 'blogSettings', 'main');
     const postsQuery = query(collection(db, "posts"), where("contentType", "==", "blog"));
     const authorsQuery = query(collection(db, "users"), where("roles.author", "==", true));
+
+    let settingsLoaded = false;
+    let postsLoaded = false;
+
+    const checkLoading = () => {
+      if(settingsLoaded && postsLoaded) {
+        setIsLoading(false);
+      }
+    }
+
+    getDoc(settingsRef).then(docSnap => {
+        if(docSnap.exists()){
+            setSettings(docSnap.data() as BlogSettings);
+        }
+        settingsLoaded = true;
+        checkLoading();
+    });
 
     const unsubPosts = onSnapshot(postsQuery, (snapshot) => {
       const fetchedPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as BlogPost));
       setPosts(fetchedPosts);
-      // We set loading to false here, even if authors are not loaded yet,
-      // to show post data as soon as it's available.
-      setIsLoading(false);
+      postsLoaded = true;
+      checkLoading();
     }, (error) => {
       console.error("Error fetching posts:", error);
-      setIsLoading(false);
+      postsLoaded = true;
+      checkLoading();
     });
 
     const unsubAuthors = onSnapshot(authorsQuery, (snapshot) => {
@@ -83,7 +102,12 @@ export default function BlogAdminDashboard() {
           <CardTitle>Recent Articles</CardTitle>
         </CardHeader>
         <CardContent>
-            <AllArticlesTable posts={posts.slice(0, 5)} isLoading={isLoading} showFilters={false} />
+            <AllArticlesTable 
+                posts={posts.slice(0, 5)} 
+                categories={settings?.categories || []}
+                isLoading={isLoading} 
+                showFilters={false} 
+            />
         </CardContent>
       </Card>
     </div>

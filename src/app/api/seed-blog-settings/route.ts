@@ -17,7 +17,7 @@ const blogSettingsData: BlogSettings = {
   authorsSectionTitle: "Автори",
   subscribeTitle: "Будьте в курсі",
   subscribeDescription: "Отримуйте оновлення про нові статті та рекомендований контент.",
-  seoTitle: "Блог про духовні практики | AWE28",
+  seoTitle: "Блог про духовні практики | LECTOR",
   seoDescription: "Все про таро, астрологію, нумерологію та інші духовні практики.",
   ogImageUrl: "",
   canonicalUrl: "/blog",
@@ -28,7 +28,22 @@ const blogSettingsData: BlogSettings = {
   showCategoriesSection: true,
   showAuthorsSection: false,
   showSubscribeBlock: true,
-  categories: ['таро', 'астрологія', 'шаман', 'ретрит', 'гадання', 'нумерологія', 'практики', 'поради', 'аналітика'],
+  categories: [
+    { id: 'taro', name: 'Таро', subcategories: [
+      { id: 'beginners', name: 'Для початківців' },
+      { id: 'spreads', name: 'Розклади' },
+    ]},
+    { id: 'astrology', name: 'Астрологія', subcategories: [
+      { id: 'forecasts', name: 'Прогнози' },
+      { id: 'natal-chart', name: 'Натальна карта' },
+    ]},
+    { id: 'shamanism', name: 'Шаманізм', subcategories: [] },
+    { id: 'retreat', name: 'Ретрит', subcategories: [] },
+    { id: 'divination', name: 'Гадання', subcategories: [] },
+    { id: 'numerology', name: 'Нумерологія', subcategories: [] },
+    { id: 'practices', name: 'Практики', subcategories: [] },
+    { id: 'advice', name: 'Поради', subcategories: [] },
+  ],
   tags: ['самопізнання', 'стосунки', 'кар\'єра', 'енергія', 'медитація', 'майбутнє'],
 };
 

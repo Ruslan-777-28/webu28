@@ -9,10 +9,10 @@ import { useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { BlogSettings } from "@/lib/types";
+import type { BlogSettings, BlogCategory } from "@/lib/types";
 
 export default function CategoriesPage() {
-    const [categories, setCategories] = useState<string[]>([]);
+    const [categories, setCategories] = useState<BlogCategory[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -55,7 +55,8 @@ export default function CategoriesPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Name</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead>ID</TableHead>
+                                <TableHead>Subcategories</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -63,21 +64,21 @@ export default function CategoriesPage() {
                                 Array.from({ length: 5 }).map((_, i) => (
                                     <TableRow key={`skel-${i}`}>
                                         <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                                        <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+                                        <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                                        <TableCell><Skeleton className="h-5 w-48" /></TableCell>
                                     </TableRow>
                                 ))
                             ) : categories.length > 0 ? (
                                 categories.map((cat) => (
-                                    <TableRow key={cat}>
-                                        <TableCell className="font-medium capitalize">{cat}</TableCell>
-                                        <TableCell className="text-right">
-                                            {/* Future actions can go here */}
-                                        </TableCell>
+                                    <TableRow key={cat.id}>
+                                        <TableCell className="font-medium capitalize">{cat.name}</TableCell>
+                                        <TableCell><code>{cat.id}</code></TableCell>
+                                        <TableCell>{cat.subcategories?.map(s => s.name).join(', ') || 'N/A'}</TableCell>
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={2} className="h-24 text-center">
+                                    <TableCell colSpan={3} className="h-24 text-center">
                                          <div className="flex flex-col items-center gap-2">
                                             <Folder className="h-8 w-8 text-muted-foreground" />
                                             <p className="text-muted-foreground">No categories found.</p>
