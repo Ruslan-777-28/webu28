@@ -29,7 +29,7 @@ export default function PublicationQueuePage() {
                 const q = query(postsRef,
                     where("contentType", "==", "post"),
                     where("allowSitePublication", "==", true),
-                    where("editorialStatus", "in", ["submitted", "under_review", "revision"])
+                    where("editorialStatus", "in", ["submitted", "under_review", "changes_requested"])
                 );
 
                 const unsubscribe = onSnapshot(q, (snapshot) => {

@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
                 if (!payload?.revisionMessage) {
                     return NextResponse.json({ success: false, message: 'Revision message is required.' }, { status: 400 });
                 }
-                updateData.editorialStatus = 'revision' as EditorialStatus;
+                updateData.editorialStatus = 'changes_requested' as EditorialStatus;
                 updateData.revisionRequested = true;
                 updateData.revisionMessage = payload.revisionMessage;
                 logAction = 'requestChanges';

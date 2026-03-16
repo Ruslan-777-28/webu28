@@ -14,15 +14,17 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { AlertCircle, CheckCircle, Clock, FileText, Send, User, XCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock, FileText, Send, User, XCircle, FileWarning } from 'lucide-react';
 
 const statusInfo: Record<EditorialStatus, { icon: React.ElementType, color: string, label: string, description: string }> = {
-    submitted: { icon: Send, color: 'text-blue-600', label: 'Submitted', description: 'This post is waiting for review.' },
-    under_review: { icon: FileText, color: 'text-yellow-600', label: 'Under Review', description: 'This post is currently being reviewed.' },
-    revision: { icon: AlertCircle, color: 'text-orange-600', label: 'Changes Requested', description: 'The author needs to make changes before this can be published.' },
-    rejected: { icon: XCircle, color: 'text-red-600', label: 'Rejected', description: 'This post has been rejected and will not be published.' },
-    published: { icon: CheckCircle, color: 'text-green-600', label: 'Published', description: 'This post is live on the site.' },
+    draft: { icon: FileText, color: 'text-gray-600', label: 'Чернетка', description: 'Цей пост є чернеткою і не поданий на розгляд.' },
+    submitted: { icon: Send, color: 'text-blue-600', label: 'Нове звернення', description: 'Цей пост очікує на розгляд.' },
+    under_review: { icon: FileWarning, color: 'text-yellow-600', label: 'У роботі', description: 'Цей пост зараз переглядається.' },
+    changes_requested: { icon: AlertCircle, color: 'text-orange-600', label: 'Очікує правок', description: 'Автор має внести зміни, перш ніж це можна буде опублікувати.' },
+    rejected: { icon: XCircle, color: 'text-red-600', label: 'Відхилено', description: 'Цей пост було відхилено і не буде опубліковано.' },
+    published: { icon: CheckCircle, color: 'text-green-600', label: 'Опубліковано', description: 'Цей пост опубліковано на сайті.' },
 };
+
 
 async function moderatePost(postId: string, action: string, payload: any, token: string) {
     const response = await fetch('/api/admin/moderate-post', {
@@ -108,13 +110,13 @@ export function SubmissionReviewForm({ post, categories }: { post: Post & { id: 
                     <CardContent className="text-sm space-y-4">
                         {post.revisionRequested && post.revisionMessage && (
                              <div className="p-3 bg-orange-50 border border-orange-200 rounded-md">
-                                <p className="font-bold text-orange-800">Changes Requested:</p>
+                                <p className="font-bold text-orange-800">Запит на зміни:</p>
                                 <p className="italic">"{post.revisionMessage}"</p>
                             </div>
                         )}
                         {post.editorialStatus === 'rejected' && post.moderationNotes && (
                              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                                <p className="font-bold text-red-800">Rejection Reason:</p>
+                                <p className="font-bold text-red-800">Причина відхилення:</p>
                                 <p className="italic">"{post.moderationNotes}"</p>
                             </div>
                         )}
@@ -130,46 +132,46 @@ export function SubmissionReviewForm({ post, categories }: { post: Post & { id: 
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Moderation Actions</CardTitle>
+                        <CardTitle>Дії модератора</CardTitle>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-3">
                          {currentStatus === 'submitted' && (
                             <Button onClick={() => handleAction('MARK_AS_UNDER_REVIEW')} disabled={isLoading} className="w-full">
-                                Mark as Under Review
+                                Позначити як "У роботі"
                             </Button>
                          )}
                          {currentStatus !== 'published' && currentStatus !== 'rejected' && (
                             <>
                                 <Dialog>
-                                    <DialogTrigger asChild><Button variant="outline" className="w-full">Request Changes</Button></DialogTrigger>
+                                    <DialogTrigger asChild><Button variant="outline" className="w-full">Запросити зміни</Button></DialogTrigger>
                                     <DialogContent>
-                                        <DialogHeader><DialogTitle>Request Changes</DialogTitle><DialogDescription>Provide clear feedback for the author.</DialogDescription></DialogHeader>
-                                        <Textarea placeholder="e.g., 'Please add more details to the second paragraph...'" value={revisionMessage} onChange={(e) => setRevisionMessage(e.target.value)} />
+                                        <DialogHeader><DialogTitle>Запросити зміни</DialogTitle><DialogDescription>Надайте чіткий відгук для автора.</DialogDescription></DialogHeader>
+                                        <Textarea placeholder="напр., 'Будь ласка, додайте більше деталей до другого абзацу...'" value={revisionMessage} onChange={(e) => setRevisionMessage(e.target.value)} />
                                         <DialogFooter>
-                                            <Button onClick={() => handleAction('REQUEST_CHANGES', { revisionMessage })} disabled={isLoading || !revisionMessage}>Send Feedback</Button>
+                                            <Button onClick={() => handleAction('REQUEST_CHANGES', { revisionMessage })} disabled={isLoading || !revisionMessage}>Надіслати відгук</Button>
                                         </DialogFooter>
                                     </DialogContent>
                                 </Dialog>
                                 
                                 <Dialog>
-                                    <DialogTrigger asChild><Button variant="destructive" outline className="w-full">Reject</Button></DialogTrigger>
+                                    <DialogTrigger asChild><Button variant="destructive" outline className="w-full">Відхилити</Button></DialogTrigger>
                                      <DialogContent>
-                                        <DialogHeader><DialogTitle>Reject Submission</DialogTitle><DialogDescription>Provide an internal reason for rejection.</DialogDescription></DialogHeader>
-                                        <Textarea placeholder="Internal notes for rejection reason..." value={rejectionReason} onChange={(e) => setRejectionReason(e.target.value)} />
+                                        <DialogHeader><DialogTitle>Відхилити подання</DialogTitle><DialogDescription>Вкажіть внутрішню причину відхилення.</DialogDescription></DialogHeader>
+                                        <Textarea placeholder="Внутрішні нотатки щодо причини відхилення..." value={rejectionReason} onChange={(e) => setRejectionReason(e.target.value)} />
                                         <DialogFooter>
-                                            <Button variant="destructive" onClick={() => handleAction('REJECT', { moderationNotes: rejectionReason })} disabled={isLoading || !rejectionReason}>Confirm Rejection</Button>
+                                            <Button variant="destructive" onClick={() => handleAction('REJECT', { moderationNotes: rejectionReason })} disabled={isLoading || !rejectionReason}>Підтвердити відхилення</Button>
                                         </DialogFooter>
                                     </DialogContent>
                                 </Dialog>
                                 
                                 <Button onClick={() => handleAction('APPROVE_FOR_PUBLICATION')} disabled={isLoading} className="w-full">
-                                    Approve and Publish
+                                    Схвалити та опублікувати
                                 </Button>
                             </>
                          )}
                          {currentStatus === 'rejected' && (
                              <Button onClick={() => handleAction('MARK_AS_UNDER_REVIEW')} disabled={isLoading} variant="secondary" className="w-full">
-                                Re-review
+                                Переглянути повторно
                             </Button>
                          )}
                     </CardContent>

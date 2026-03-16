@@ -27,10 +27,20 @@ import { useMemo, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
+const statusLabels: Record<EditorialStatus, string> = {
+    draft: 'Чернетка',
+    submitted: 'Нове звернення',
+    under_review: 'У роботі',
+    changes_requested: 'Очікує правок',
+    published: 'Опубліковано',
+    rejected: 'Відхилено',
+};
+
 const statusColors: Record<EditorialStatus, string> = {
+    draft: 'bg-gray-500',
     submitted: 'bg-blue-500',
     under_review: 'bg-yellow-500',
-    revision: 'bg-orange-500',
+    changes_requested: 'bg-orange-500',
     rejected: 'bg-red-500',
     published: 'bg-green-500',
 }
@@ -115,9 +125,9 @@ export function SubmissionsTable({
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="submitted">Submitted</SelectItem>
-                    <SelectItem value="under_review">Under Review</SelectItem>
-                    <SelectItem value="revision">Changes Requested</SelectItem>
+                    <SelectItem value="submitted">{statusLabels.submitted}</SelectItem>
+                    <SelectItem value="under_review">{statusLabels.under_review}</SelectItem>
+                    <SelectItem value="changes_requested">{statusLabels.changes_requested}</SelectItem>
                 </SelectContent>
             </Select>
             <Select value={sourceFilter} onValueChange={setSourceFilter}>
@@ -169,10 +179,12 @@ export function SubmissionsTable({
                     </div>
                 </TableCell>
                 <TableCell>
-                    <div className="flex items-center gap-2">
-                        <span className={`h-2 w-2 rounded-full ${statusColors[post.editorialStatus!]}`} />
-                        <span className="capitalize">{post.editorialStatus?.replace('_', ' ')}</span>
-                    </div>
+                    {post.editorialStatus && (
+                        <div className="flex items-center gap-2">
+                            <span className={`h-2 w-2 rounded-full ${statusColors[post.editorialStatus]}`} />
+                            <span>{statusLabels[post.editorialStatus]}</span>
+                        </div>
+                    )}
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline">{getCategoryPath(post.categoryId, post.subcategoryId)}</Badge>

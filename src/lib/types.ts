@@ -1,6 +1,6 @@
 export type PostStatus = 'draft' | 'scheduled' | 'published' | 'archived';
 export type PostContentType = 'blog' | 'post';
-export type EditorialStatus = 'submitted' | 'under_review' | 'published' | 'rejected' | 'revision';
+export type EditorialStatus = 'draft' | 'submitted' | 'under_review' | 'changes_requested' | 'published' | 'rejected';
 export type SourcePlatform = 'site' | 'app' | 'admin';
 
 export type Post = {
