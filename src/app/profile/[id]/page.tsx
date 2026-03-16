@@ -251,7 +251,7 @@ export default function PublicProfilePage() {
                                 <SelectValue placeholder="Оберіть категорію" />
                             </SelectTrigger>
                             <SelectContent>
-                                {subcategories.map(sub => (
+                                {subcategories.filter(sub => sub.id && sub.name).map(sub => (
                                     <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
                                 ))}
                             </SelectContent>
