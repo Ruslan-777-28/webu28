@@ -37,6 +37,8 @@ const settingsSchema = z.object({
     tags: z.string().optional(),
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
+    canonicalUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
+    ogImageUrl: z.string().url("Must be a valid URL.").optional().or(z.literal('')),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -48,7 +50,21 @@ export default function BlogSettingsPage() {
     const form = useForm<SettingsFormValues>({
         resolver: zodResolver(settingsSchema),
         defaultValues: {
-            categories: '[]'
+            blogPageTitle: "",
+            blogPageSubtitle: "",
+            articlesPerPage: 9,
+            defaultSort: "latest",
+            showFeaturedSection: true,
+            showPopularSection: true,
+            showCategoriesSection: true,
+            showAuthorsSection: false,
+            showSubscribeBlock: true,
+            categories: '[]',
+            tags: "",
+            seoTitle: "",
+            seoDescription: "",
+            canonicalUrl: "",
+            ogImageUrl: "",
         },
         mode: "onChange",
     });
@@ -144,6 +160,22 @@ export default function BlogSettingsPage() {
                                 )}/>
                                 <FormField control={form.control} name="seoDescription" render={({ field }) => (
                                     <FormItem><FormLabel>Meta Description</FormLabel><FormControl><Textarea placeholder="Meta Description" {...field} /></FormControl><FormMessage /></FormItem>
+                                )}/>
+                                <FormField control={form.control} name="canonicalUrl" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Canonical URL</FormLabel>
+                                        <FormControl><Input placeholder="https://..." {...field} /></FormControl>
+                                         <FormDescription>The original source URL for this content.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
+                                <FormField control={form.control} name="ogImageUrl" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Open Graph Image URL</FormLabel>
+                                        <FormControl><Input placeholder="https://..." {...field} /></FormControl>
+                                        <FormDescription>Image for social media sharing (e.g., 1200x630px).</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
                                 )}/>
                             </CardContent>
                         </Card>
