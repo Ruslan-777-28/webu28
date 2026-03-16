@@ -59,7 +59,7 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <Link href="/user">
+          <Link href="/profile">
             <DropdownMenuItem className="cursor-pointer">
               Профіль
             </DropdownMenuItem>
