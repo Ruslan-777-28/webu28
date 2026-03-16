@@ -16,13 +16,13 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { AlertCircle, CheckCircle, Clock, FileText, Send, User, XCircle, FileWarning } from 'lucide-react';
 
-const statusInfo: Record<EditorialStatus, { icon: React.ElementType, color: string, label: string, description: string }> = {
-    draft: { icon: FileText, color: 'text-gray-600', label: 'Чернетка', description: 'Цей пост є чернеткою і не поданий на розгляд.' },
-    submitted: { icon: Send, color: 'text-blue-600', label: 'Нове звернення', description: 'Цей пост очікує на розгляд.' },
-    under_review: { icon: FileWarning, color: 'text-yellow-600', label: 'У роботі', description: 'Цей пост зараз переглядається.' },
-    changes_requested: { icon: AlertCircle, color: 'text-orange-600', label: 'Очікує правок', description: 'Автор має внести зміни, перш ніж це можна буде опублікувати.' },
-    rejected: { icon: XCircle, color: 'text-red-600', label: 'Відхилено', description: 'Цей пост було відхилено і не буде опубліковано.' },
-    published: { icon: CheckCircle, color: 'text-green-600', label: 'Опубліковано', description: 'Цей пост опубліковано на сайті.' },
+const statusInfo: Record<EditorialStatus, { icon: React.ElementType, label: string, description: string }> = {
+    draft: { icon: FileText, label: 'Чернетка', description: 'Цей пост є чернеткою і не поданий на розгляд.' },
+    submitted: { icon: Send, label: 'Нове звернення', description: 'Цей пост очікує на розгляд.' },
+    under_review: { icon: FileWarning, label: 'У роботі', description: 'Цей пост зараз переглядається.' },
+    changes_requested: { icon: AlertCircle, label: 'Очікує правок', description: 'Автор має внести зміни, перш ніж це можна буде опублікувати.' },
+    rejected: { icon: XCircle, label: 'Відхилено', description: 'Цей пост було відхилено і не буде опубліковано.' },
+    published: { icon: CheckCircle, label: 'Опубліковано', description: 'Цей пост опубліковано на сайті.' },
 };
 
 
@@ -102,7 +102,7 @@ export function SubmissionReviewForm({ post, categories }: { post: Post & { id: 
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                           <statusDetails.icon className={cn("w-6 h-6", statusDetails.color)} />
+                           <statusDetails.icon className="w-6 h-6 text-muted-foreground" />
                            {statusDetails.label}
                         </CardTitle>
                         <CardDescription>{statusDetails.description}</CardDescription>

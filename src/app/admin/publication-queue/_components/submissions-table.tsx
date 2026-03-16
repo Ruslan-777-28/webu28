@@ -8,14 +8,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Inbox } from 'lucide-react';
 import Image from 'next/image';
@@ -26,24 +18,34 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useMemo, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 
-const statusLabels: Record<EditorialStatus, string> = {
-    draft: 'Чернетка',
-    submitted: 'Нове звернення',
-    under_review: 'У роботі',
-    changes_requested: 'Очікує правок',
-    published: 'Опубліковано',
-    rejected: 'Відхилено',
+const statusInfo: Record<EditorialStatus, { label: string; className: string }> = {
+  draft: {
+    label: 'Чернетка',
+    className: 'bg-[#F1F1EE] text-[#5E5E5A] border-[#D9D9D3]',
+  },
+  submitted: {
+    label: 'Нове звернення',
+    className: 'bg-[#F3F2F7] text-[#4F4B5C] border-[#D7D2E2]',
+  },
+  under_review: {
+    label: 'У роботі',
+    className: 'bg-[#ECECEC] text-[#2F2F32] border-[#CFCFCF]',
+  },
+  changes_requested: {
+    label: 'Очікує правок',
+    className: 'bg-[#F5F1EC] text-[#6A5848] border-[#DDD2C6]',
+  },
+  published: {
+    label: 'Опубліковано',
+    className: 'bg-[#EEF2EE] text-[#415043] border-[#CDD8CE]',
+  },
+  rejected: {
+    label: 'Відхилено',
+    className: 'bg-[#F3EEEE] text-[#6B5252] border-[#DCCACA]',
+  },
 };
-
-const statusColors: Record<EditorialStatus, string> = {
-    draft: 'bg-gray-500',
-    submitted: 'bg-blue-500',
-    under_review: 'bg-yellow-500',
-    changes_requested: 'bg-orange-500',
-    rejected: 'bg-red-500',
-    published: 'bg-green-500',
-}
 
 export function SubmissionsTable({ 
   posts,
@@ -125,9 +127,9 @@ export function SubmissionsTable({
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="submitted">{statusLabels.submitted}</SelectItem>
-                    <SelectItem value="under_review">{statusLabels.under_review}</SelectItem>
-                    <SelectItem value="changes_requested">{statusLabels.changes_requested}</SelectItem>
+                    <SelectItem value="submitted">{statusInfo.submitted.label}</SelectItem>
+                    <SelectItem value="under_review">{statusInfo.under_review.label}</SelectItem>
+                    <SelectItem value="changes_requested">{statusInfo.changes_requested.label}</SelectItem>
                 </SelectContent>
             </Select>
             <Select value={sourceFilter} onValueChange={setSourceFilter}>
@@ -179,12 +181,17 @@ export function SubmissionsTable({
                     </div>
                 </TableCell>
                 <TableCell>
-                    {post.editorialStatus && (
-                        <div className="flex items-center gap-2">
-                            <span className={`h-2 w-2 rounded-full ${statusColors[post.editorialStatus]}`} />
-                            <span>{statusLabels[post.editorialStatus]}</span>
-                        </div>
-                    )}
+                  {post.editorialStatus && (
+                    <Badge 
+                      variant="outline"
+                      className={cn(
+                        "font-normal normal-case hover:bg-inherit",
+                        statusInfo[post.editorialStatus].className
+                      )}
+                    >
+                      {statusInfo[post.editorialStatus].label}
+                    </Badge>
+                  )}
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline">{getCategoryPath(post.categoryId, post.subcategoryId)}</Badge>
