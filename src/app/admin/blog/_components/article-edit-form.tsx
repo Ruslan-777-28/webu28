@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,15 +9,18 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/hooks/use-auth';
-import { db } from '@/lib/firebase/client';
+import { db, storage } from '@/lib/firebase/client';
 import type { Post, BlogCategory } from '@/lib/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
+import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import { Progress } from '@/components/ui/progress';
+import { ImageIcon, Upload, X } from 'lucide-react';
 
 const articleSchema = z.object({
     title: z.string().min(1, "Title is required"),
@@ -51,7 +54,6 @@ interface ArticleEditFormProps {
     categories: BlogCategory[];
 }
 
-// Helper to generate slug
 const generateSlug = (title: string) =>
   title
     .toLowerCase()
@@ -65,8 +67,12 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
     const router = useRouter();
     const { user, profile } = useUser();
     const { toast } = useToast();
-    const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(!!initialData?.slug);
     
+    const [postId] = useState<string>(initialData?.id || doc(collection(db, 'posts')).id);
+    const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(!!initialData?.slug);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+
     const isEditing = !!initialData;
     
     const form = useForm<ArticleFormValues>({
@@ -98,7 +104,6 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
     const watchedCategoryId = useWatch({ control: form.control, name: 'categoryId' });
     const watchedCoverImageUrl = useWatch({ control: form.control, name: 'coverImageUrl' });
 
-    // Auto-generate slug from title
     useEffect(() => {
         if (!isEditing && !isSlugManuallyEdited && watchedTitle) {
             form.setValue('slug', generateSlug(watchedTitle), { shouldValidate: true });
@@ -119,6 +124,75 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
         }
     }, [watchedCategoryId, availableSubcategories, form]);
 
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            toast({ variant: 'destructive', title: 'Непідтримуваний формат файлу', description: 'Завантажте JPG, PNG або WEBP.' });
+            return;
+        }
+
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            toast({ variant: 'destructive', title: 'Файл завеликий', description: 'Оберіть менше зображення.' });
+            return;
+        }
+
+        handleImageUpload(file);
+        e.target.value = '';
+    };
+
+    const handleImageUpload = (file: File) => {
+        setIsUploading(true);
+        const storageRef = ref(storage, `posts/${postId}/cover-${Date.now()}-${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setUploadProgress(progress);
+            },
+            (error) => {
+                console.error("Upload error:", error);
+                toast({ variant: 'destructive', title: 'Не вдалося завантажити зображення', description: 'Спробуйте ще раз.' });
+                setIsUploading(false);
+            },
+            () => {
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                    const oldUrl = form.getValues('coverImageUrl');
+                    if (oldUrl) {
+                        try {
+                           const oldImageRef = ref(storage, oldUrl);
+                           deleteObject(oldImageRef).catch(err => console.warn("Could not delete old image:", err));
+                        } catch(e) { console.error(e) }
+                    }
+                    form.setValue('coverImageUrl', downloadURL, { shouldValidate: true });
+                    setIsUploading(false);
+                });
+            }
+        );
+    };
+
+     const handleImageRemove = async () => {
+        const imageUrl = form.getValues('coverImageUrl');
+        if (!imageUrl) return;
+
+        try {
+            const imageRef = ref(storage, imageUrl);
+            await deleteObject(imageRef);
+            form.setValue('coverImageUrl', '', { shouldValidate: true });
+            toast({ title: 'Зображення видалено.' });
+        } catch (error: any) {
+            console.error("Error removing image:", error);
+            if (error.code === 'storage/object-not-found') {
+                form.setValue('coverImageUrl', '', { shouldValidate: true });
+            } else {
+                toast({ variant: 'destructive', title: 'Помилка видалення', description: error.message });
+            }
+        }
+    };
 
      async function onSubmit(data: ArticleFormValues) {
         if (!user || !profile) {
@@ -149,6 +223,7 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
                 await updateDoc(postRef, postPayload);
                 toast({ title: "Article updated successfully!" });
             } else {
+                const postRef = doc(db, 'posts', postId);
                 const newPostPayload = {
                     ...postPayload,
                     contentType: 'blog' as const,
@@ -158,9 +233,9 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
                     createdAt: serverTimestamp(),
                     views: 0,
                 };
-                const docRef = await addDoc(collection(db, 'posts'), newPostPayload);
+                await setDoc(postRef, newPostPayload);
                 toast({ title: "Article created successfully!" });
-                router.push(`/admin/blog/articles/${docRef.id}`);
+                router.push(`/admin/blog/articles/${postId}`);
             }
         } catch (error: any) {
             console.error("Form submission error:", error);
@@ -177,10 +252,10 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
                  <div className="flex items-center justify-end gap-4 mb-8">
-                    <Button variant="outline" type="button" onClick={() => handleAction('draft')} disabled={form.formState.isSubmitting}>
+                    <Button variant="outline" type="button" onClick={() => handleAction('draft')} disabled={form.formState.isSubmitting || isUploading}>
                         {form.formState.isSubmitting ? 'Saving...' : 'Save Draft'}
                     </Button>
-                    <Button type="submit" disabled={form.formState.isSubmitting}>
+                    <Button type="submit" disabled={form.formState.isSubmitting || isUploading}>
                         {form.formState.isSubmitting ? 'Saving...' : 'Save & Publish'}
                     </Button>
                 </div>
@@ -348,24 +423,60 @@ export function ArticleEditForm({ initialData, categories = [] }: ArticleEditFor
                              </CardContent>
                         </Card>
                          <Card>
-                            <CardHeader><CardTitle>Media</CardTitle></CardHeader>
+                            <CardHeader>
+                                <CardTitle>Обкладинка статті</CardTitle>
+                                <CardDescription>Завантажте основне зображення, яке буде використовуватися в картці статті та на сторінці публікації.</CardDescription>
+                            </CardHeader>
                             <CardContent className="space-y-4">
-                                {watchedCoverImageUrl && (
-                                    <div className="relative aspect-video w-full">
-                                        <Image src={watchedCoverImageUrl} alt="Cover image preview" layout="fill" className="rounded-md object-cover" />
+                                {watchedCoverImageUrl ? (
+                                    <div className="space-y-4">
+                                        <p className="text-sm font-medium">Поточна обкладинка</p>
+                                        <div className="relative group">
+                                            <Image src={watchedCoverImageUrl} alt={form.getValues('coverAlt') || 'Поточна обкладинка'} width={400} height={225} className="rounded-md object-cover w-full aspect-video" />
+                                            <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <label htmlFor="cover-image-upload-edit">
+                                                    <Button asChild size="icon" variant="secondary" className="h-7 w-7 cursor-pointer">
+                                                        <span><Upload className="h-4 w-4" /></span>
+                                                    </Button>
+                                                </label>
+                                                <Button size="icon" variant="destructive" className="h-7 w-7" onClick={handleImageRemove}>
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="border-2 border-dashed border-muted rounded-lg p-6 text-center">
+                                        {isUploading ? (
+                                            <>
+                                                <p className="text-sm text-muted-foreground mb-2">Завантажуємо обкладинку...</p>
+                                                <Progress value={uploadProgress} className="w-full" />
+                                                <p className="text-sm mt-2 text-muted-foreground">{Math.round(uploadProgress)}%</p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
+                                                <label htmlFor="cover-image-upload-edit" className="mt-4 inline-block cursor-pointer">
+                                                    <Button asChild variant="outline">
+                                                        <span><Upload className="mr-2 h-4 w-4" /> Завантажити зображення</span>
+                                                    </Button>
+                                                </label>
+                                                <p className="text-xs text-muted-foreground mt-2">Підтримуються JPG, PNG, WEBP. Рекомендовано горизонтальне зображення хорошої якості.</p>
+                                            </>
+                                        )}
                                     </div>
                                 )}
-                                <FormField control={form.control} name="coverImageUrl" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Cover Image URL</FormLabel>
-                                        <FormControl><Input placeholder="https://..." {...field} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}/>
+                                <input id="cover-image-upload-edit" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={handleFileSelect} disabled={isUploading} />
+                                 <FormField
+                                    control={form.control}
+                                    name="coverImageUrl"
+                                    render={({ field }) => ( <FormItem className="hidden"><FormControl><Input {...field} /></FormControl></FormItem> )}
+                                />
                                 <FormField control={form.control} name="coverAlt" render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Cover Image Alt Text</FormLabel>
-                                        <FormControl><Input placeholder="A description of the image" {...field} /></FormControl>
+                                        <FormLabel>Опис зображення</FormLabel>
+                                        <FormControl><Input placeholder="Коротко опишіть, що зображено на обкладинці статті" {...field} /></FormControl>
+                                        <FormDescription>Це поле використовується для доступності та кращого опису зображення.</FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}/>

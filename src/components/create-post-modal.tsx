@@ -27,6 +27,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/hooks/use-auth";
@@ -36,13 +37,14 @@ import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebas
 import type { BlogSettings } from "@/lib/types";
 import React, { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
-import { Image as ImageIcon, Upload, X } from 'lucide-react';
+import { ImageIcon, Upload, X } from 'lucide-react';
 import { Progress } from "./ui/progress";
 
 const postSchema = z.object({
   title: z.string().min(5, { message: "Заголовок має містити щонайменше 5 символів." }),
   content: z.string().min(20, { message: "Вміст має містити щонайменше 20 символів." }),
   coverImageUrl: z.string().url({ message: "Будь ласка, введіть дійсну URL-адресу." }).optional().or(z.literal('')),
+  coverAlt: z.string().optional(),
   categoryId: z.string({ required_error: "Будь ласка, оберіть категорію." }),
   subcategoryId: z.string().optional(),
 });
@@ -57,8 +59,25 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
 
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
-  const [newPostId, setNewPostId] = useState<string | null>(null);
+  const [newPostId] = useState<string>(doc(collection(db, 'posts')).id);
+
+  const form = useForm<PostFormValues>({
+    resolver: zodResolver(postSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+      coverImageUrl: "",
+      coverAlt: "",
+      categoryId: "",
+      subcategoryId: "",
+    },
+  });
+
+  const watchedCategoryId = useWatch({
+      control: form.control,
+      name: 'categoryId',
+  });
+  const watchedCoverImageUrl = useWatch({ control: form.control, name: 'coverImageUrl' });
 
   useEffect(() => {
     const settingsRef = doc(db, 'blogSettings', 'main');
@@ -75,22 +94,6 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
     return () => unsubscribe();
   }, []);
 
-  const form = useForm<PostFormValues>({
-    resolver: zodResolver(postSchema),
-    defaultValues: {
-      title: "",
-      content: "",
-      coverImageUrl: "",
-      categoryId: "",
-      subcategoryId: "",
-    },
-  });
-
-  const watchedCategoryId = useWatch({
-      control: form.control,
-      name: 'categoryId',
-  });
-
   const availableSubcategories = useMemo(() => {
       if (!watchedCategoryId || !settings) return [];
       const selectedCategory = settings.categories.find(c => c.id === watchedCategoryId);
@@ -103,13 +106,13 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
 
         const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
-            toast({ variant: 'destructive', title: 'Invalid file type', description: 'Please select a PNG, JPG, or WEBP image.' });
+            toast({ variant: 'destructive', title: 'Непідтримуваний формат файлу', description: 'Завантажте JPG, PNG або WEBP.' });
             return;
         }
 
         const maxSize = 5 * 1024 * 1024; // 5MB
         if (file.size > maxSize) {
-            toast({ variant: 'destructive', title: 'File too large', description: 'Image size should not exceed 5MB.' });
+            toast({ variant: 'destructive', title: 'Файл завеликий', description: 'Оберіть менше зображення.' });
             return;
         }
 
@@ -118,14 +121,8 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
     };
 
     const handleImageUpload = (file: File) => {
-        let postId = newPostId;
-        if (!postId) {
-            postId = doc(collection(db, "posts")).id;
-            setNewPostId(postId);
-        }
-
         setIsUploading(true);
-        const storageRef = ref(storage, `posts/${postId}/cover-${Date.now()}-${file.name}`);
+        const storageRef = ref(storage, `posts/${newPostId}/cover-${Date.now()}-${file.name}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
 
         uploadTask.on('state_changed',
@@ -135,34 +132,35 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
             },
             (error) => {
                 console.error("Upload error:", error);
-                toast({ variant: 'destructive', title: 'Upload failed', description: error.message });
+                toast({ variant: 'destructive', title: 'Не вдалося завантажити зображення', description: 'Спробуйте ще раз.' });
                 setIsUploading(false);
             },
             () => {
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    if (coverImageUrl) {
-                        const oldImageRef = ref(storage, coverImageUrl);
+                    const oldUrl = form.getValues('coverImageUrl');
+                    if (oldUrl) {
+                        const oldImageRef = ref(storage, oldUrl);
                         deleteObject(oldImageRef).catch(err => console.warn("Could not delete old image:", err));
                     }
-                    setCoverImageUrl(downloadURL);
+                    form.setValue('coverImageUrl', downloadURL, { shouldValidate: true });
                     setIsUploading(false);
-                    toast({ title: 'Image uploaded!' });
                 });
             }
         );
     };
 
     const handleImageRemove = async () => {
-        if (!coverImageUrl) return;
-        const imageRef = ref(storage, coverImageUrl);
+        const imageUrl = form.getValues('coverImageUrl');
+        if (!imageUrl) return;
+        const imageRef = ref(storage, imageUrl);
         try {
             await deleteObject(imageRef);
-            setCoverImageUrl(null);
+            form.setValue('coverImageUrl', '', { shouldValidate: true });
             toast({ title: 'Image removed.' });
         } catch (error: any) {
             console.error("Error removing image:", error);
             if (error.code === 'storage/object-not-found') {
-                setCoverImageUrl(null);
+                form.setValue('coverImageUrl', '', { shouldValidate: true });
             } else {
                 toast({ variant: 'destructive', title: 'Error removing image', description: error.message });
             }
@@ -175,13 +173,14 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
       return;
     }
     
-    const docRef = newPostId ? doc(db, "posts", newPostId) : doc(collection(db, "posts"));
+    const docRef = doc(db, "posts", newPostId);
 
     const newPostPayload = {
       // Core content
       title: values.title,
       content: values.content,
-      coverImageUrl: coverImageUrl || '',
+      coverImageUrl: values.coverImageUrl || '',
+      coverAlt: values.coverAlt || '',
       slug: values.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 70),
       contentType: 'post' as const,
 
@@ -267,12 +266,20 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
 
           <div className="space-y-2">
             <FormLabel>Зображення обкладинки</FormLabel>
-            {coverImageUrl ? (
+            <FormDescription>Додайте зображення, яке буде відображатися як обкладинка вашого поста.</FormDescription>
+            {watchedCoverImageUrl ? (
                 <div className="relative group">
-                    <Image src={coverImageUrl} alt="Cover image preview" width={400} height={225} className="rounded-md object-cover w-full aspect-video" />
-                    <Button size="icon" variant="destructive" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={handleImageRemove}>
-                        <X className="h-4 w-4" />
-                    </Button>
+                    <Image src={watchedCoverImageUrl} alt="Cover image preview" width={400} height={225} className="rounded-md object-cover w-full aspect-video" />
+                    <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <label htmlFor="cover-image-upload-create">
+                            <Button asChild size="icon" variant="secondary" className="h-7 w-7 cursor-pointer">
+                                <span><Upload className="h-4 w-4" /></span>
+                            </Button>
+                        </label>
+                        <Button size="icon" variant="destructive" className="h-7 w-7" onClick={handleImageRemove}>
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
                 </div>
             ) : (
                 <div className="border-2 border-dashed border-muted rounded-lg p-6 text-center">
@@ -286,25 +293,34 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
                             <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
                             <label htmlFor="cover-image-upload-create" className="mt-4 inline-block cursor-pointer">
                                 <Button asChild variant="outline">
-                                    <span><Upload className="mr-2 h-4 w-4" /> Завантажити</span>
+                                    <span><Upload className="mr-2 h-4 w-4" /> Завантажити зображення</span>
                                 </Button>
                             </label>
-                            <input id="cover-image-upload-create" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={handleFileSelect} />
-                            <p className="text-xs text-muted-foreground mt-2">PNG, JPG, WEBP до 5MB.</p>
+                            <p className="text-xs text-muted-foreground mt-2">Підтримуються JPG, PNG, WEBP. Рекомендовано горизонтальне зображення хорошої якості.</p>
                           </>
                     )}
                 </div>
             )}
+            <input id="cover-image-upload-create" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={handleFileSelect} disabled={isUploading} />
              <FormField
                 control={form.control}
                 name="coverImageUrl"
-                render={({ field }) => (
-                    <FormItem className="hidden">
-                        <FormControl><Input {...field} value={coverImageUrl || ''} /></FormControl>
-                    </FormItem>
-                )}
+                render={({ field }) => ( <FormItem className="hidden"><FormControl><Input {...field} /></FormControl></FormItem> )}
             />
           </div>
+            <FormField
+              control={form.control}
+              name="coverAlt"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Опис зображення</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Коротко опишіть, що зображено на обкладинці" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           
            <div className="grid grid-cols-2 gap-4">
              <FormField

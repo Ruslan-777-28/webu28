@@ -22,6 +22,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import {
   Select,
@@ -36,13 +37,14 @@ import { doc, onSnapshot, serverTimestamp, updateDoc } from "firebase/firestore"
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import type { BlogSettings, Post } from "@/lib/types";
 import Image from "next/image";
-import { Image as ImageIcon, Upload, X } from 'lucide-react';
+import { ImageIcon, Upload, X } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 
 const postSchema = z.object({
   title: z.string().min(5, { message: "Заголовок має містити щонайменше 5 символів." }),
   content: z.string().min(20, { message: "Вміст має містити щонайменше 20 символів." }),
   coverImageUrl: z.string().url({ message: "Будь ласка, введіть дійсну URL-адресу." }).optional().or(z.literal('')),
+  coverAlt: z.string().optional(),
   categoryId: z.string({ required_error: "Будь ласка, оберіть категорію." }),
   subcategoryId: z.string().optional(),
 });
@@ -84,6 +86,7 @@ export function EditPostModal({ post, isOpen, setOpen }: EditPostModalProps) {
       title: post.title,
       content: post.content || '',
       coverImageUrl: post.coverImageUrl || '',
+      coverAlt: post.coverAlt || '',
       categoryId: post.categoryId,
       subcategoryId: post.subcategoryId,
     },
@@ -94,6 +97,7 @@ export function EditPostModal({ post, isOpen, setOpen }: EditPostModalProps) {
       title: post.title,
       content: post.content || '',
       coverImageUrl: post.coverImageUrl || '',
+      coverAlt: post.coverAlt || '',
       categoryId: post.categoryId,
       subcategoryId: post.subcategoryId,
     });
@@ -117,13 +121,13 @@ export function EditPostModal({ post, isOpen, setOpen }: EditPostModalProps) {
 
         const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
-            toast({ variant: 'destructive', title: 'Invalid file type', description: 'Please select a PNG, JPG, or WEBP image.' });
+            toast({ variant: 'destructive', title: 'Непідтримуваний формат файлу', description: 'Завантажте JPG, PNG або WEBP.' });
             return;
         }
 
         const maxSize = 5 * 1024 * 1024; // 5MB
         if (file.size > maxSize) {
-            toast({ variant: 'destructive', title: 'File too large', description: 'Image size should not exceed 5MB.' });
+            toast({ variant: 'destructive', title: 'Файл завеликий', description: 'Оберіть менше зображення.' });
             return;
         }
 
@@ -145,7 +149,7 @@ export function EditPostModal({ post, isOpen, setOpen }: EditPostModalProps) {
             },
             (error) => {
                 console.error("Upload error:", error);
-                toast({ variant: 'destructive', title: 'Upload failed', description: error.message });
+                toast({ variant: 'destructive', title: 'Не вдалося завантажити зображення', description: 'Спробуйте ще раз.' });
                 setIsUploading(false);
             },
             () => {
@@ -260,12 +264,20 @@ export function EditPostModal({ post, isOpen, setOpen }: EditPostModalProps) {
             
             <div className="space-y-2">
                 <FormLabel>Зображення обкладинки</FormLabel>
+                <FormDescription>Додайте зображення, яке буде відображатися як обкладинка вашого поста.</FormDescription>
                 {watchedCoverImageUrl ? (
                     <div className="relative group">
                         <Image src={watchedCoverImageUrl} alt="Cover image preview" width={400} height={225} className="rounded-md object-cover w-full aspect-video" />
-                        <Button size="icon" variant="destructive" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={handleImageRemove}>
-                            <X className="h-4 w-4" />
-                        </Button>
+                        <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <label htmlFor="cover-image-upload-edit">
+                                <Button asChild size="icon" variant="secondary" className="h-7 w-7 cursor-pointer">
+                                    <span><Upload className="h-4 w-4" /></span>
+                                </Button>
+                            </label>
+                            <Button size="icon" variant="destructive" className="h-7 w-7" onClick={handleImageRemove}>
+                                <X className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
                 ) : (
                     <div className="border-2 border-dashed border-muted rounded-lg p-6 text-center">
@@ -279,25 +291,34 @@ export function EditPostModal({ post, isOpen, setOpen }: EditPostModalProps) {
                                 <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
                                 <label htmlFor="cover-image-upload-edit" className="mt-4 inline-block cursor-pointer">
                                     <Button asChild variant="outline">
-                                        <span><Upload className="mr-2 h-4 w-4" /> Завантажити</span>
+                                        <span><Upload className="mr-2 h-4 w-4" /> Завантажити зображення</span>
                                     </Button>
                                 </label>
-                                <input id="cover-image-upload-edit" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={handleFileSelect} />
-                                <p className="text-xs text-muted-foreground mt-2">PNG, JPG, WEBP до 5MB.</p>
+                                <p className="text-xs text-muted-foreground mt-2">Підтримуються JPG, PNG, WEBP. Рекомендовано горизонтальне зображення хорошої якості.</p>
                             </>
                         )}
                     </div>
                 )}
+                 <input id="cover-image-upload-edit" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={handleFileSelect} disabled={isUploading} />
                  <FormField
                     control={form.control}
                     name="coverImageUrl"
-                    render={({ field }) => (
-                        <FormItem className="hidden">
-                            <FormControl><Input {...field} /></FormControl>
-                        </FormItem>
-                    )}
+                    render={({ field }) => ( <FormItem className="hidden"><FormControl><Input {...field} /></FormControl></FormItem> )}
                 />
             </div>
+             <FormField
+                control={form.control}
+                name="coverAlt"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Опис зображення</FormLabel>
+                    <FormControl>
+                        <Input placeholder="Коротко опишіть, що зображено на обкладинці" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
             
             <div className="grid grid-cols-2 gap-4">
                <FormField
