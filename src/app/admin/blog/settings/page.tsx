@@ -8,13 +8,26 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { db } from "@/lib/firebase/client";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PlusCircle, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const subcategorySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Назва підкатегорії обов'язкова"),
+});
+
+const categorySchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Назва категорії обов'язкова"),
+  subcategories: z.array(subcategorySchema),
+});
 
 const settingsSchema = z.object({
     blogPageTitle: z.string().min(1, "Title is required"),
@@ -26,14 +39,7 @@ const settingsSchema = z.object({
     showCategoriesSection: z.boolean(),
     showAuthorsSection: z.boolean(),
     showSubscribeBlock: z.boolean(),
-    categories: z.string().refine((val) => {
-        try {
-            JSON.parse(val);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    }, { message: "Invalid JSON format for categories." }),
+    categories: z.array(categorySchema).default([]),
     tags: z.string().optional(),
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
@@ -42,6 +48,9 @@ const settingsSchema = z.object({
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
+
+const generateSlug = (name: string) => name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+
 
 export default function BlogSettingsPage() {
     const { toast } = useToast();
@@ -59,14 +68,18 @@ export default function BlogSettingsPage() {
             showCategoriesSection: true,
             showAuthorsSection: false,
             showSubscribeBlock: true,
-            categories: '[]',
+            categories: [],
             tags: "",
             seoTitle: "",
             seoDescription: "",
             canonicalUrl: "",
             ogImageUrl: "",
         },
-        mode: "onChange",
+    });
+    
+    const { fields, append, remove } = useFieldArray({
+        control: form.control,
+        name: "categories"
     });
 
     useEffect(() => {
@@ -78,7 +91,7 @@ export default function BlogSettingsPage() {
                 const data = docSnap.data();
                 form.reset({
                     ...data,
-                    categories: JSON.stringify(data.categories || [], null, 2),
+                    categories: data.categories || [],
                     tags: Array.isArray(data.tags) ? data.tags.join(', ') : '',
                 });
             }
@@ -92,7 +105,14 @@ export default function BlogSettingsPage() {
             const settingsRef = doc(db, 'blogSettings', 'main');
             const settingsData = {
                 ...data,
-                categories: JSON.parse(data.categories),
+                categories: data.categories.map(cat => ({
+                    ...cat,
+                    id: generateSlug(cat.name) || cat.id,
+                    subcategories: cat.subcategories.map(sub => ({
+                        ...sub,
+                        id: generateSlug(sub.name) || sub.id
+                    }))
+                })),
                 tags: data.tags?.split(',').map(t => t.trim()).filter(Boolean),
             };
             await setDoc(settingsRef, settingsData, { merge: true });
@@ -185,16 +205,24 @@ export default function BlogSettingsPage() {
                                 <CardDescription>Manage categories and tags for blog posts.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <FormField control={form.control} name="categories" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Categories (JSON format)</FormLabel>
-                                        <FormControl><Textarea placeholder="Enter categories as a JSON array" {...field} className="min-h-64 font-mono text-xs" /></FormControl>
-                                        <FormDescription>
-                                            Use JSON format: `[{ "id": "cat1", "name": "Category 1", "subcategories": [{ "id": "sub1", "name": "Sub 1" }] }]`
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}/>
+                                <div>
+                                    <FormLabel>Categories</FormLabel>
+                                    <div className="space-y-4 pt-2">
+                                        {fields.map((field, index) => (
+                                            <CategoryItem key={field.id} form={form} categoryIndex={index} removeCategory={remove} />
+                                        ))}
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="mt-4"
+                                        onClick={() => append({ id: '', name: '', subcategories: [] })}
+                                    >
+                                        <PlusCircle className="mr-2 h-4 w-4" />
+                                        Add Category
+                                    </Button>
+                                </div>
                                 <FormField control={form.control} name="tags" render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Tags</FormLabel>
@@ -252,3 +280,123 @@ export default function BlogSettingsPage() {
         </Form>
     );
 }
+
+function CategoryItem({ form, categoryIndex, removeCategory }: { form: any, categoryIndex: number, removeCategory: (index: number) => void }) {
+    const { fields, append, remove } = useFieldArray({
+        control: form.control,
+        name: `categories.${categoryIndex}.subcategories`
+    });
+    
+    const categoryName = useWatch({
+        control: form.control,
+        name: `categories.${categoryIndex}.name`
+    });
+
+    useEffect(() => {
+        if (categoryName) {
+            form.setValue(`categories.${categoryIndex}.id`, generateSlug(categoryName));
+        }
+    }, [categoryName, categoryIndex, form]);
+
+    return (
+        <div className="p-4 border rounded-lg bg-muted/20">
+            <div className="flex items-center gap-2">
+                <FormField
+                    control={form.control}
+                    name={`categories.${categoryIndex}.name`}
+                    render={({ field }) => (
+                        <FormItem className="flex-grow">
+                            <FormControl>
+                                <Input placeholder="Category Name" {...field} />
+                            </FormControl>
+                             <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name={`categories.${categoryIndex}.id`}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <Input readOnly disabled placeholder="category-id" {...field} className="w-32 bg-muted text-muted-foreground" />
+                            </FormControl>
+                        </FormItem>
+                    )}
+                />
+                <Button type="button" variant="ghost" size="icon" onClick={() => removeCategory(categoryIndex)}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+            </div>
+            <div className="pl-8 mt-4 space-y-2">
+                <FormLabel className="text-xs text-muted-foreground">Subcategories</FormLabel>
+                {fields.map((field, subIndex) => (
+                    <SubcategoryItem 
+                        key={field.id}
+                        form={form} 
+                        categoryIndex={categoryIndex} 
+                        subcategoryIndex={subIndex} 
+                        removeSubcategory={remove} 
+                    />
+                ))}
+                <Button 
+                    type="button" 
+                    variant="link" 
+                    size="sm" 
+                    className="p-0 h-auto"
+                    onClick={() => append({ id: '', name: ''})}
+                >
+                     <PlusCircle className="mr-2 h-4 w-4" />
+                     Add Subcategory
+                </Button>
+            </div>
+        </div>
+    )
+}
+
+function SubcategoryItem({ form, categoryIndex, subcategoryIndex, removeSubcategory }: { form: any, categoryIndex: number, subcategoryIndex: number, removeSubcategory: (index: number) => void }) {
+    
+    const subcategoryName = useWatch({
+        control: form.control,
+        name: `categories.${categoryIndex}.subcategories.${subcategoryIndex}.name`
+    });
+
+    useEffect(() => {
+        if (subcategoryName) {
+            form.setValue(`categories.${categoryIndex}.subcategories.${subcategoryIndex}.id`, generateSlug(subcategoryName));
+        }
+    }, [subcategoryName, categoryIndex, subcategoryIndex, form]);
+    
+    return (
+        <div className="flex items-center gap-2">
+             <FormField
+                control={form.control}
+                name={`categories.${categoryIndex}.subcategories.${subcategoryIndex}.name`}
+                render={({ field }) => (
+                    <FormItem className="flex-grow">
+                        <FormControl>
+                            <Input placeholder="Subcategory Name" {...field} className="h-8" />
+                        </FormControl>
+                         <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name={`categories.${categoryIndex}.subcategories.${subcategoryIndex}.id`}
+                render={({ field }) => (
+                    <FormItem>
+                        <FormControl>
+                            <Input readOnly disabled placeholder="subcategory-id" {...field} className="w-32 h-8 bg-muted text-muted-foreground" />
+                        </FormControl>
+                    </FormItem>
+                )}
+            />
+            <Button type="button" variant="ghost" size="icon" onClick={() => removeSubcategory(subcategoryIndex)} className="h-8 w-8">
+                <Trash2 className="h-4 w-4 text-destructive/70" />
+            </Button>
+        </div>
+    )
+}
+
+
