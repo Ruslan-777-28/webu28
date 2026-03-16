@@ -51,7 +51,7 @@ export default function BlogAdminDashboard() {
     { title: "Total Articles", value: stats.total, icon: Newspaper },
     { title: "Published", value: stats.published, icon: BookMarked },
     { title: "Drafts", value: stats.drafts, icon: LayoutList },
-    { title: "Authors", value: stats.authors, icon: Users },
+    { title: "Total Authors", value: stats.authors, icon: Users },
   ];
 
   return (
