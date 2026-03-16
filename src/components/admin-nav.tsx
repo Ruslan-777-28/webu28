@@ -7,6 +7,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarSeparator,
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
@@ -17,6 +18,7 @@ import {
   Settings,
   Languages,
   Users,
+  ExternalLink,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -55,6 +57,17 @@ export function AdminNav() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
+           <SidebarMenuItem>
+            <Link href="/" legacyBehavior passHref>
+              <SidebarMenuButton asChild tooltip="Перейти на сайт">
+                <a>
+                  <ExternalLink />
+                  <span>Перейти на сайт</span>
+                </a>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarSeparator />
           {visibleNavItems.map((item) => (
             <SidebarMenuItem key={item.href}>
               <Link href={item.href} legacyBehavior passHref>
