@@ -339,9 +339,15 @@ export function EditPostModal({ post, isOpen, setOpen }: EditPostModalProps) {
                           </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                          {settings?.categories?.filter(cat => cat.id && cat.name).map(cat => (
-                              <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                          ))}
+                         {(() => {
+                              const filteredCategories = settings?.categories?.filter(cat => cat.id && cat.name) || [];
+                              if (filteredCategories.length > 0) {
+                                  return filteredCategories.map(cat => (
+                                      <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                                  ));
+                              }
+                              return <SelectItem value="-" disabled>Немає доступних категорій</SelectItem>;
+                          })()}
                       </SelectContent>
                       </Select>
                       <FormMessage />
