@@ -59,7 +59,7 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <Link href="/profile">
+          <Link href={`/profile/${user.uid}`}>
             <DropdownMenuItem className="cursor-pointer">
               Профіль
             </DropdownMenuItem>

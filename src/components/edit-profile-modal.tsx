@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
@@ -20,28 +20,112 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import type { UserProfile } from "@/lib/types";
-import { db } from "@/lib/firebase/client";
+import { db, storage } from "@/lib/firebase/client";
 import { doc, updateDoc } from "firebase/firestore";
+import React, { useState } from 'react';
+import Image from "next/image";
+import { Progress } from "./ui/progress";
+import { ImageIcon, Upload, X } from "lucide-react";
+import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 
 const profileSchema = z.object({
   name: z.string().min(2, { message: "Ім'я має містити щонайменше 2 символи." }),
   bio: z.string().optional(),
+  coverUrl: z.string().url().optional().or(z.literal('')),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, setOpen: (open: boolean) => void }) {
   const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: profile.name || "",
       bio: profile.bio || "",
+      coverUrl: profile.coverUrl || "",
     },
   });
+
+  const watchedCoverUrl = useWatch({ control: form.control, name: 'coverUrl' });
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+        toast({ variant: 'destructive', title: 'Непідтримуваний формат файлу', description: 'Завантажте JPG, PNG або WEBP.' });
+        return;
+    }
+
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+        toast({ variant: 'destructive', title: 'Файл завеликий', description: 'Оберіть менше зображення.' });
+        return;
+    }
+
+    handleImageUpload(file);
+    e.target.value = '';
+  };
+
+  const handleImageUpload = (file: File) => {
+      setIsUploading(true);
+      const storageRef = ref(storage, `users/${profile.uid}/cover-${Date.now()}-${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on('state_changed',
+          (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              setUploadProgress(progress);
+          },
+          (error) => {
+              console.error("Upload error:", error);
+              toast({ variant: 'destructive', title: 'Не вдалося завантажити зображення', description: 'Спробуйте ще раз.' });
+              setIsUploading(false);
+          },
+          () => {
+              getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                  const oldUrl = form.getValues('coverUrl');
+                  if (oldUrl) {
+                      try {
+                          const oldImageRef = ref(storage, oldUrl);
+                          deleteObject(oldImageRef).catch(err => console.warn("Could not delete old image:", err));
+                      } catch(e) { console.error(e) }
+                  }
+                  form.setValue('coverUrl', downloadURL, { shouldValidate: true });
+                  setIsUploading(false);
+              });
+          }
+      );
+  };
+
+  const handleImageRemove = async () => {
+    const imageUrl = form.getValues('coverUrl');
+    if (!imageUrl) return;
+
+    try {
+        const imageRef = ref(storage, imageUrl);
+        await deleteObject(imageRef);
+        form.setValue('coverUrl', '', { shouldValidate: true });
+        toast({ title: 'Зображення видалено.' });
+    } catch (error: any) {
+        console.error("Error removing image:", error);
+        if (error.code === 'storage/object-not-found') {
+            form.setValue('coverUrl', '', { shouldValidate: true });
+        } else {
+            toast({ variant: 'destructive', title: 'Помилка видалення', description: error.message });
+        }
+    }
+  };
+
 
   async function onSubmit(values: ProfileFormValues) {
     if (!profile.uid) return;
@@ -51,6 +135,7 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
       await updateDoc(userDocRef, {
         name: values.name,
         bio: values.bio,
+        coverUrl: values.coverUrl,
       });
       toast({
         title: "Профіль оновлено!",
@@ -103,9 +188,55 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
               </FormItem>
             )}
           />
+           <div className="space-y-2">
+            <FormLabel>Фон профілю</FormLabel>
+            <FormDescription>Завантажте фонове зображення для вашого публічного профілю.</FormDescription>
+            {watchedCoverUrl ? (
+                <div className="relative group">
+                    <Image src={watchedCoverUrl} alt="Попередній перегляд фону" width={400} height={225} className="rounded-md object-cover w-full aspect-video" />
+                    <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <label htmlFor="cover-url-upload-edit">
+                            <Button asChild size="icon" variant="secondary" className="h-7 w-7 cursor-pointer">
+                                <span><Upload className="h-4 w-4" /></span>
+                            </Button>
+                        </label>
+                        <Button size="icon" variant="destructive" className="h-7 w-7" onClick={handleImageRemove}>
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            ) : (
+                <div className="border-2 border-dashed border-muted rounded-lg p-6 text-center">
+                    {isUploading ? (
+                        <>
+                            <p className="text-sm text-muted-foreground mb-2">Завантажуємо зображення...</p>
+                            <Progress value={uploadProgress} className="w-full" />
+                            <p className="text-sm mt-2 text-muted-foreground">{Math.round(uploadProgress)}%</p>
+                        </>
+                    ) : (
+                        <>
+                            <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
+                            <label htmlFor="cover-url-upload-edit" className="mt-4 inline-block cursor-pointer">
+                                <Button asChild variant="outline">
+                                    <span><Upload className="mr-2 h-4 w-4" /> Завантажити фон</span>
+                                </Button>
+                            </label>
+                            <p className="text-xs text-muted-foreground mt-2">Підтримуються JPG, PNG, WEBP. Макс. розмір 5MB.</p>
+                        </>
+                    )}
+                </div>
+            )}
+            <input id="cover-url-upload-edit" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={handleFileSelect} disabled={isUploading} />
+            <FormField
+                control={form.control}
+                name="coverUrl"
+                render={({ field }) => ( <FormItem className="hidden"><FormControl><Input {...field} /></FormControl></FormItem> )}
+            />
+          </div>
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Скасувати</Button>
-            <Button type="submit" disabled={form.formState.isSubmitting}>
+            <Button type="submit" disabled={form.formState.isSubmitting || isUploading}>
                 {form.formState.isSubmitting ? 'Збереження...' : 'Зберегти зміни'}
             </Button>
           </DialogFooter>

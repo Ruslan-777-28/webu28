@@ -113,6 +113,25 @@ export type BlogSettings = {
 
 export type UserAccountStatus = 'active' | 'limited' | 'suspended' | 'banned';
 
+export type ProfileMetrics = {
+    customer?: {
+        [subcategoryId: string]: {
+            ratingAvg?: number;
+            ratingCount?: number;
+            platformRank?: number | null;
+            completedCount?: number;
+        }
+    };
+    professional?: {
+        [subcategoryId: string]: {
+            ratingAvg?: number;
+            ratingCount?: number;
+            platformRank?: number | null;
+            completedCount?: number;
+        }
+    };
+}
+
 export type UserProfile = {
   uid: string;
   name: string;
@@ -131,6 +150,8 @@ export type UserProfile = {
   };
   bio?: string;
   avatarUrl?: string;
+  coverUrl?: string;
+  profileMetrics?: ProfileMetrics;
   preferredLanguage?: string;
   availability?: {
     status: 'available' | 'busy' | 'away';
