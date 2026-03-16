@@ -31,10 +31,12 @@ import Image from "next/image";
 import { Progress } from "./ui/progress";
 import { ImageIcon, Upload, X } from "lucide-react";
 import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const profileSchema = z.object({
   name: z.string().min(2, { message: "Ім'я має містити щонайменше 2 символи." }),
   bio: z.string().optional(),
+  avatarUrl: z.string().url().optional().or(z.literal('')),
   coverUrl: z.string().url().optional().or(z.literal('')),
 });
 
@@ -42,21 +44,61 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, setOpen: (open: boolean) => void }) {
   const { toast } = useToast();
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [coverUploadProgress, setCoverUploadProgress] = useState(0);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarUploadProgress, setAvatarUploadProgress] = useState(0);
   
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: profile.name || "",
       bio: profile.bio || "",
+      avatarUrl: profile.avatarUrl || "",
       coverUrl: profile.coverUrl || "",
     },
   });
 
+  const watchedAvatarUrl = useWatch({ control: form.control, name: 'avatarUrl' });
   const watchedCoverUrl = useWatch({ control: form.control, name: 'coverUrl' });
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (file: File, type: 'avatar' | 'cover') => {
+      const isAvatar = type === 'avatar';
+      const path = isAvatar ? `avatars/${profile.uid}/avatar-${Date.now()}-${file.name}` : `users/${profile.uid}/cover-${Date.now()}-${file.name}`;
+      
+      isAvatar ? setIsUploadingAvatar(true) : setIsUploadingCover(true);
+
+      const storageRef = ref(storage, path);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on('state_changed',
+          (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              isAvatar ? setAvatarUploadProgress(progress) : setCoverUploadProgress(progress);
+          },
+          (error) => {
+              console.error("Upload error:", error);
+              toast({ variant: 'destructive', title: 'Не вдалося завантажити зображення', description: 'Спробуйте ще раз.' });
+              isAvatar ? setIsUploadingAvatar(false) : setIsUploadingCover(false);
+          },
+          () => {
+              getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                  const oldUrl = form.getValues(isAvatar ? 'avatarUrl' : 'coverUrl');
+                  if (oldUrl) {
+                      try {
+                          const oldImageRef = ref(storage, oldUrl);
+                          deleteObject(oldImageRef).catch(err => console.warn("Could not delete old image:", err));
+                      } catch(e) { console.error(e) }
+                  }
+                  form.setValue(isAvatar ? 'avatarUrl' : 'coverUrl', downloadURL, { shouldValidate: true });
+                  isAvatar ? setIsUploadingAvatar(false) : setIsUploadingCover(false);
+              });
+          }
+      );
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -72,54 +114,24 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
         return;
     }
 
-    handleImageUpload(file);
+    handleFileUpload(file, type);
     e.target.value = '';
   };
 
-  const handleImageUpload = (file: File) => {
-      setIsUploading(true);
-      const storageRef = ref(storage, `users/${profile.uid}/cover-${Date.now()}-${file.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-
-      uploadTask.on('state_changed',
-          (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              setUploadProgress(progress);
-          },
-          (error) => {
-              console.error("Upload error:", error);
-              toast({ variant: 'destructive', title: 'Не вдалося завантажити зображення', description: 'Спробуйте ще раз.' });
-              setIsUploading(false);
-          },
-          () => {
-              getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                  const oldUrl = form.getValues('coverUrl');
-                  if (oldUrl) {
-                      try {
-                          const oldImageRef = ref(storage, oldUrl);
-                          deleteObject(oldImageRef).catch(err => console.warn("Could not delete old image:", err));
-                      } catch(e) { console.error(e) }
-                  }
-                  form.setValue('coverUrl', downloadURL, { shouldValidate: true });
-                  setIsUploading(false);
-              });
-          }
-      );
-  };
-
-  const handleImageRemove = async () => {
-    const imageUrl = form.getValues('coverUrl');
+  const handleImageRemove = async (type: 'avatar' | 'cover') => {
+    const isAvatar = type === 'avatar';
+    const imageUrl = form.getValues(isAvatar ? 'avatarUrl' : 'coverUrl');
     if (!imageUrl) return;
 
     try {
         const imageRef = ref(storage, imageUrl);
         await deleteObject(imageRef);
-        form.setValue('coverUrl', '', { shouldValidate: true });
+        form.setValue(isAvatar ? 'avatarUrl' : 'coverUrl', '', { shouldValidate: true });
         toast({ title: 'Зображення видалено.' });
     } catch (error: any) {
         console.error("Error removing image:", error);
         if (error.code === 'storage/object-not-found') {
-            form.setValue('coverUrl', '', { shouldValidate: true });
+            form.setValue(isAvatar ? 'avatarUrl' : 'coverUrl', '', { shouldValidate: true });
         } else {
             toast({ variant: 'destructive', title: 'Помилка видалення', description: error.message });
         }
@@ -135,6 +147,7 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
       await updateDoc(userDocRef, {
         name: values.name,
         bio: values.bio,
+        avatarUrl: values.avatarUrl,
         coverUrl: values.coverUrl,
       });
       toast({
@@ -152,6 +165,8 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
     }
   }
 
+  const isUploading = isUploadingAvatar || isUploadingCover;
+
   return (
     <DialogContent className="sm:max-w-[525px]">
       <DialogHeader>
@@ -161,7 +176,44 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6 py-4">
+          
+          <FormItem>
+              <FormLabel>Аватар</FormLabel>
+              <div className="flex items-center gap-4">
+                  <Avatar className="h-20 w-20">
+                      <AvatarImage src={watchedAvatarUrl || undefined} alt={profile.name} />
+                      <AvatarFallback>{profile.name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  {isUploadingAvatar ? (
+                      <div className="w-full">
+                           <p className="text-sm text-muted-foreground mb-2">Завантажуємо аватар...</p>
+                          <Progress value={avatarUploadProgress} className="w-full" />
+                          <p className="text-sm mt-2 text-muted-foreground">{Math.round(avatarUploadProgress)}%</p>
+                      </div>
+                  ) : (
+                      <div className="flex items-center gap-2">
+                          <label htmlFor="avatar-upload-edit">
+                              <Button asChild variant="outline">
+                                  <span><Upload className="mr-2 h-4 w-4" /> Завантажити</span>
+                              </Button>
+                          </label>
+                          {watchedAvatarUrl && (
+                              <Button variant="ghost" size="icon" onClick={() => handleImageRemove('avatar')}>
+                                  <X className="h-4 w-4" />
+                              </Button>
+                          )}
+                      </div>
+                  )}
+              </div>
+              <input id="avatar-upload-edit" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={(e) => handleFileSelect(e, 'avatar')} disabled={isUploading} />
+              <FormField
+                  control={form.control}
+                  name="avatarUrl"
+                  render={({ field }) => ( <FormItem className="hidden"><FormControl><Input {...field} /></FormControl></FormItem> )}
+              />
+          </FormItem>
+          
           <FormField
             control={form.control}
             name="name"
@@ -175,6 +227,7 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="bio"
@@ -188,6 +241,7 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
               </FormItem>
             )}
           />
+
            <div className="space-y-2">
             <FormLabel>Фон профілю</FormLabel>
             <FormDescription>Завантажте фонове зображення для вашого публічного профілю.</FormDescription>
@@ -200,18 +254,18 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
                                 <span><Upload className="h-4 w-4" /></span>
                             </Button>
                         </label>
-                        <Button size="icon" variant="destructive" className="h-7 w-7" onClick={handleImageRemove}>
+                        <Button size="icon" variant="destructive" className="h-7 w-7" onClick={() => handleImageRemove('cover')}>
                             <X className="h-4 w-4" />
                         </Button>
                     </div>
                 </div>
             ) : (
                 <div className="border-2 border-dashed border-muted rounded-lg p-6 text-center">
-                    {isUploading ? (
+                    {isUploadingCover ? (
                         <>
                             <p className="text-sm text-muted-foreground mb-2">Завантажуємо зображення...</p>
-                            <Progress value={uploadProgress} className="w-full" />
-                            <p className="text-sm mt-2 text-muted-foreground">{Math.round(uploadProgress)}%</p>
+                            <Progress value={coverUploadProgress} className="w-full" />
+                            <p className="text-sm mt-2 text-muted-foreground">{Math.round(coverUploadProgress)}%</p>
                         </>
                     ) : (
                         <>
@@ -226,7 +280,7 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
                     )}
                 </div>
             )}
-            <input id="cover-url-upload-edit" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={handleFileSelect} disabled={isUploading} />
+            <input id="cover-url-upload-edit" type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={(e) => handleFileSelect(e, 'cover')} disabled={isUploading} />
             <FormField
                 control={form.control}
                 name="coverUrl"
@@ -236,8 +290,8 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Скасувати</Button>
-            <Button type="submit" disabled={form.formState.isSubmitting || isUploading}>
-                {form.formState.isSubmitting ? 'Збереження...' : 'Зберегти зміни'}
+            <Button type="submit" disabled={isUploading}>
+                {isUploading ? 'Завантаження...' : 'Зберегти зміни'}
             </Button>
           </DialogFooter>
         </form>
