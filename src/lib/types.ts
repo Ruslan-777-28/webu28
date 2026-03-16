@@ -47,6 +47,7 @@ export type Post = {
   createdAt: any; // Firestore Timestamp
   updatedAt: any; // Firestore Timestamp
   publishedAt?: any | null; // Firestore Timestamp for 'blog'
+  scheduledAt?: any | null;
 
   // --- New Platform-wide Fields ---
   sourcePlatform?: SourcePlatform;
