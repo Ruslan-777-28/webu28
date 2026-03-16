@@ -35,7 +35,7 @@ export default function EditUserPage() {
             const userSnap = await getDoc(userRef);
 
             if (userSnap.exists()) {
-                setUserProfile({ ...userSnap.data() } as UserProfile);
+                setUserProfile({ uid: userSnap.id, ...userSnap.data() } as UserProfile);
             } else {
                 setError("User not found.");
             }
@@ -48,7 +48,7 @@ export default function EditUserPage() {
     };
     
     fetchData();
-  }, [id]);
+  }, [uid]);
   
   if (isLoading) {
     return (

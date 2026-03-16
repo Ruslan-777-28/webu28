@@ -18,6 +18,7 @@ export default function AllUsersPage() {
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const fetchedUsers = snapshot.docs.map(doc => ({
+                uid: doc.id,
                 ...doc.data()
             } as UserProfile));
             setUsers(fetchedUsers);
