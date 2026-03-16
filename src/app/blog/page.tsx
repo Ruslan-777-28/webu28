@@ -11,11 +11,139 @@ import { cn } from '@/lib/utils';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { CreatePostModal } from '@/components/create-post-modal';
 import Footer from '@/components/layout/footer';
-import { db } from '@/lib/firebase/client';
-import { collection, onSnapshot, query, where, getDoc, doc } from 'firebase/firestore';
 import type { Post, BlogSettings } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+// --- MOCK DATA ---
+
+const mockSettings: BlogSettings = {
+  blogPageTitle: "Блог про духовні практики",
+  blogPageSubtitle: "Ідеї, практики, аналітика, поради та матеріали, які допомагають краще зрозуміти себе, знайти фахівця, інструмент або рішення.",
+  featuredSectionTitle: "Рекомендоване",
+  articlesPerPage: 9,
+  defaultSort: 'latest',
+  showFeaturedSection: true,
+  showPopularSection: true,
+  showCategoriesSection: true,
+  showAuthorsSection: false,
+  showSubscribeBlock: true,
+  subscribeTitle: "Будьте в курсі",
+  subscribeDescription: "Отримуйте оновлення про нові статті та рекомендований контент.",
+  categories: [
+    { id: 'taro', name: 'Таро', subcategories: [
+      { id: 'beginners', name: 'Для початківців' },
+      { id: 'spreads', name: 'Розклади' },
+    ]},
+    { id: 'astrology', name: 'Астрологія', subcategories: [
+      { id: 'forecasts', name: 'Прогнози' },
+      { id: 'natal-chart', name: 'Натальна карта' },
+    ]},
+     { id: 'practices', name: 'Практики', subcategories: [] },
+  ],
+};
+
+const mockPosts: Post[] = [
+    {
+        id: '1',
+        title: 'Як почати працювати з картами Таро: гід для новачків',
+        excerpt: 'Все, що потрібно знати, щоб зробити свій перший розклад. Від вибору колоди до тлумачення карт.',
+        coverImageUrl: 'https://picsum.photos/seed/taro1/800/450',
+        authorName: 'Олена Таро',
+        publishedAt: { toDate: () => new Date('2024-05-15') },
+        createdAt: { toDate: () => new Date('2024-05-15') },
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'.repeat(2),
+        categoryId: 'taro',
+        subcategoryId: 'beginners',
+        slug: 'taro-for-beginners',
+        contentType: 'blog',
+        status: 'published',
+        authorId: 'author1',
+    },
+    {
+        id: '2',
+        title: 'Астрологічний прогноз на червень: що готують нам зірки?',
+        excerpt: 'Детальний розбір впливу планет на кожен знак зодіаку. Поради, як використати цей час з користю.',
+        coverImageUrl: 'https://picsum.photos/seed/astro1/800/450',
+        authorName: 'Сергій Астролог',
+        publishedAt: { toDate: () => new Date('2024-05-14') },
+        createdAt: { toDate: () => new Date('2024-05-14') },
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'.repeat(3),
+        categoryId: 'astrology',
+        subcategoryId: 'forecasts',
+        slug: 'astro-forecast-june',
+        contentType: 'blog',
+        status: 'published',
+        authorId: 'author2',
+    },
+    {
+        id: '3',
+        title: 'Розклад "Кельтський хрест": глибокий аналіз ситуації',
+        excerpt: 'Покрокова інструкція для одного з найпопулярніших та найглибших розкладів Таро. Розкрийте всі аспекти вашого питання.',
+        coverImageUrl: 'https://picsum.photos/seed/taro2/800/450',
+        authorName: 'Олена Таро',
+        publishedAt: { toDate: () => new Date('2024-05-12') },
+        createdAt: { toDate: () => new Date('2024-05-12') },
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'.repeat(2.5),
+        categoryId: 'taro',
+        subcategoryId: 'spreads',
+        slug: 'celtic-cross-spread',
+        contentType: 'blog',
+        status: 'published',
+        authorId: 'author1',
+    },
+    {
+        id: '4',
+        title: 'Натальна карта: ключ до розуміння себе',
+        excerpt: 'Що таке натальна карта і як вона допомагає розкрити свій потенціал, сильні та слабкі сторони.',
+        coverImageUrl: 'https://picsum.photos/seed/astro2/800/450',
+        authorName: 'Сергій Астролог',
+        publishedAt: { toDate: () => new Date('2024-05-10') },
+        createdAt: { toDate: () => new Date('2024-05-10') },
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'.repeat(4),
+        categoryId: 'astrology',
+        subcategoryId: 'natal-chart',
+        slug: 'natal-chart-guide',
+        contentType: 'blog',
+        status: 'published',
+        authorId: 'author2',
+    },
+    {
+        id: '5',
+        title: 'Ранкові медитації для енергії та спокою',
+        excerpt: 'Пʼять простих, але дієвих практик, які допоможуть налаштуватися на продуктивний та гармонійний день.',
+        coverImageUrl: 'https://picsum.photos/seed/pract1/800/450',
+        authorName: 'Анна Практик',
+        publishedAt: { toDate: () => new Date('2024-05-08') },
+        createdAt: { toDate: () => new Date('2024-05-08') },
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'.repeat(1),
+        categoryId: 'practices',
+        subcategoryId: '',
+        slug: 'morning-meditations',
+        contentType: 'blog',
+        status: 'published',
+        authorId: 'author3',
+    },
+    {
+        id: '6',
+        title: 'Як обрати свою першу колоду Таро?',
+        excerpt: 'Райдер-Уейт, Тота, Марсельське Таро чи авторська колода? Допоможемо розібратися у різноманітті та знайти те, що підходить саме вам.',
+        coverImageUrl: 'https://picsum.photos/seed/taro3/800/450',
+        authorName: 'Олена Таро',
+        publishedAt: { toDate: () => new Date('2024-05-05') },
+        createdAt: { toDate: () => new Date('2024-05-05') },
+        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'.repeat(2.8),
+        categoryId: 'taro',
+        subcategoryId: 'beginners',
+        slug: 'choose-first-tarot-deck',
+        contentType: 'blog',
+        status: 'published',
+        authorId: 'author1',
+    },
+];
+
+// --- END MOCK DATA ---
+
 
 const ArticleCard = ({ post, categoryName, subcategoryName, className, isFeatured = false }: { post: Post, categoryName: string, subcategoryName: string, className?: string, isFeatured?: boolean }) => (
   <Card className={cn("overflow-hidden flex flex-col h-full shadow-md hover:shadow-xl transition-shadow duration-300", className)}>
@@ -44,43 +172,15 @@ const ArticleCard = ({ post, categoryName, subcategoryName, className, isFeature
 );
 
 export default function BlogPage() {
-  const [settings, setSettings] = useState<BlogSettings | null>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [settings, setSettings] = useState<BlogSettings | null>(mockSettings);
+  const [posts, setPosts] = useState<Post[]>(mockPosts);
+  const [isLoading, setIsLoading] = useState(false);
   const [isPostModalOpen, setPostModalOpen] = useState(false);
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   
-  useEffect(() => {
-    const settingsRef = doc(db, 'blogSettings', 'main');
-    const unsubSettings = onSnapshot(settingsRef, (doc) => {
-        if(doc.exists()){
-            setSettings(doc.data() as BlogSettings);
-        }
-    });
-
-    const postsQuery = query(
-        collection(db, "posts"), 
-        where("contentType", "==", "blog"),
-        where("status", "==", "published")
-    );
-    const unsubPosts = onSnapshot(postsQuery, (snapshot) => {
-        const fetchedPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
-        setPosts(fetchedPosts);
-        setIsLoading(false);
-    }, (error) => {
-        console.error("Error fetching posts:", error);
-        setIsLoading(false);
-    });
-
-    return () => {
-        unsubSettings();
-        unsubPosts();
-    };
-  }, []);
-
   const availableSubcategories = useMemo(() => {
     if (selectedCategory === 'all' || !settings) return [];
     const category = settings.categories.find(c => c.id === selectedCategory);
