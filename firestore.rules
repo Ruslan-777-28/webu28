@@ -59,22 +59,46 @@ service cloud.firestore {
     // ---------- Posts (Blog and other types) ----------
     match /posts/{postId} {
         // Public can list and get published blog posts. Staff can get any post.
-        allow list, get: if (resource.data.contentType == 'blog' && resource.data.status == 'published')
-                         || isAuthor();
+        // An author can read their own posts regardless of status.
+        allow get, list: if (resource.data.contentType == 'blog' && resource.data.status == 'published')
+                         || isAuthor()
+                         || (isSignedIn() && resource.data.authorId == request.auth.uid);
         
-        // Authors can create blog posts for themselves.
-        allow create: if isAuthor() && 
-                         request.resource.data.authorId == request.auth.uid && 
-                         request.resource.data.contentType == 'blog';
+        allow create: if (isAuthor() && request.resource.data.authorId == request.auth.uid && request.resource.data.contentType == 'blog')
+                      || (isSignedIn() && request.resource.data.authorId == request.auth.uid && request.resource.data.contentType == 'post');
 
-        // Authors can update their own blog posts (if contentType is blog). Editors/Admins can update any post.
-        allow update: if (isAuthor() && 
-                          resource.data.authorId == request.auth.uid &&
-                          resource.data.contentType == 'blog'
-                         ) || isEditor();
+        // Function to check if a user is the author of a document
+        function isPostAuthor() {
+          return resource.data.authorId == request.auth.uid;
+        }
 
-        // Editors/Admins can delete posts.
-        allow delete: if isEditor();
+        // Function to check which fields are being updated for a 'post' contentType
+        function canUpdateOwnPost() {
+            let mutableFields = ['title', 'content', 'excerpt', 'coverImageUrl', 'coverAlt', 'categoryId', 'subcategoryId', 'tags'];
+            // When just saving, authors can only update content fields and the updatedAt timestamp.
+            return request.resource.data.diff(resource.data).affectedKeys().hasOnly(mutableFields.concat(['updatedAt']));
+        }
+        
+        // Function to check fields on resubmission
+        function canResubmitOwnPost() {
+            let resubmitFields = ['title', 'content', 'excerpt', 'coverImageUrl', 'coverAlt', 'categoryId', 'subcategoryId', 'tags', 'updatedAt', 'editorialStatus', 'revisionRequested', 'revisionSubmittedAt'];
+            // On resubmission, authors can update content fields and specific status fields.
+            return resource.data.editorialStatus == 'changes_requested' &&
+                   request.resource.data.editorialStatus == 'submitted' &&
+                   request.resource.data.revisionRequested == false &&
+                   request.resource.data.diff(resource.data).affectedKeys().hasOnly(resubmitFields);
+        }
+
+        allow update: if 
+            // Editors/Admins can update any post.
+            isEditor() || 
+            // Authors can update their own blog posts.
+            (isAuthor() && isPostAuthor() && resource.data.contentType == 'blog') ||
+            // Users can update their own user-generated posts under specific conditions.
+            (isSignedIn() && isPostAuthor() && resource.data.contentType == 'post' && (canUpdateOwnPost() || canResubmitOwnPost()));
+
+        // Editors/Admins can delete posts. Authors can delete their own posts.
+        allow delete: if isEditor() || (isAuthor() && isPostAuthor());
 
         // Comments subcollection
         match /comments/{commentId} {

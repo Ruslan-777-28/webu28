@@ -64,8 +64,13 @@ export function UserNav() {
               Профіль
             </DropdownMenuItem>
           </Link>
+           <Link href="/my-posts">
+            <DropdownMenuItem className="cursor-pointer">
+              Мої публікації
+            </DropdownMenuItem>
+          </Link>
           {canAccessAdmin && (
-            <Link href="/admin/blog">
+            <Link href="/admin">
               <DropdownMenuItem className="cursor-pointer">
                 Адмін панель
               </DropdownMenuItem>
