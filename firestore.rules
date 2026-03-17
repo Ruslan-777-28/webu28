@@ -3,6 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ---------- Helpers ----------
     function isSignedIn() {
       return request.auth != null;
     }
@@ -128,6 +129,22 @@ service cloud.firestore {
     match /blogSettings/{docId} {
       allow read: if true;
       allow write: if isSignedIn();
+    }
+
+    // ---------- Site Pages CMS ----------
+    match /sitePages/{pageId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+
+      match /contentBlocks/{blockId} {
+        allow read: if true;
+        allow write: if isSignedIn();
+
+        match /items/{itemId} {
+          allow read: if true;
+          allow write: if isSignedIn();
+        }
+      }
     }
 
     // ---------- Default deny ----------
