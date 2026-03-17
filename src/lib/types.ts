@@ -238,7 +238,7 @@ export type ProProfessionalItem = {
   roleLine: string;
   description: string;
   imageUrl: string;
-  imageAlt: string;
+  imageAlt?: string;
   updatedAt: any;
   updatedBy: string;
 };
