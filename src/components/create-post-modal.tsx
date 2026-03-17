@@ -45,7 +45,7 @@ const postSchema = z.object({
   content: z.string().min(20, { message: "Вміст має містити щонайменше 20 символів." }),
   coverImageUrl: z.string().url({ message: "Будь ласка, введіть дійсну URL-адресу." }).optional().or(z.literal('')),
   coverAlt: z.string().optional(),
-  categoryId: z.string({ required_error: "Будь ласка, оберіть категорію." }),
+  categoryId: z.string({ required_error: "Будь ласка, оберіть категорію." }).min(1, "Категорія є обов'язковою"),
   subcategoryId: z.string().optional(),
 });
 
@@ -187,7 +187,7 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
       content: values.content,
       coverImageUrl: values.coverImageUrl || '',
       coverAlt: values.coverAlt || '',
-      slug: values.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 70),
+      slug: values.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 70) + `-${newPostId.slice(0,5)}`,
       contentType: 'post' as const,
 
       // Author

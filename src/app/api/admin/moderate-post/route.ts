@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
-import type { EditorialStatus } from '@/lib/types';
+import type { EditorialStatus, PostStatus } from '@/lib/types';
 
 interface ModeratePostRequestBody {
     postId: string;
@@ -72,9 +72,11 @@ export async function POST(req: NextRequest) {
 
             case 'APPROVE_FOR_PUBLICATION':
                 updateData.editorialStatus = 'published' as EditorialStatus;
+                updateData.status = 'published' as PostStatus;
                 updateData.sitePublished = true;
                 updateData.sitePublishedAt = FieldValue.serverTimestamp();
                 updateData.publishedBy = adminUid;
+                updateData.updatedAt = FieldValue.serverTimestamp();
                 logAction = 'approvePost';
                 break;
 

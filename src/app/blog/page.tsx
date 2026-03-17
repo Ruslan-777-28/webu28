@@ -57,30 +57,69 @@ export default function BlogPage() {
   useEffect(() => {
     setIsLoading(true);
     const settingsRef = doc(db, 'blogSettings', 'main');
-    const postsQuery = query(
-        collection(db, "posts"), 
-        where("contentType", "==", "blog"),
-        where("status", "==", "published")
-    );
-
     const unsubSettings = onSnapshot(settingsRef, (docSnap) => {
         if(docSnap.exists()){
             setSettings(docSnap.data() as BlogSettings);
         }
     });
+
+    let blogPosts: Post[] = [];
+    let userPosts: Post[] = [];
+    let blogLoaded = false;
+    let userLoaded = false;
+
+    const combineAndSetPosts = () => {
+        if (!blogLoaded || !userLoaded) return;
+
+        const allPosts = [...blogPosts, ...userPosts];
+        const uniquePosts = Array.from(new Map(allPosts.map(p => [p.id, p])).values());
+        
+        uniquePosts.sort((a, b) => {
+            const dateA = (a.sitePublishedAt || a.publishedAt || a.createdAt)?.toDate() || new Date(0);
+            const dateB = (b.sitePublishedAt || b.publishedAt || b.createdAt)?.toDate() || new Date(0);
+            return dateB.getTime() - dateA.getTime();
+        });
+
+        setPosts(uniquePosts);
+        setIsLoading(false);
+    };
+
+    const blogPostsQuery = query(
+        collection(db, "posts"), 
+        where("contentType", "==", "blog"),
+        where("status", "==", "published")
+    );
     
-    const unsubPosts = onSnapshot(postsQuery, (snapshot) => {
-      const fetchedPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
-      setPosts(fetchedPosts);
-      setIsLoading(false);
+    const unsubBlogPosts = onSnapshot(blogPostsQuery, (snapshot) => {
+        blogPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+        blogLoaded = true;
+        combineAndSetPosts();
     }, (error) => {
-      console.error("Error fetching posts:", error);
-      setIsLoading(false);
+        console.error("Error fetching blog posts:", error);
+        blogLoaded = true;
+        combineAndSetPosts();
+    });
+
+    const userPostsQuery = query(
+        collection(db, "posts"), 
+        where("contentType", "==", "post"),
+        where("sitePublished", "==", true)
+    );
+
+    const unsubUserPosts = onSnapshot(userPostsQuery, (snapshot) => {
+        userPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+        userLoaded = true;
+        combineAndSetPosts();
+    }, (error) => {
+        console.error("Error fetching user posts:", error);
+        userLoaded = true;
+        combineAndSetPosts();
     });
 
     return () => {
       unsubSettings();
-      unsubPosts();
+      unsubBlogPosts();
+      unsubUserPosts();
     };
   }, []);
   
