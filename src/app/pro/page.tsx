@@ -41,10 +41,14 @@ import {
   Video,
   Wallet
 } from 'lucide-react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Footer from '@/components/layout/footer';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { collection, doc, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
+import type { ProHowUsersSeeYouBlock, ProKnowYourCustomerBlock, ProProfessionalItem, ProProfessionalsBlock } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const forYouItems = [
     'астролог',
@@ -129,7 +133,7 @@ const workFormats = [
     { icon: Users, title: 'Групові події', text: 'Створення тематичних зустрічей, подій або форматів для кількох учасників.' },
     { icon: MessageSquare, title: 'Текстова взаємодія', text: 'Формат для тих, хто працює через текст, короткі відповіді або асинхронний контакт.' },
     { icon: File, title: 'Обмін файлами', text: 'Можливість передавати матеріали, розбори, рекомендації чи персональні файли.' },
-    { icon: Package, title: 'Цифрові продукти', text: 'Продаж авторських матеріалів, гідів, файлів, практик або інших цифрових форматів.' },
+    { icon: Package, title: 'Цифрові продукти', text: 'Продаж авторських матеріалів, гідів, практик або інших цифрових форматів.' },
 ];
 
 const growthBenefits = [
@@ -154,17 +158,6 @@ const growthBenefits = [
         text: 'Активність, стабільна присутність і якісний сервіс перетворюються на відчутне зростання всередині платформи.',
     },
 ];
-
-const comparisonPoints = [
-    'Профіль, контент і взаємодія в одному місці',
-    'Не потрібно збирати все вручну між месенджерами та соцмережами',
-    'Легше будувати довіру і професійну подачу',
-    'Легше масштабувати свою практику',
-    'Зручніше працювати з міжнародною аудиторією',
-    'Менше хаосу, більше структури',
-];
-
-const brandPoints = ['профіль', 'публікації', 'цифрові матеріали', 'публічна подача', 'розвиток власного стилю'];
 
 const monetizationPaths = [
     { icon: Video, title: 'Консультації', text: 'Персональна взаємодія з клієнтами у вибраному форматі.' },
@@ -200,41 +193,52 @@ const faqItems = [
     },
 ];
 
-const professionals = [
-    {
-        avatar: 'https://picsum.photos/seed/expert2/200',
-        name: 'Олена Коваль',
-        specialization: 'Таролог, Астропсихолог',
-        description: 'Допомагаю знайти ясність у стосунках і кар’єрі через глибокий аналіз карт та натальної карти.',
-    },
-    {
-        avatar: 'https://picsum.photos/seed/expert3/200',
-        name: 'Максим Сидоренко',
-        specialization: 'Енергопрактик, Провідник медитацій',
-        description: 'Працюю з енергетичним полем для відновлення балансу та гармонії. Проводжу індивідуальні та групові сесії.',
-    },
-    {
-        avatar: 'https://picsum.photos/seed/expert4/200',
-        name: 'Ірина Вогник',
-        specialization: 'Нумеролог',
-        description: 'Розкриваю потенціал особистості через аналіз чисел. Складаю персональні прогнози та матриці долі.',
-    },
-    {
-        avatar: 'https://picsum.photos/seed/expert5/200',
-        name: 'Сергій Ткач',
-        specialization: 'Духовний наставник',
-        description: 'Супроводжую на шляху особистісного зростання, допомагаю знайти відповіді на глибокі життєві питання.',
-    },
-    {
-        avatar: 'https://picsum.photos/seed/expert6/200',
-        name: 'Анна Лисенко',
-        specialization: 'Human Design',
-        description: 'Читаю бодіграфи, допомагаю зрозуміти свою унікальну природу та стратегію прийняття рішень.',
-    },
-];
-
-
 export default function ProPage() {
+    const [customerBlock, setCustomerBlock] = useState<ProKnowYourCustomerBlock | null>(null);
+    const [profileBlock, setProfileBlock] = useState<ProHowUsersSeeYouBlock | null>(null);
+    const [professionalsBlock, setProfessionalsBlock] = useState<ProProfessionalsBlock | null>(null);
+    const [professionalItems, setProfessionalItems] = useState<ProProfessionalItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    
+    useEffect(() => {
+        const proPageRef = doc(db, 'sitePages', 'pro');
+        const contentBlocksRef = collection(proPageRef, 'contentBlocks');
+
+        const unsubCustomer = onSnapshot(doc(contentBlocksRef, 'know-your-customer'), (docSnap) => {
+            if (docSnap.exists()) {
+                setCustomerBlock(docSnap.data() as ProKnowYourCustomerBlock);
+            }
+        });
+
+        const unsubProfile = onSnapshot(doc(contentBlocksRef, 'how-users-see-you'), (docSnap) => {
+             if (docSnap.exists()) {
+                setProfileBlock(docSnap.data() as ProHowUsersSeeYouBlock);
+            }
+        });
+        
+        const unsubProBlock = onSnapshot(doc(contentBlocksRef, 'professionals-already-with-us'), (docSnap) => {
+            if (docSnap.exists()) {
+                setProfessionalsBlock(docSnap.data() as ProProfessionalsBlock);
+                const itemsRef = collection(docSnap.ref, 'items');
+                const itemsQuery = query(itemsRef, orderBy('sortOrder', 'asc'));
+                const unsubItems = onSnapshot(itemsQuery, (querySnap) => {
+                    const items = querySnap.docs.map(d => ({...d.data(), id: d.id } as ProProfessionalItem));
+                    setProfessionalItems(items.filter(item => item.isActive));
+                });
+                return unsubItems;
+            }
+        });
+        
+        const timer = setTimeout(() => setIsLoading(false), 1500);
+
+        return () => {
+            unsubCustomer();
+            unsubProfile();
+            unsubProBlock();
+            clearTimeout(timer);
+        }
+    }, []);
+
   return (
     <>
       <main className="flex flex-col w-full min-h-screen bg-background text-foreground">
@@ -360,67 +364,62 @@ export default function ProPage() {
         </section>
 
         {/* 6. SECTION: Know Your Customer */}
-        <section className="py-20 bg-card">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  Знай свого замовника
-                </h2>
-                <p className="text-lg text-muted-foreground mb-8">
-                  Платформа допомагає бачити не лише запит, а й контекст людини, з якою ви починаєте взаємодію, посилюючи довіру та усвідомленість рішень.
-                </p>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <ShieldCheck className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
-                    <p className="text-md font-medium">Рейтинг замовника, що формується на основі взаємодій.</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <ShieldCheck className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
-                    <p className="text-md font-medium">Кількість завершених сесій та історія активності.</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <ShieldCheck className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
-                    <p className="text-md font-medium">Відгуки, залишені іншими професіоналами.</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-background p-6 rounded-lg shadow-sm border">
-                <CardTitle className="mb-4 text-xl">Профіль Замовника</CardTitle>
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src="https://picsum.photos/seed/client1/100" />
-                    <AvatarFallback>ІК</AvatarFallback>
-                  </Avatar>
+        {customerBlock && customerBlock.isActive && (
+            <section className="py-20 bg-card">
+              <div className="container mx-auto px-4">
+                <div className="grid lg:grid-cols-2 gap-12 items-center">
                   <div>
-                    <h4 className="font-bold text-lg">Ірина Коваленко</h4>
-                    <p className="text-sm text-muted-foreground">Учасник спільноти з 2024</p>
-                  </div>
-                </div>
-                <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
-                  <div className="bg-card p-3 rounded-md border">
-                    <p className="text-muted-foreground text-xs">Рейтинг</p>
-                    <div className="flex items-center gap-1 font-bold text-lg">
-                      <Star className="w-5 h-5 text-accent fill-accent" />
-                      4.9
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                      {customerBlock.sectionTitle}
+                    </h2>
+                    <p className="text-lg text-muted-foreground mb-8">
+                      {customerBlock.sectionDescription}
+                    </p>
+                    <div className="space-y-4">
+                        {customerBlock.bullets.map((bullet, i) => (
+                            <div key={i} className="flex items-start gap-3">
+                                <ShieldCheck className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
+                                <p className="text-md font-medium">{bullet}</p>
+                            </div>
+                        ))}
                     </div>
                   </div>
-                  <div className="bg-card p-3 rounded-md border">
-                    <p className="text-muted-foreground text-xs">Завершено сесій</p>
-                    <p className="font-bold text-lg">14</p>
-                  </div>
-                </div>
-                <div className="mt-4">
-                    <h5 className="font-semibold mb-2 text-sm">Основні інтереси:</h5>
-                    <div className="flex flex-wrap gap-2">
-                        <Badge variant="outline">астрологія</Badge>
-                        <Badge variant="outline">Human Design</Badge>
+                  <div className="bg-background p-6 rounded-lg shadow-sm border">
+                    <CardTitle className="mb-4 text-xl">{customerBlock.cardTitle}</CardTitle>
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-16 w-16">
+                        <AvatarImage src={customerBlock.imageUrl || "https://picsum.photos/seed/client1/100"} alt={customerBlock.imageAlt}/>
+                        <AvatarFallback>{customerBlock.cardPersonName?.slice(0,2)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h4 className="font-bold text-lg">{customerBlock.cardPersonName}</h4>
+                        <p className="text-sm text-muted-foreground">{customerBlock.cardMetaText}</p>
+                      </div>
                     </div>
+                    <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
+                      <div className="bg-card p-3 rounded-md border">
+                        <p className="text-muted-foreground text-xs">Рейтинг</p>
+                        <div className="flex items-center gap-1 font-bold text-lg">
+                          <Star className="w-5 h-5 text-accent fill-accent" />
+                          {customerBlock.cardRatingValue}
+                        </div>
+                      </div>
+                      <div className="bg-card p-3 rounded-md border">
+                        <p className="text-muted-foreground text-xs">Завершено сесій</p>
+                        <p className="font-bold text-lg">{customerBlock.cardCompletedSessions}</p>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                        <h5 className="font-semibold mb-2 text-sm">Основні інтереси:</h5>
+                        <div className="flex flex-wrap gap-2">
+                           {customerBlock.cardTags.map(tag => <Badge key={tag} variant="outline">{tag}</Badge>)}
+                        </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
+            </section>
+        )}
 
         {/* 7. SECTION: Visibility & Growth */}
         <section className="py-20 bg-background">
@@ -466,7 +465,14 @@ export default function ProPage() {
                 </p>
               </div>
               <div className="bg-background p-8 rounded-lg shadow-sm border space-y-4">
-                {comparisonPoints.map((point, i) => (
+                {[
+                    'Профіль, контент і взаємодія в одному місці',
+                    'Не потрібно збирати все вручну між месенджерами та соцмережами',
+                    'Легше будувати довіру і професійну подачу',
+                    'Легше масштабувати свою практику',
+                    'Зручніше працювати з міжнародною аудиторією',
+                    'Менше хаосу, більше структури',
+                ].map((point, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
                     <p className="text-md font-medium">{point}</p>
@@ -478,104 +484,107 @@ export default function ProPage() {
         </section>
 
         {/* 9. SECTION: Profile Mockup & Personal Brand */}
-        <section className="py-20 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Так вас бачитимуть користувачі платформи
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Ваш профіль — це не просто сторінка, а професійна подача вашої експертності, стилю, напрямів роботи та формату взаємодії.
-              </p>
-            </div>
+        {profileBlock && profileBlock.isActive && (
+            <section className="py-20 bg-background">
+              <div className="container mx-auto px-4">
+                <div className="text-center max-w-3xl mx-auto mb-16">
+                  <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                    {profileBlock.sectionTitle}
+                  </h2>
+                  <p className="text-lg text-muted-foreground">
+                    {profileBlock.sectionDescription}
+                  </p>
+                </div>
 
-            <div className="max-w-2xl mx-auto bg-card p-6 sm:p-8 rounded-xl shadow-lg border border-border">
-                <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6">
-                    <div className="flex-shrink-0">
-                        <Avatar className="h-24 w-24 border-4 border-card shadow-md">
-                            <AvatarImage src="https://picsum.photos/seed/expert1/200" alt="Alina Zoryana"/>
-                            <AvatarFallback>AZ</AvatarFallback>
-                        </Avatar>
-                    </div>
-                    <div className="flex-grow">
-                        <h3 className="text-2xl font-bold text-foreground">Alina Zoryana</h3>
-                        <p className="text-muted-foreground mt-1">Допомагаю знайти відповіді через Таро та астрологію. 10+ років практики.</p>
-                        <div className="flex items-center justify-center sm:justify-start gap-4 mt-3 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1.5">
-                                <Globe className="h-4 w-4" />
-                                Українська, English
-                            </span>
-                            <span className="text-border">|</span>
-                            <div className="flex items-center gap-2">
-                                <span className="relative flex h-2.5 w-2.5">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                <div className="max-w-2xl mx-auto bg-card p-6 sm:p-8 rounded-xl shadow-lg border border-border">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6">
+                        <div className="flex-shrink-0">
+                            <Avatar className="h-24 w-24 border-4 border-card shadow-md">
+                                <AvatarImage src={profileBlock.imageUrl} alt={profileBlock.imageAlt}/>
+                                <AvatarFallback>{profileBlock.cardPersonName?.slice(0,2)}</AvatarFallback>
+                            </Avatar>
+                        </div>
+                        <div className="flex-grow">
+                            <h3 className="text-2xl font-bold text-foreground">{profileBlock.cardPersonName}</h3>
+                            <p className="text-muted-foreground mt-1">{profileBlock.cardHeadline}</p>
+                            <div className="flex items-center justify-center sm:justify-start gap-4 mt-3 text-sm text-muted-foreground">
+                                <span className="flex items-center gap-1.5">
+                                    <Globe className="h-4 w-4" />
+                                    {profileBlock.cardLanguages}
                                 </span>
-                                <span>Online</span>
+                                <span className="text-border">|</span>
+                                {profileBlock.cardStatusLabel && (
+                                    <div className="flex items-center gap-2">
+                                        <span className="relative flex h-2.5 w-2.5">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                                        </span>
+                                        <span>{profileBlock.cardStatusLabel}</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className="mt-6">
-                    <h4 className="font-semibold text-foreground mb-3">Напрямки:</h4>
-                    <div className="flex flex-wrap gap-2">
-                        <Badge variant="outline">Таро</Badge>
-                        <Badge variant="outline">Астрологія</Badge>
-                        <Badge variant="outline">Нумерологія</Badge>
-                        <Badge variant="outline">Стосунки</Badge>
-                        <Badge variant="outline">Карти долі</Badge>
+                    <div className="mt-6">
+                        <h4 className="font-semibold text-foreground mb-3">Напрямки:</h4>
+                        <div className="flex flex-wrap gap-2">
+                             {profileBlock.cardDirections.map(dir => <Badge key={dir} variant="outline">{dir}</Badge>)}
+                        </div>
+                    </div>
+                    <div className="mt-8 border-t border-border pt-6">
+                         <Button className="w-full" size="lg">{profileBlock.cardButtonLabel}</Button>
                     </div>
                 </div>
-                <div className="mt-8 border-t border-border pt-6">
-                     <Button className="w-full" size="lg">Замовити консультацію</Button>
-                </div>
-            </div>
-          </div>
-        </section>
+              </div>
+            </section>
+        )}
 
         {/* 10. Professionals Showcase */}
-        <section className="py-20 bg-card">
-          <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Професіонали, які вже з нами
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Платформа вже об’єднує людей, які працюють через знання, досвід, інтуїцію й особисту практику. Тут формується жива екосистема експертів і провідників з різних напрямів.
-              </p>
-            </div>
-
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              className="w-full max-w-6xl mx-auto"
-            >
-              <CarouselContent className="-ml-4">
-                {professionals.map((pro, index) => (
-                  <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                    <div className="p-1 h-full">
-                      <Card className="h-full flex flex-col items-center text-center p-8 bg-background border-border shadow-sm hover:shadow-lg transition-shadow duration-300">
-                        <Avatar className="h-20 w-20 mb-4 border-2 border-border">
-                          <AvatarImage src={pro.avatar} alt={pro.name} />
-                          <AvatarFallback>{pro.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <h3 className="text-xl font-bold text-foreground mb-1">{pro.name}</h3>
-                        <p className="text-sm font-medium text-accent mb-4">{pro.specialization}</p>
-                        <p className="text-sm text-muted-foreground text-center flex-grow">
-                          {pro.description}
-                        </p>
-                      </Card>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="hidden sm:flex left-[-50px]" />
-              <CarouselNext className="hidden sm:flex right-[-50px]" />
-            </Carousel>
-          </div>
-        </section>
+        {professionalsBlock && professionalsBlock.isActive && professionalItems.length > 0 && (
+            <section className="py-20 bg-card">
+              <div className="container mx-auto px-4">
+                <div className="text-center max-w-3xl mx-auto mb-16">
+                  <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                    {professionalsBlock.sectionTitle}
+                  </h2>
+                  <p className="text-lg text-muted-foreground">
+                    {professionalsBlock.sectionDescription}
+                  </p>
+                </div>
+                {isLoading ? <Skeleton className="h-96 w-full"/> : (
+                <Carousel
+                  opts={{
+                    align: "start",
+                    loop: true,
+                  }}
+                  className="w-full max-w-6xl mx-auto"
+                >
+                  <CarouselContent className="-ml-4">
+                    {professionalItems.map((pro) => (
+                      <CarouselItem key={pro.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                        <div className="p-1 h-full">
+                          <Card className="h-full flex flex-col items-center text-center p-8 bg-background border-border shadow-sm hover:shadow-lg transition-shadow duration-300">
+                            <Avatar className="h-20 w-20 mb-4 border-2 border-border">
+                              <AvatarImage src={pro.imageUrl} alt={pro.name} />
+                              <AvatarFallback>{pro.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                            </Avatar>
+                            <h3 className="text-xl font-bold text-foreground mb-1">{pro.name}</h3>
+                            <p className="text-sm font-medium text-accent mb-4">{pro.roleLine}</p>
+                            <p className="text-sm text-muted-foreground text-center flex-grow">
+                              {pro.description}
+                            </p>
+                          </Card>
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="hidden sm:flex left-[-50px]" />
+                  <CarouselNext className="hidden sm:flex right-[-50px]" />
+                </Carousel>
+                )}
+              </div>
+            </section>
+        )}
 
         {/* 11. SECTION “Монетизація” */}
         <section className="py-20 bg-background">
@@ -646,5 +655,3 @@ export default function ProPage() {
     </>
   );
 }
-
-    

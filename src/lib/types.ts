@@ -186,3 +186,59 @@ export type AdminActionLog = {
   createdBy: string; // UID of admin
   createdByName: string; // Denormalized admin name
 };
+
+// --- Pro Page CMS Types ---
+
+export type ProKnowYourCustomerBlock = {
+  isActive: boolean;
+  sectionTitle: string;
+  sectionDescription: string;
+  bullets: string[];
+  cardTitle: string;
+  imageUrl: string;
+  imageAlt: string;
+  cardPersonName: string;
+  cardMetaText: string;
+  cardRatingValue: number;
+  cardCompletedSessions: number;
+  cardTags: string[];
+  updatedAt: any;
+  updatedBy: string;
+};
+
+export type ProHowUsersSeeYouBlock = {
+  isActive: boolean;
+  sectionTitle: string;
+  sectionDescription: string;
+  imageUrl: string;
+  imageAlt: string;
+  cardPersonName: string;
+  cardHeadline: string;
+  cardLanguages: string;
+  cardStatusLabel: string;
+  cardDirections: string[];
+  cardButtonLabel: string;
+  updatedAt: any;
+  updatedBy: string;
+};
+
+export type ProProfessionalsBlock = {
+  isActive: boolean;
+  sectionTitle: string;
+  sectionDescription: string;
+  updatedAt: any;
+  updatedBy: string;
+};
+
+export type ProProfessionalItem = {
+  id: string;
+  isActive: boolean;
+  sortOrder: number;
+  name: string;
+  roleLine: string;
+  description: string;
+  imageUrl: string;
+  imageAlt: string;
+  updatedAt: any;
+  updatedBy: string;
+};

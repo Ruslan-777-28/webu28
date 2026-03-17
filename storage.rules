@@ -17,6 +17,12 @@ service firebase.storage {
         && request.resource.contentType.matches('image/.*');
     }
 
+    // Site Content managed by admins
+    match /site-content/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.token.admin == true && isImageUpload(5);
+    }
+
     // Avatar files: avatars/{userId}/...
     match /avatars/{userId}/{allPaths=**} {
       allow read: if true;
