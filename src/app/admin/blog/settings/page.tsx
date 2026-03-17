@@ -18,15 +18,23 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const generateSlug = (name: string) => name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+
 const subcategorySchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Назва підкатегорії обов'язкова"),
+}).refine(data => generateSlug(data.name).length > 0, {
+    message: "Назва підкатегорії повинна містити літери або цифри.",
+    path: ["name"],
 });
 
 const categorySchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Назва категорії обов'язкова"),
   subcategories: z.array(subcategorySchema),
+}).refine(data => generateSlug(data.name).length > 0, {
+    message: "Назва категорії повинна містити літери або цифри.",
+    path: ["name"],
 });
 
 const settingsSchema = z.object({
@@ -48,9 +56,6 @@ const settingsSchema = z.object({
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
-
-const generateSlug = (name: string) => name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
-
 
 export default function BlogSettingsPage() {
     const { toast } = useToast();
@@ -398,6 +403,3 @@ function SubcategoryItem({ form, categoryIndex, subcategoryIndex, removeSubcateg
         </div>
     )
 }
-
-
-
