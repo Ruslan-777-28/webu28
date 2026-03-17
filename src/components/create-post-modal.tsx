@@ -68,8 +68,8 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
       content: "",
       coverImageUrl: "",
       coverAlt: "",
-      categoryId: "",
-      subcategoryId: "",
+      categoryId: undefined,
+      subcategoryId: undefined,
     },
   });
 
@@ -101,7 +101,7 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
   }, [watchedCategoryId, settings]);
   
   useEffect(() => {
-    form.setValue('subcategoryId', '');
+    form.setValue('subcategoryId', undefined);
   }, [watchedCategoryId, form]);
 
 
@@ -341,7 +341,7 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
                   render={({ field }) => (
                   <FormItem>
                       <FormLabel>Категорія</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value || ''} disabled={isLoading}>
+                      <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
                       <FormControl>
                           <SelectTrigger>
                           <SelectValue placeholder="Оберіть категорію" />
@@ -367,7 +367,7 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
                 render={({ field }) => (
                 <FormItem>
                     <FormLabel>Підкатегорія</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ""} disabled={availableSubcategories.length === 0}>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={availableSubcategories.length === 0}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Оберіть підкатегорію" /></SelectTrigger></FormControl>
                     <SelectContent>
                         {availableSubcategories.filter(sub => sub.id && sub.name).map(sub => (
