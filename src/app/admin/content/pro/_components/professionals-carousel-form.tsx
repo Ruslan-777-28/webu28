@@ -169,7 +169,7 @@ export function ProfessionalsCarouselForm() {
         unsubBlock();
         unsubItems();
     };
-  }, [form]);
+  }, []);
 
   async function onBlockSubmit(values: BlockFormValues) {
     if (!user) return toast({ variant: 'destructive', title: 'Authentication Error' });
