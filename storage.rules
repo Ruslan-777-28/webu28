@@ -17,48 +17,49 @@ service firebase.storage {
         && request.resource.contentType.matches('image/.*');
     }
 
-    // Site Content managed by admins
+    // ---------- Site Content CMS ----------
     match /site-content/{allPaths=**} {
       allow read: if true;
-      allow write: if isSignedIn() && request.auth.token.admin == true && isImageUpload(5);
+      allow create, update: if isSignedIn() && isImageUpload(5);
+      allow delete: if isSignedIn();
     }
 
-    // Avatar files: avatars/{userId}/...
+    // ---------- Avatar files ----------
     match /avatars/{userId}/{allPaths=**} {
       allow read: if true;
       allow create, update: if isSelf(userId) && isImageUpload(5);
       allow delete: if isSelf(userId);
     }
 
-    // Profile cover and other user-owned files: users/{userId}/...
+    // ---------- Profile cover and other user-owned files ----------
     match /users/{userId}/{allPaths=**} {
       allow read: if true;
       allow create, update: if isSelf(userId) && isImageUpload(5);
       allow delete: if isSelf(userId);
     }
 
-    // Post images: posts/{userId}/...
+    // ---------- Post images ----------
     match /posts/{userId}/{allPaths=**} {
       allow read: if true;
       allow create, update: if isSelf(userId) && isImageUpload(10);
       allow delete: if isSelf(userId);
     }
 
-    // Product images: products/{userId}/...
+    // ---------- Product images ----------
     match /products/{userId}/{allPaths=**} {
       allow read: if true;
       allow create, update: if isSelf(userId) && isImageUpload(10);
       allow delete: if isSelf(userId);
     }
 
-    // Communication request uploads
+    // ---------- Communication request uploads ----------
     match /uploads/{uid}/{allPaths=**} {
       allow read: if isSignedIn();
       allow create, update: if isSelf(uid) && isImageUpload(10);
       allow delete: if isSelf(uid);
     }
 
-    // Deny all other paths
+    // ---------- Default deny ----------
     match /{allPaths=**} {
       allow read, write: if false;
     }
