@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useEffect, useState } from 'react';
-import { collection, doc, onSnapshot, setDoc, serverTimestamp, addDoc, deleteDoc, query, orderBy, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, serverTimestamp, addDoc, deleteDoc, query, orderBy, updateDoc } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase/client';
 import { useUser } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
@@ -154,21 +154,32 @@ export function ProfessionalsCarouselForm() {
   });
 
   useEffect(() => {
-    const unsubBlock = onSnapshot(blockDocRef, (doc) => {
-      if (doc.exists()) form.reset(doc.data() as BlockFormValues);
-      setIsLoading(false);
-    });
-    
-    const itemsQuery = query(itemsCollectionRef, orderBy('sortOrder', 'asc'));
-    const unsubItems = onSnapshot(itemsQuery, (snapshot) => {
-        const fetchedItems = snapshot.docs.map(d => ({...d.data(), id: d.id } as ProProfessionalItem));
-        setItems(fetchedItems);
-    });
+    async function fetchData() {
+        setIsLoading(true);
+        try {
+            const blockDocSnap = await getDoc(blockDocRef);
+            if (blockDocSnap.exists()) {
+                form.reset(blockDocSnap.data() as BlockFormValues);
+            }
 
-    return () => {
-        unsubBlock();
-        unsubItems();
-    };
+            const itemsQuery = query(itemsCollectionRef, orderBy('sortOrder', 'asc'));
+            const itemsSnapshot = await getDocs(itemsQuery);
+            const fetchedItems = itemsSnapshot.docs.map(d => ({ ...d.data(), id: d.id } as ProProfessionalItem));
+            setItems(fetchedItems);
+
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            toast({
+                variant: "destructive",
+                title: "Failed to load content",
+                description: "There was an error fetching the carousel content.",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    fetchData();
   }, []);
 
   async function onBlockSubmit(values: BlockFormValues) {

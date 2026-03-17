@@ -4,7 +4,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useEffect, useState } from 'react';
-import { doc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase/client';
 import { useUser } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
@@ -69,14 +69,15 @@ export function CustomerPreviewForm() {
   const { fields: tagFields, append: appendTag, remove: removeTag } = useFieldArray({ control: form.control, name: 'cardTags' });
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(docRef, (doc) => {
-      if (doc.exists()) {
-        form.reset(doc.data() as FormValues);
+    async function fetchData() {
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        form.reset(docSnap.data() as FormValues);
       }
       setIsLoading(false);
-    });
-    return () => unsubscribe();
-  }, [form]);
+    }
+    fetchData();
+  }, []);
 
   const handleImageUpload = (file: File) => {
     if (!user) return toast({ variant: 'destructive', title: 'Authentication Error' });
