@@ -99,6 +99,11 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
       const selectedCategory = settings.categories.find(c => c.id === watchedCategoryId);
       return selectedCategory?.subcategories || [];
   }, [watchedCategoryId, settings]);
+  
+  useEffect(() => {
+    form.setValue('subcategoryId', '');
+  }, [watchedCategoryId, form]);
+
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -343,15 +348,13 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
                           </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                          {(() => {
-                              const filteredCategories = settings?.categories?.filter(cat => cat.id && cat.name) || [];
-                              if (filteredCategories.length > 0) {
-                                  return filteredCategories.map(cat => (
-                                      <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                                  ));
-                              }
-                              return <SelectItem value="-" disabled>Немає доступних категорій</SelectItem>;
-                          })()}
+                          {settings?.categories && settings.categories.filter(cat => cat.id && cat.name).length > 0 ? (
+                             settings.categories.filter(cat => cat.id && cat.name).map(cat => (
+                                  <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                              ))
+                          ) : (
+                            <SelectItem value="-" disabled>Немає доступних категорій</SelectItem>
+                          )}
                       </SelectContent>
                       </Select>
                       <FormMessage />
