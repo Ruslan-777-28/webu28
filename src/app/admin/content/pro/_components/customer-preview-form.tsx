@@ -25,7 +25,7 @@ const formSchema = z.object({
   isActive: z.boolean().default(true),
   sectionTitle: z.string().min(1, 'Required'),
   sectionDescription: z.string().min(1, 'Required'),
-  bullets: z.array(z.string().min(1, 'Bullet point cannot be empty')),
+  bullets: z.array(z.string()),
   cardTitle: z.string().min(1, 'Required'),
   imageUrl: z.string().url().or(z.literal('')),
   imageAlt: z.string(),
@@ -33,7 +33,7 @@ const formSchema = z.object({
   cardMetaText: z.string().min(1, 'Required'),
   cardRatingValue: z.coerce.number().min(0).max(5),
   cardCompletedSessions: z.coerce.number().min(0),
-  cardTags: z.array(z.string().min(1, 'Tag cannot be empty')),
+  cardTags: z.array(z.string()),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -77,7 +77,7 @@ export function CustomerPreviewForm() {
       setIsLoading(false);
     }
     fetchData();
-  }, []);
+  }, [form]);
 
   const handleImageUpload = (file: File) => {
     if (!user) return toast({ variant: 'destructive', title: 'Authentication Error' });
