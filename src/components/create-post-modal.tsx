@@ -341,7 +341,7 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
                   render={({ field }) => (
                   <FormItem>
                       <FormLabel>Категорія</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+                      <Select onValueChange={field.onChange} value={field.value || ''} disabled={isLoading}>
                       <FormControl>
                           <SelectTrigger>
                           <SelectValue placeholder="Оберіть категорію" />
