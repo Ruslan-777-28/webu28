@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Navigation } from '@/components/navigation';
@@ -28,12 +29,14 @@ import {
   Globe,
   Handshake,
   Layers,
+  LifeBuoy,
   Megaphone,
   MessageSquare,
   Package,
   PenSquare,
   Repeat,
   Rocket,
+  Scale,
   ShieldCheck,
   Star,
   TrendingUp,
@@ -64,8 +67,8 @@ const forYouItems = [
 const benefits = [
     {
         icon: Globe,
-        title: 'Глобальна аудиторія',
-        text: 'Працюйте з людьми з різних країн і відкривайте свої знання для ширшого світу.',
+        title: 'Вихід на глобальну сцену',
+        text: 'Працюйте з людьми з різних країн і відкривайте свої знання для ширшого світу, без мовних бар’єрів.',
     },
     {
         icon: Layers,
@@ -74,13 +77,13 @@ const benefits = [
     },
     {
         icon: CircleDollarSign,
-        title: 'Монетизація знань',
+        title: 'Преміальний дохід',
         text: 'Перетворюйте досвід, інтуїцію та експертність на реальну й зрозумілу цінність для клієнта.',
     },
     {
         icon: Star,
-        title: 'Особистий бренд',
-        text: 'Створюйте професійний профіль, формуйте довіру й вибудовуйте власну присутність у платформі.',
+        title: 'Професійний бренд',
+        text: 'Створюйте потужний профіль, формуйте довіру й вибудовуйте власну репутаційну вагу в платформі.',
     },
      {
         icon: Repeat,
@@ -136,11 +139,29 @@ const workFormats = [
     { icon: Package, title: 'Цифрові продукти', text: 'Продаж авторських матеріалів, гідів, практик або інших цифрових форматів.' },
 ];
 
+const safetyAndSupportItems = [
+    {
+        icon: ShieldCheck,
+        title: 'Безпека та конфіденційність',
+        text: 'Ваші дані та взаємодія з клієнтами захищені. Ми гарантуємо конфіденційність і безпеку платежів.',
+    },
+    {
+        icon: LifeBuoy,
+        title: 'Підтримка на кожному кроці',
+        text: 'Наша команда готова допомогти вам з будь-якими технічними чи організаційними питаннями.',
+    },
+    {
+        icon: Scale,
+        title: 'Прозорі та чесні правила',
+        text: 'Ми беремо лише невелику комісію з успішних транзакцій. Жодних прихованих платежів або складних умов.',
+    },
+];
+
 const growthBenefits = [
     {
         icon: TrendingUp,
         title: 'Видимість у категорії',
-        text: 'Зростайте у своїй ніші завдяки активності, якості взаємодії та довірі користувачів.',
+        text: 'Зростайте у своїй ніші завдяки активності, якості взаємодії та довірі користувачів. LECTOR — це меритократія.',
     },
     {
         icon: Award,
@@ -168,29 +189,52 @@ const monetizationPaths = [
 
 const faqItems = [
     {
-        question: 'Хто може стати професіоналом на платформі?',
-        answer: 'Платформа відкрита для експертів, практиків і провідників, чия цінність ґрунтується на знаннях, досвіді, особистій практиці та змістовній взаємодії з людьми.',
+        category: "Загальні питання",
+        questions: [
+            {
+                question: 'Хто може стати професіоналом на платформі?',
+                answer: 'Платформа відкрита для експертів, практиків і провідників, чия цінність ґрунтується на знаннях, досвіді, особистій практиці та змістовній взаємодії з людьми.',
+            },
+            {
+                question: 'Чи обов’язково мати велику аудиторію, щоб почати?',
+                answer: 'Ні. Платформа створена не лише для тих, хто вже має велику видимість, а й для тих, хто хоче професійно оформити свою присутність і поступово зростати.',
+            },
+            {
+                question: 'Чи можна працювати з міжнародною аудиторією?',
+                answer: 'Так. Платформа задумана як глобальний простір без географічних обмежень і з перспективою глибшої міжнародної взаємодії.',
+            },
+        ]
     },
     {
-        question: 'Чи обов’язково мати велику аудиторію, щоб почати?',
-        answer: 'Ні. Платформа створена не лише для тих, хто вже має велику видимість, а й для тих, хто хоче професійно оформити свою присутність і поступово зростати.',
+        category: "Формати роботи та монетизація",
+        questions: [
+             {
+                question: 'У яких форматах я зможу працювати?',
+                answer: 'Ви зможете обирати різні моделі взаємодії: консультації, події, текстове спілкування, обмін файлами та цифрові продукти.',
+            },
+            {
+                question: 'Чи можу я продавати свої цифрові матеріали?',
+                answer: 'Так. Платформа передбачає можливість пропонувати й продавати цифрові продукти як окрему частину вашої експертної присутності.',
+            },
+             {
+                question: 'Яка комісія платформи?',
+                answer: 'Ми дотримуємося політики прозорості. Платформа утримує невеликий відсоток лише з успішно завершених транзакцій. Усі умови чітко прописані, без прихованих платежів.',
+            },
+        ]
     },
     {
-        question: 'У яких форматах я зможу працювати?',
-        answer: 'Ви зможете обирати різні моделі взаємодії: консультації, події, текстове спілкування, обмін файлами та цифрові продукти.',
-    },
-    {
-        question: 'Чи можна працювати з міжнародною аудиторією?',
-        answer: 'Так. Платформа задумана як глобальний простір без географічних обмежень і з перспективою глибшої міжнародної взаємодії.',
-    },
-    {
-        question: 'Чи можу я продавати свої цифрові матеріали?',
-        answer: 'Так. Платформа передбачає можливість пропонувати й продавати цифрові продукти як окрему частину вашої експертної присутності.',
-    },
-    {
-        question: 'Чи можна поєднувати різні формати роботи?',
-        answer: 'Так. Ви не обмежені одним сценарієм і можете будувати власну модель взаємодії відповідно до свого стилю й напряму.',
-    },
+        category: "Робота з клієнтами",
+        questions: [
+             {
+                question: 'Як вирішуються конфліктні ситуації?',
+                answer: 'У нас є служба підтримки та чіткі правила спільноти. Ми допомагаємо вирішувати будь-які непорозуміння, щоб забезпечити чесну та поважну взаємодію.',
+            },
+            {
+                question: 'Чи можу я поєднувати різні формати роботи?',
+                answer: 'Так. Ви не обмежені одним сценарієм і можете будувати власну модель взаємодії відповідно до свого стилю й напряму.',
+            },
+        ]
+    }
 ];
 
 export default function ProPage() {
@@ -251,10 +295,10 @@ export default function ProPage() {
           </div>
           <div className="container mx-auto px-4 relative">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-              Монетизуйте свої знання без кордонів
+              Монетизуйте свою цінність без кордонів
             </h1>
             <p className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
-              Створюйте власні пропозиції, консультуйте клієнтів з усього світу та перетворюйте досвід, інтуїцію й експертність на реальний дохід у зручному для вас форматі.
+              Створюйте власні пропозиції, консультуйте клієнтів з усього світу та перетворюйте досвід, інтуїцію й експертність на преміальний дохід у зручному для вас форматі.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Button size="lg">Стати професіоналом</Button>
@@ -284,15 +328,15 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 3. SECTION “Що ви отримуєте на платформі” */}
+        {/* 3. SECTION “Що ви отримуєте на платформі” (Strengthened) */}
         <section className="py-20 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Що ви отримуєте на платформі
+                Інструменти для вашого успіху та росту
               </h2>
               <p className="text-lg text-muted-foreground">
-                Все, що потрібно для того, щоб оформити свою цінність, вийти на аудиторію та перетворити знання на системну практику й дохід.
+                Все, що потрібно, щоб оформити свою цінність, вийти на глобальну аудиторію та перетворити знання на системну практику й дохід.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -330,6 +374,10 @@ export default function ProPage() {
                   </div>
                 </div>
               ))}
+            </div>
+             {/* CTA #1 */}
+            <div className="text-center mt-16">
+                <Button size="lg">Почати свій шлях на LECTOR</Button>
             </div>
           </div>
         </section>
@@ -420,23 +468,52 @@ export default function ProPage() {
               </div>
             </section>
         )}
-
-        {/* 7. SECTION: Visibility & Growth */}
+        
+        {/* 7. NEW BLOCK: Safety, Support & Fair Play */}
         <section className="py-20 bg-background">
+            <div className="container mx-auto px-4">
+                <div className="text-center max-w-3xl mx-auto mb-12">
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                        Безпека, підтримка та прозорі правила гри
+                    </h2>
+                    <p className="text-lg text-muted-foreground">
+                        Ми будуємо простір, заснований на довірі, де кожен учасник почувається захищеним і впевненим.
+                    </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {safetyAndSupportItems.map((item, index) => (
+                        <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow bg-card/50 border">
+                            <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
+                                <div className="bg-background p-2 rounded-lg border">
+                                    <item.icon className="h-6 w-6 text-accent" />
+                                </div>
+                                <CardTitle className="text-lg">{item.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground">{item.text}</p>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
+
+        {/* 8. SECTION: Visibility & Growth (Strengthened) */}
+        <section className="py-20 bg-card">
             <div className="container mx-auto px-4">
                 <div className="text-center max-w-3xl mx-auto mb-12">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
                         Ставайте помітними у своїй ніші
                     </h2>
                     <p className="text-lg text-muted-foreground">
-                        Платформа враховує активність, якість взаємодії, довіру та результати, формуючи видимість професіонала всередині екосистеми. Це створює простір не лише для монетизації, а й для реального зростання статусу та імені.
+                        Платформа враховує активність, якість взаємодії та довіру, формуючи репутаційну вагу професіонала всередині екосистеми. Це створює простір не лише для монетизації, а й для реального зростання статусу та імені.
                     </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {growthBenefits.map((benefit, index) => (
                         <Card key={index} className="text-center border-none shadow-none bg-transparent">
                             <CardContent className="p-6">
-                                <div className="inline-flex items-center justify-center bg-card rounded-full p-3 mb-4 border">
+                                <div className="inline-flex items-center justify-center bg-background rounded-full p-3 mb-4 border">
                                     <benefit.icon className="h-8 w-8 text-accent" />
                                 </div>
                                 <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
@@ -449,8 +526,8 @@ export default function ProPage() {
         </section>
 
 
-        {/* 8. SECTION “Чому це більше, ніж робота через соцмережі...” */}
-        <section className="py-20 bg-card">
+        {/* 9. SECTION “Чому це більше, ніж робота через соцмережі...” (Strengthened) */}
+        <section className="py-20 bg-background">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
@@ -458,20 +535,20 @@ export default function ProPage() {
                   Більше, ніж хаотична робота через соцмережі
                 </h2>
                 <p className="text-lg text-muted-foreground mb-8">
-                  Платформа допомагає зібрати вашу присутність, взаємодію та цінність в одному місці.
+                  Платформа допомагає зібрати вашу присутність, взаємодію та цінність в єдину професійну систему.
                 </p>
                 <p className="text-md">
-                  Замість розрізнених каналів, випадкових повідомлень і хаотичної присутності в різних сервісах ви отримуєте простір, де профіль, формати взаємодії, публічність і монетизація поєднані в одну зрозумілу систему. Це допомагає виглядати професійніше, працювати спокійніше й вибудовувати довшу довіру з аудиторією.
+                  Замість розрізнених каналів і випадкових повідомлень ви отримуєте простір, де профіль, формати взаємодії, публічність і монетизація поєднані в одну зрозумілу екосистему. Це допомагає виглядати професійніше, працювати спокійніше й вибудовувати довшу довіру з аудиторією.
                 </p>
               </div>
-              <div className="bg-background p-8 rounded-lg shadow-sm border space-y-4">
+              <div className="bg-card p-8 rounded-lg shadow-sm border space-y-4">
                 {[
                     'Профіль, контент і взаємодія в одному місці',
                     'Не потрібно збирати все вручну між месенджерами та соцмережами',
                     'Легше будувати довіру і професійну подачу',
-                    'Легше масштабувати свою практику',
+                    'Простіше масштабувати свою практику',
                     'Зручніше працювати з міжнародною аудиторією',
-                    'Менше хаосу, більше структури',
+                    'Менше хаосу, більше структури та статусу',
                 ].map((point, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
@@ -483,9 +560,9 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 9. SECTION: Profile Mockup & Personal Brand */}
+        {/* 10. SECTION: Profile Mockup & Personal Brand */}
         {profileBlock && profileBlock.isActive && (
-            <section className="py-20 bg-background">
+            <section className="py-20 bg-card">
               <div className="container mx-auto px-4">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                   <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -496,10 +573,10 @@ export default function ProPage() {
                   </p>
                 </div>
 
-                <div className="max-w-2xl mx-auto bg-card p-6 sm:p-8 rounded-xl shadow-lg border border-border">
+                <div className="max-w-2xl mx-auto bg-background p-6 sm:p-8 rounded-xl shadow-lg border border-border">
                     <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6">
                         <div className="flex-shrink-0">
-                            <Avatar className="h-24 w-24 border-4 border-card shadow-md">
+                            <Avatar className="h-24 w-24 border-4 border-background shadow-md">
                                 <AvatarImage src={profileBlock.imageUrl} alt={profileBlock.imageAlt}/>
                                 <AvatarFallback>{profileBlock.cardPersonName?.slice(0,2)}</AvatarFallback>
                             </Avatar>
@@ -539,9 +616,9 @@ export default function ProPage() {
             </section>
         )}
 
-        {/* 10. Professionals Showcase */}
+        {/* 11. Professionals Showcase */}
         {professionalsBlock && professionalsBlock.isActive && professionalItems.length > 0 && (
-            <section className="py-20 bg-card">
+            <section className="py-20 bg-background">
               <div className="container mx-auto px-4">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                   <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -563,7 +640,7 @@ export default function ProPage() {
                     {professionalItems.map((pro) => (
                       <CarouselItem key={pro.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
                         <div className="p-1 h-full">
-                          <Card className="h-full flex flex-col items-center text-center p-8 bg-background border-border shadow-sm hover:shadow-lg transition-shadow duration-300">
+                          <Card className="h-full flex flex-col items-center text-center p-8 bg-card border-border shadow-sm hover:shadow-lg transition-shadow duration-300">
                             <Avatar className="h-20 w-20 mb-4 border-2 border-border">
                               <AvatarImage src={pro.imageUrl} alt={pro.name} />
                               <AvatarFallback>{pro.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
@@ -582,12 +659,16 @@ export default function ProPage() {
                   <CarouselNext className="hidden sm:flex right-[-50px]" />
                 </Carousel>
                 )}
+                 {/* CTA #2 */}
+                <div className="text-center mt-16">
+                    <Button size="lg" variant="default">Приєднатися до спільноти професіоналів</Button>
+                </div>
               </div>
             </section>
         )}
 
-        {/* 11. SECTION “Монетизація” */}
-        <section className="py-20 bg-background">
+        {/* 12. SECTION “Монетизація” (Strengthened) */}
+        <section className="py-20 bg-card">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -599,10 +680,10 @@ export default function ProPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {monetizationPaths.map((path, index) => (
-                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow bg-card">
+                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow bg-background">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-3">
-                       <div className="bg-background p-2 rounded-lg border">
+                       <div className="bg-card p-2 rounded-lg border">
                           <path.icon className="h-6 w-6 text-accent" />
                        </div>
                       {path.title}
@@ -617,35 +698,42 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 12. FAQ SECTION */}
-        <section className="py-20 bg-card">
+        {/* 13. FAQ SECTION (Strengthened) */}
+        <section className="py-20 bg-background">
           <div className="container mx-auto px-4 max-w-3xl">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               Поширені запитання
             </h2>
-            <Accordion type="single" collapsible className="w-full">
-              {faqItems.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-base text-muted-foreground">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+            <div className="space-y-8">
+            {faqItems.map((category) => (
+                <div key={category.category}>
+                    <h3 className="text-2xl font-semibold mb-4 border-b pb-2">{category.category}</h3>
+                     <Accordion type="single" collapsible className="w-full">
+                        {category.questions.map((faq, index) => (
+                            <AccordionItem key={index} value={`item-${category.category}-${index}`}>
+                            <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline">
+                                {faq.question}
+                            </AccordionTrigger>
+                            <AccordionContent className="text-base text-muted-foreground">
+                                {faq.answer}
+                            </AccordionContent>
+                            </AccordionItem>
+                        ))}
+                    </Accordion>
+                </div>
+            ))}
+            </div>
           </div>
         </section>
 
-        {/* 13. FINAL CTA SECTION */}
-        <section className="py-20 md:py-28 bg-background">
+        {/* 14. FINAL CTA SECTION */}
+        <section className="py-20 md:py-28 bg-card">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Ваші знання вже мають цінність
             </h2>
             <p className="max-w-xl mx-auto text-lg text-muted-foreground mb-8">
-              Дайте їм простір, аудиторію та правильний формат монетизації.
+              Дайте їм професійний простір, глобальну аудиторію та гідний формат монетизації.
             </p>
             <Button size="lg">Приєднатися як професіонал</Button>
           </div>
@@ -655,3 +743,4 @@ export default function ProPage() {
     </>
   );
 }
+
