@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import Footer from '@/components/layout/footer';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const whyNeedItItems = [
     {
@@ -134,7 +135,7 @@ export default function CommunityPage() {
                     </div>
                     <div className="container mx-auto px-4 relative">
                         <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-                            Знайдіть ясність та підтримку у змістовній розмові
+                            Знайдіть ясність у змістовній розмові
                         </h1>
                         <p className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
                             LECTOR — це безпечний простір, де ви можете отримати персональну консультацію, новий погляд на ситуацію та живу взаємодію з перевіреними експертами, практиками й провідниками з усього світу.
@@ -152,10 +153,10 @@ export default function CommunityPage() {
                 <section className="py-20 bg-card">
                     <div className="container mx-auto px-4 max-w-4xl text-center">
                         <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                            Що таке LECTOR і для кого він створений
+                           Що таке LECTOR і для кого він створений
                         </h2>
                         <p className="text-lg text-muted-foreground">
-                           LECTOR — це курована екосистема, де люди знаходять не просто інформацію, а живу, змістовну взаємодію з перевіреними експертами, чия цінність ґрунтується на реальному досвіді, знаннях та етичній практиці. Це простір для тих, хто шукає персональні відповіді, підтримку в періоди змін або глибше розуміння власного шляху, і цінує безпечний, конфіденційний та професійний підхід.
+                           LECTOR — це курована екосистема, де люди знаходять не просто інформацію, а живу, змістовну взаємодію з перевіреними експертами. Це простір для тих, хто шукає персональні відповіді, підтримку в періоди змін або глибше розуміння власного шляху, і цінує безпечний, конфіденційний та професійний підхід.
                         </p>
                     </div>
                 </section>
@@ -192,7 +193,7 @@ export default function CommunityPage() {
                                 Що відкриває для вас реєстрація
                             </h2>
                             <p className="text-lg text-muted-foreground">
-                                Це не просто формальність, а вхід у повну екосистему для персональної взаємодії та росту.
+                               Це не просто формальність, а вхід у повну екосистему для персональної взаємодії та росту.
                             </p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -235,7 +236,7 @@ export default function CommunityPage() {
                         </div>
                     </div>
                 </section>
-
+                
                 {/* 6. CTA #1 */}
                 <section className="pb-20 bg-background">
                     <div className="container mx-auto px-4 text-center">
@@ -272,22 +273,95 @@ export default function CommunityPage() {
                     </div>
                 </section>
 
-                {/* 8. SECTION “Чому це краще...” */}
+                {/* NEW EXPERTS BLOCK */}
                 <section className="py-20 bg-background">
+                    <div className="container mx-auto px-4">
+                        <div className="text-center max-w-3xl mx-auto mb-12">
+                            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                                Знайдіть свого експерта
+                            </h2>
+                            <p className="text-lg text-muted-foreground">
+                                На платформі ви знаходите не випадкові сторінки, а людей, чий підхід, стиль і спосіб взаємодії можуть по-справжньому відгукнутися саме вам. Це допомагає обирати не навмання, а з більшою довірою і ясністю.
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                            <Card className="text-center shadow-md hover:shadow-xl transition-shadow">
+                                <CardContent className="p-8">
+                                    <Avatar className="h-24 w-24 mx-auto mb-4 border-2 border-border">
+                                    <AvatarImage src="https://picsum.photos/seed/alina/150" />
+                                    <AvatarFallback>AZ</AvatarFallback>
+                                    </Avatar>
+                                    <h3 className="text-xl font-bold">Alina Zoryana</h3>
+                                    <p className="text-sm text-accent font-medium mb-2">Таролог, Астролог</p>
+                                    <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground mb-4">
+                                        <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                                        <span className="font-bold">4.9</span>
+                                        <span>·</span>
+                                        <span>120+ сесій</span>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">
+                                    Допомагаю знаходити відповіді через Таро та астрологію. Працюю з темами стосунків, внутрішніх змін і життєвих циклів.
+                                    </p>
+                                </CardContent>
+                            </Card>
+                             <Card className="text-center shadow-md hover:shadow-xl transition-shadow">
+                                <CardContent className="p-8">
+                                    <Avatar className="h-24 w-24 mx-auto mb-4 border-2 border-border">
+                                    <AvatarImage src="https://picsum.photos/seed/irina/150" />
+                                    <AvatarFallback>ІВ</AvatarFallback>
+                                    </Avatar>
+                                    <h3 className="text-xl font-bold">Ірина Вогник</h3>
+                                    <p className="text-sm text-accent font-medium mb-2">Нумеролог</p>
+                                    <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground mb-4">
+                                        <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                                        <span className="font-bold">4.8</span>
+                                        <span>·</span>
+                                        <span>90+ сесій</span>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">
+                                    Допомагаю побачити сильні сторони, внутрішні сценарії та напрям розвитку через аналіз чисел і персональні розбори.
+                                    </p>
+                                </CardContent>
+                            </Card>
+                             <Card className="text-center shadow-md hover:shadow-xl transition-shadow">
+                                <CardContent className="p-8">
+                                    <Avatar className="h-24 w-24 mx-auto mb-4 border-2 border-border">
+                                    <AvatarImage src="https://picsum.photos/seed/maksym/150" />
+                                    <AvatarFallback>МС</AvatarFallback>
+                                    </Avatar>
+                                    <h3 className="text-xl font-bold">Максим Сидоренко</h3>
+                                    <p className="text-sm text-accent font-medium mb-2">Енергопрактик, Провідник медитацій</p>
+                                    <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground mb-4">
+                                        <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                                        <span className="font-bold">4.9</span>
+                                        <span>·</span>
+                                        <span>140+ сесій</span>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">
+                                    Працюю з відновленням внутрішнього балансу, стану і ясності через практики, живу присутність та індивідуальну взаємодію.
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 8. SECTION “Чому це краще...” */}
+                <section className="py-20 bg-card">
                     <div className="container mx-auto px-4">
                         <div className="grid lg:grid-cols-2 gap-12 items-center">
                             <div>
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                                Більше, ніж хаотичний пошук у соцмережах
+                                Більше, ніж нескінченний пошук у соцмережах
                             </h2>
                             <p className="text-lg text-muted-foreground mb-8">
-                                Ми створили LECTOR, щоб ви могли перейти від нескінченного споживання контенту до сфокусованої, змістовної взаємодії.
+                                Ми створили LECTOR, щоб ви могли перейти від споживання контенту до сфокусованої, змістовної взаємодії.
                             </p>
                             <p className="text-md">
                             Замість розрізнених сторінок, випадкових порад і хаосу в месенджерах ви отримуєте єдиний, надійний простір, де легко знайти експерта, обрати зручний формат і отримати реальну цінність. Це допомагає рухатися до відповідей спокійніше, точніше і з більшою довірою до процесу.
                             </p>
                             </div>
-                            <div className="bg-card p-8 rounded-lg shadow-sm border space-y-4">
+                            <div className="bg-background p-8 rounded-lg shadow-sm border space-y-4">
                                 <div className="flex items-start gap-3">
                                     <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
                                     <p className="text-md font-medium">Профілі, категорії й контент зібрані в одному місці.</p>
@@ -310,7 +384,7 @@ export default function CommunityPage() {
                 </section>
 
                 {/* 9. CTA #2 */}
-                <section className="pb-20 bg-background">
+                <section className="pb-20 bg-card">
                     <div className="container mx-auto px-4 text-center">
                         <Button variant="outline" size="lg">Відкрити доступ до платформи</Button>
                     </div>
@@ -318,14 +392,14 @@ export default function CommunityPage() {
 
 
                 {/* 10. SECTION “Для яких ситуацій...” */}
-                <section className="py-20 bg-card">
+                <section className="py-20 bg-background">
                     <div className="container mx-auto px-4">
                         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
                             Коли платформа може бути особливо корисною
                         </h2>
                         <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {useCases.map((item, index) => (
-                            <Card key={index} className="bg-background/70 shadow-sm hover:shadow-md transition-shadow">
+                            <Card key={index} className="bg-card/70 shadow-sm hover:shadow-md transition-shadow">
                                 <CardContent className="p-4 flex items-center gap-3">
                                 <CheckCircle className="h-5 w-5 text-accent flex-shrink-0" />
                                 <span className="font-medium text-sm">{item}</span>
@@ -337,7 +411,7 @@ export default function CommunityPage() {
                 </section>
                 
                 {/* 11. FAQ SECTION */}
-                <section className="py-20 bg-background">
+                <section className="py-20 bg-card">
                     <div className="container mx-auto px-4 max-w-3xl">
                     <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
                         Поширені запитання
@@ -358,7 +432,7 @@ export default function CommunityPage() {
                 </section>
 
                 {/* 12. FINAL CTA SECTION */}
-                <section className="py-20 md:py-28 bg-card">
+                <section className="py-20 md:py-28 bg-background">
                     <div className="container mx-auto px-4 text-center">
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">
                         Зареєструйтесь, щоб перейти від пошуку до справжньої взаємодії
