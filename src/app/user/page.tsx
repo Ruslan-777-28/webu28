@@ -24,9 +24,13 @@ import {
   Handshake,
   Calendar
 } from 'lucide-react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Footer from '@/components/layout/footer';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
+import type { FaqItem } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const whyNeedItItems = [
     {
@@ -95,34 +99,31 @@ const useCases = [
     'коли важлива особиста, а не масова взаємодія',
 ];
 
-const faqItems = [
-    {
-        question: 'Для кого створена платформа?',
-        answer: 'Для людей, які шукають не випадкові поради, а глибшу, персональну й змістовну взаємодію з експертами, практиками та провідниками.',
-    },
-    {
-        question: 'Чи потрібно одразу знати, кого саме я шукаю?',
-        answer: 'Ні. Платформа якраз і допомагає дослідити напрямки, профілі та зміст, щоб поступово знайти того, хто підходить саме вам.',
-    },
-    {
-        question: 'Чи можу я обрати зручний формат спілкування?',
-        answer: 'Так. Платформа підтримує різні сценарії взаємодії, щоб кожен користувач міг знайти комфортний для себе формат.',
-    },
-    {
-        question: 'Чи підходить це для міжнародної аудиторії?',
-        answer: 'Так. Платформа задумана як глобальний простір без географічних обмежень і з фокусом на доступність взаємодії.',
-    },
-    {
-        question: 'Чому варто зареєструватися?',
-        answer: 'Реєстрація відкриває доступ до повного функціоналу платформи: профілів, взаємодії, персональних форматів, матеріалів і подальшої екосистеми користування.',
-    },
-    {
-        question: 'Чим це відрізняється від звичайного перегляду контенту?',
-        answer: 'Тут ідеться не лише про споживання інформації, а про особисту взаємодію, реальні запити, змістовний контакт і персональну цінність.',
-    },
-];
 
 export default function CommunityPage() {
+    const [faqItems, setFaqItems] = useState<FaqItem[]>([]);
+    const [isLoadingFaq, setIsLoadingFaq] = useState(true);
+
+    useEffect(() => {
+        const faqQuery = query(
+            collection(db, 'faqItems'),
+            where('isActive', '==', true),
+            where('showOnCommunityPage', '==', true),
+            orderBy('sortOrder', 'asc')
+        );
+
+        const unsubscribe = onSnapshot(faqQuery, (snapshot) => {
+            const fetchedFaqs = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as FaqItem));
+            setFaqItems(fetchedFaqs);
+            setIsLoadingFaq(false);
+        }, (error) => {
+            console.error("Error fetching community FAQ items: ", error);
+            setIsLoadingFaq(false);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
     return (
         <>
             <main className="flex flex-col w-full min-h-screen bg-background text-foreground">
@@ -413,21 +414,29 @@ export default function CommunityPage() {
                 {/* 11. FAQ SECTION */}
                 <section className="py-20 bg-card">
                     <div className="container mx-auto px-4 max-w-3xl">
-                    <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-                        Поширені запитання
-                    </h2>
-                    <Accordion type="single" collapsible className="w-full">
-                        {faqItems.map((faq, index) => (
-                        <AccordionItem key={index} value={`item-${index}`}>
-                            <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline">
-                            {faq.question}
-                            </AccordionTrigger>
-                            <AccordionContent className="text-base text-muted-foreground">
-                            {faq.answer}
-                            </AccordionContent>
-                        </AccordionItem>
-                        ))}
-                    </Accordion>
+                        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+                            Поширені запитання
+                        </h2>
+                        {isLoadingFaq ? (
+                            <div className="space-y-4">
+                                <Skeleton className="h-16 w-full" />
+                                <Skeleton className="h-16 w-full" />
+                                <Skeleton className="h-16 w-full" />
+                            </div>
+                        ) : (
+                            <Accordion type="single" collapsible className="w-full">
+                                {faqItems.map((faq) => (
+                                <AccordionItem key={faq.id} value={`item-${faq.id}`}>
+                                    <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline">
+                                    {faq.question}
+                                    </AccordionTrigger>
+                                    <AccordionContent className="text-base text-muted-foreground">
+                                    {faq.answer}
+                                    </AccordionContent>
+                                </AccordionItem>
+                                ))}
+                            </Accordion>
+                        )}
                     </div>
                 </section>
 
