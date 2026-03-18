@@ -30,43 +30,43 @@ import Footer from '@/components/layout/footer';
 const whyNeedItItems = [
     {
         icon: MessageSquare,
-        title: 'Важливі питання',
-        text: 'Стосунки, особисті рішення, внутрішні зміни, життєві цикли та моменти невизначеності часто потребують не шуму, а глибшого погляду.',
+        title: 'Коли ви відчуваєте невизначеність',
+        text: 'У моменти, коли звичні поради не працюють, а внутрішні питання про стосунки, рішення чи життєвий шлях потребують не просто інформації, а глибокого, спокійного погляду.',
     },
     {
         icon: Handshake,
-        title: 'Персональна взаємодія',
-        text: 'Замість загальних порад ви отримуєте увагу до вашої ситуації, вашого запиту і вашого контексту.',
+        title: 'Коли вам потрібна персональна взаємодія',
+        text: 'Замість загальних рекомендацій ви отримуєте живу, конфіденційну розмову, зосереджену на вашій унікальній ситуації, вашому запиті та вашому контексті.',
     },
     {
         icon: Eye,
-        title: 'Новий погляд',
-        text: 'Розмова з правильною людиною допомагає побачити більше, відчути спокійніше і зрозуміти напрямок ясніше.',
+        title: 'Коли важливо побачити новий погляд',
+        text: 'Іноді розмова з правильною людиною допомагає побачити ситуацію під іншим кутом, відчути більше спокою і зрозуміти свій наступний крок набагато ясніше.',
     },
     {
         icon: Star,
-        title: 'Доступ до експертів',
-        text: 'В одному просторі зібрані люди, які працюють через знання, досвід, практику та особисту глибину.',
+        title: 'Коли ви шукаєте перевірених експертів',
+        text: 'Ми об’єднали в одному просторі людей, які працюють через реальні знання, досвід, етичну практику та особисту глибину, щоб ви могли довіряти тим, до кого звертаєтесь.',
     },
      {
         icon: Sparkles,
-        title: 'Менше хаосу',
-        text: 'Не потрібно шукати між десятками розрізнених сторінок, каналів і випадкових рекомендацій.',
+        title: 'Коли ви втомилися від інформаційного хаосу',
+        text: 'Замість того, щоб губитися між десятками розрізнених сторінок, каналів і випадкових порад, ви отримуєте структурований, спокійний простір для пошуку.',
     },
     {
         icon: Heart,
-        title: 'Більше змісту',
-        text: 'Платформа допомагає перейти від безкінечного перегляду до осмисленої взаємодії.',
+        title: 'Коли ви прагнете змістовної розмови',
+        text: 'Платформа допомагає перейти від нескінченного перегляду контенту до осмисленої взаємодії, де кожна розмова має реальну цінність.',
     },
 ];
 
 const registrationBenefits = [
-    { icon: Search, title: 'Доступ до експертів', text: 'Знаходьте фахівців і практиків, які відповідають саме вашому запиту.' },
-    { icon: Handshake, title: 'Персональні консультації', text: 'Отримуйте не загальні слова, а живу взаємодію, побудовану навколо вашої ситуації.' },
-    { icon: MessageSquare, title: 'Зручні формати спілкування', text: 'Обирайте той спосіб взаємодії, який підходить саме вам.' },
-    { icon: BookOpen, title: 'Контент і матеріали', text: 'Читайте, досліджуйте й зберігайте корисний зміст у межах однієї екосистеми.' },
-    { icon: Star, title: 'Обрані люди й напрямки', text: 'Формуйте власний простір інтересів, експертів і матеріалів.' },
-    { icon: Users, title: 'Довша взаємодія', text: 'Повертавайтеся до тих, хто вже допоміг вам побачити більше й відчути ясніше.' },
+    { icon: Search, title: 'Знаходьте “своїх” людей', text: 'Отримайте доступ до курованої спільноти експертів і практиків, щоб знайти того, хто резонує саме з вашим запитом і цінностями.' },
+    { icon: Handshake, title: 'Отримуйте персональну підтримку', text: 'На відміну від загального контенту, тут ви отримуєте живу взаємодію, побудовану навколо вашої унікальної ситуації.' },
+    { icon: MessageSquare, title: 'Обирайте комфортний формат', text: 'Відеодзвінок, текстова консультація чи асинхронний обмін повідомленнями — ви самі вирішуєте, як вам зручніше взаємодіяти.' },
+    { icon: BookOpen, title: 'Користуйтесь екосистемою знань', text: 'Читайте, досліджуйте та зберігайте корисні матеріали, створені експертами платформи, в одному зручному просторі.' },
+    { icon: Star, title: 'Формуйте своє коло довіри', text: 'Створюйте власне коло обраних експертів, напрямків і матеріалів, до яких ви завжди можете повернутися.' },
+    { icon: Users, title: 'Будуйте довшу взаємодію', text: 'Повертайтеся до тих, хто вже допоміг вам побачити більше. Платформа сприяє побудові довготривалих стосунків, заснованих на довірі.' },
 ];
 
 const howItWorksSteps = [
@@ -134,10 +134,10 @@ export default function CommunityPage() {
                     </div>
                     <div className="container mx-auto px-4 relative">
                         <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-                            Знайдіть відповіді, які справді мають значення
+                            Знайдіть ясність та підтримку у змістовній розмові
                         </h1>
                         <p className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
-                            Отримуйте персональні консультації, глибші інсайти та живу взаємодію з експертами, практиками й провідниками з усього світу — без мовних і географічних бар’єрів.
+                            LECTOR — це безпечний простір, де ви можете отримати персональну консультацію, новий погляд на ситуацію та живу взаємодію з перевіреними експертами, практиками й провідниками з усього світу.
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-4">
                             <Button size="lg">Зареєструватися</Button>
@@ -148,14 +148,14 @@ export default function CommunityPage() {
                     </div>
                 </section>
 
-                {/* 2. SECTION “Що тут відбувається” */}
+                {/* 2. SECTION “Що таке LECTOR” */}
                 <section className="py-20 bg-card">
                     <div className="container mx-auto px-4 max-w-4xl text-center">
                         <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                            Що таке LECTOR
+                            Що таке LECTOR і для кого він створений
                         </h2>
                         <p className="text-lg text-muted-foreground">
-                            LECTOR — це простір, де люди знаходять не випадковий контент, а живу взаємодію з тими, чия цінність ґрунтується на знаннях, досвіді, інтуїції та особистій практиці. Тут можна звернутися із власним запитом, знайти експерта під конкретну ситуацію, отримати нове бачення і пройти шлях до ясності через змістовну розмову, матеріали або інші формати взаємодії.
+                           LECTOR — це курована екосистема, де люди знаходять не просто інформацію, а живу, змістовну взаємодію з перевіреними експертами, чия цінність ґрунтується на реальному досвіді, знаннях та етичній практиці. Це простір для тих, хто шукає персональні відповіді, підтримку в періоди змін або глибше розуміння власного шляху, і цінує безпечний, конфіденційний та професійний підхід.
                         </p>
                     </div>
                 </section>
@@ -189,10 +189,10 @@ export default function CommunityPage() {
                     <div className="container mx-auto px-4">
                         <div className="text-center max-w-3xl mx-auto mb-12">
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                                Що відкриває реєстрація
+                                Що відкриває для вас реєстрація
                             </h2>
                             <p className="text-lg text-muted-foreground">
-                                Реєстрація — це не формальність, а вхід у повну екосистему взаємодії.
+                                Це не просто формальність, а вхід у повну екосистему для персональної взаємодії та росту.
                             </p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -235,8 +235,15 @@ export default function CommunityPage() {
                         </div>
                     </div>
                 </section>
+
+                {/* 6. CTA #1 */}
+                <section className="pb-20 bg-background">
+                    <div className="container mx-auto px-4 text-center">
+                        <Button size="lg">Створити акаунт і почати</Button>
+                    </div>
+                </section>
                 
-                {/* 6. SECTION “Формати взаємодії” */}
+                {/* 7. SECTION “Формати взаємодії” */}
                 <section className="py-20 bg-card">
                     <div className="container mx-auto px-4">
                         <div className="text-center max-w-3xl mx-auto mb-12">
@@ -265,48 +272,52 @@ export default function CommunityPage() {
                     </div>
                 </section>
 
-                {/* 7. SECTION “Чому це краще...” */}
+                {/* 8. SECTION “Чому це краще...” */}
                 <section className="py-20 bg-background">
                     <div className="container mx-auto px-4">
                         <div className="grid lg:grid-cols-2 gap-12 items-center">
                             <div>
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                                Більше, ніж нескінченний пошук у соцмережах
+                                Більше, ніж хаотичний пошук у соцмережах
                             </h2>
                             <p className="text-lg text-muted-foreground mb-8">
-                                Платформа збирає людей, зміст і взаємодію в один зрозумілий простір.
+                                Ми створили LECTOR, щоб ви могли перейти від нескінченного споживання контенту до сфокусованої, змістовної взаємодії.
                             </p>
                             <p className="text-md">
-                            Замість випадкових сторінок, розрізнених порад, нескінченних повідомлень і хаотичного пошуку ви отримуєте простір, де можна зрозуміло знайти напрям, експерта, формат взаємодії та потрібний зміст. Це допомагає рухатися спокійніше, точніше і з більшою довірою до того, що ви обираєте.
+                            Замість розрізнених сторінок, випадкових порад і хаосу в месенджерах ви отримуєте єдиний, надійний простір, де легко знайти експерта, обрати зручний формат і отримати реальну цінність. Це допомагає рухатися до відповідей спокійніше, точніше і з більшою довірою до процесу.
                             </p>
                             </div>
                             <div className="bg-card p-8 rounded-lg shadow-sm border space-y-4">
                                 <div className="flex items-start gap-3">
                                     <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
-                                    <p className="text-md font-medium">не потрібно шукати все вручну</p>
+                                    <p className="text-md font-medium">Профілі, категорії й контент зібрані в одному місці.</p>
                                 </div>
                                 <div className="flex items-start gap-3">
                                     <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
-                                    <p className="text-md font-medium">профілі, категорії й контент зібрані в одному місці</p>
+                                    <p className="text-md font-medium">Легше знайти людину, яка резонує з вашим запитом.</p>
                                 </div>
                                 <div className="flex items-start gap-3">
                                     <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
-                                    <p className="text-md font-medium">легше знайти людину під свій запит</p>
+                                    <p className="text-md font-medium">Менше інформаційного шуму, більше реального сенсу.</p>
                                 </div>
-                                <div className="flex items-start gap-3">
+                                 <div className="flex items-start gap-3">
                                     <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
-                                    <p className="text-md font-medium">менше шуму, більше сенсу</p>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
-                                    <p className="text-md font-medium">зручніша й цілісніша взаємодія</p>
+                                    <p className="text-md font-medium">Зручна, безпечна та цілісна взаємодія.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* 8. SECTION “Для яких ситуацій...” */}
+                {/* 9. CTA #2 */}
+                <section className="pb-20 bg-background">
+                    <div className="container mx-auto px-4 text-center">
+                        <Button variant="outline" size="lg">Відкрити доступ до платформи</Button>
+                    </div>
+                </section>
+
+
+                {/* 10. SECTION “Для яких ситуацій...” */}
                 <section className="py-20 bg-card">
                     <div className="container mx-auto px-4">
                         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
@@ -325,7 +336,7 @@ export default function CommunityPage() {
                     </div>
                 </section>
                 
-                {/* 9. FAQ SECTION */}
+                {/* 11. FAQ SECTION */}
                 <section className="py-20 bg-background">
                     <div className="container mx-auto px-4 max-w-3xl">
                     <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
@@ -346,7 +357,7 @@ export default function CommunityPage() {
                     </div>
                 </section>
 
-                {/* 10. FINAL CTA SECTION */}
+                {/* 12. FINAL CTA SECTION */}
                 <section className="py-20 md:py-28 bg-card">
                     <div className="container mx-auto px-4 text-center">
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">
