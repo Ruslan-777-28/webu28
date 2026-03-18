@@ -242,3 +242,17 @@ export type ProProfessionalItem = {
   updatedAt: any;
   updatedBy: string;
 };
+
+export type FaqItem = {
+  id: string;
+  question: string;
+  answer: string;
+  isActive: boolean;
+  showOnProPage: boolean;
+  showOnCommunityPage: boolean;
+  sortOrder: number;
+  audience: 'professional' | 'community' | 'general';
+  createdAt: any; // Firestore Timestamp
+  updatedAt: any; // Firestore Timestamp
+  updatedBy: string; // UID of admin
+}

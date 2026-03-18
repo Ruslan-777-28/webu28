@@ -18,40 +18,41 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel";
 import {
-  Activity,
-  Award,
-  BookOpen,
-  Calendar,
-  CheckCircle,
-  ChevronsUp,
-  CircleDollarSign,
-  File,
-  Globe,
-  Handshake,
-  Layers,
-  LifeBuoy,
-  Megaphone,
-  MessageSquare,
-  Package,
-  PenSquare,
-  Repeat,
-  Rocket,
-  Scale,
-  ShieldCheck,
-  Star,
-  TrendingUp,
-  Users,
-  Video,
-  Wallet
+    Activity,
+    Award,
+    BookOpen,
+    Calendar,
+    CheckCircle,
+    ChevronsUp,
+    CircleDollarSign,
+    File,
+    Globe,
+    Handshake,
+    Layers,
+    LifeBuoy,
+    Megaphone,
+    MessageSquare,
+    Package,
+    PenSquare,
+    Repeat,
+    Rocket,
+    Scale,
+    ShieldCheck,
+    Star,
+    TrendingUp,
+    Users,
+    Video,
+    Wallet
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import Footer from '@/components/layout/footer';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { collection, doc, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { collection, doc, onSnapshot, orderBy, query, limit, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import type { ProHowUsersSeeYouBlock, ProKnowYourCustomerBlock, ProProfessionalItem, ProProfessionalsBlock } from '@/lib/types';
+import type { FaqItem, ProHowUsersSeeYouBlock, ProKnowYourCustomerBlock, ProProfessionalItem, ProProfessionalsBlock } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import Link from 'next/link';
 
 const forYouItems = [
     'астролог',
@@ -187,61 +188,12 @@ const monetizationPaths = [
     { icon: Wallet, title: 'Зручний вивід коштів', text: 'Легко керуйте своїми заробітками та виводьте кошти у зручний для вас спосіб.' },
 ];
 
-const faqItems = [
-    {
-        category: "Загальні питання",
-        questions: [
-            {
-                question: 'Хто може стати професіоналом на платформі?',
-                answer: 'Платформа відкрита для експертів, практиків і провідників, чия цінність ґрунтується на знаннях, досвіді, особистій практиці та змістовній взаємодії з людьми.',
-            },
-            {
-                question: 'Чи обов’язково мати велику аудиторію, щоб почати?',
-                answer: 'Ні. Платформа створена не лише для тих, хто вже має велику видимість, а й для тих, хто хоче професійно оформити свою присутність і поступово зростати.',
-            },
-            {
-                question: 'Чи можна працювати з міжнародною аудиторією?',
-                answer: 'Так. Платформа задумана як глобальний простір без географічних обмежень і з перспективою глибшої міжнародної взаємодії.',
-            },
-        ]
-    },
-    {
-        category: "Формати роботи та монетизація",
-        questions: [
-             {
-                question: 'У яких форматах я зможу працювати?',
-                answer: 'Ви зможете обирати різні моделі взаємодії: консультації, події, текстове спілкування, обмін файлами та цифрові продукти.',
-            },
-            {
-                question: 'Чи можу я продавати свої цифрові матеріали?',
-                answer: 'Так. Платформа передбачає можливість пропонувати й продавати цифрові продукти як окрему частину вашої експертної присутності.',
-            },
-             {
-                question: 'Яка комісія платформи?',
-                answer: 'Ми дотримуємося політики прозорості. Платформа утримує невеликий відсоток лише з успішно завершених транзакцій. Усі умови чітко прописані, без прихованих платежів.',
-            },
-        ]
-    },
-    {
-        category: "Робота з клієнтами",
-        questions: [
-             {
-                question: 'Як вирішуються конфліктні ситуації?',
-                answer: 'У нас є служба підтримки та чіткі правила спільноти. Ми допомагаємо вирішувати будь-які непорозуміння, щоб забезпечити чесну та поважну взаємодію.',
-            },
-            {
-                question: 'Чи можу я поєднувати різні формати роботи?',
-                answer: 'Так. Ви не обмежені одним сценарієм і можете будувати власну модель взаємодії відповідно до свого стилю й напряму.',
-            },
-        ]
-    }
-];
-
 export default function ProPage() {
     const [customerBlock, setCustomerBlock] = useState<ProKnowYourCustomerBlock | null>(null);
     const [profileBlock, setProfileBlock] = useState<ProHowUsersSeeYouBlock | null>(null);
     const [professionalsBlock, setProfessionalsBlock] = useState<ProProfessionalsBlock | null>(null);
     const [professionalItems, setProfessionalItems] = useState<ProProfessionalItem[]>([]);
+    const [faqItems, setFaqItems] = useState<FaqItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     
     useEffect(() => {
@@ -272,6 +224,18 @@ export default function ProPage() {
                 return unsubItems;
             }
         });
+
+        const faqQuery = query(
+            collection(db, 'faqItems'),
+            where('isActive', '==', true),
+            where('showOnProPage', '==', true),
+            orderBy('sortOrder', 'asc'),
+            limit(5)
+        );
+        const unsubFaq = onSnapshot(faqQuery, (snapshot) => {
+            const fetchedFaqs = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as FaqItem));
+            setFaqItems(fetchedFaqs);
+        });
         
         const timer = setTimeout(() => setIsLoading(false), 1500);
 
@@ -279,6 +243,7 @@ export default function ProPage() {
             unsubCustomer();
             unsubProfile();
             unsubProBlock();
+            unsubFaq();
             clearTimeout(timer);
         }
     }, []);
@@ -700,30 +665,36 @@ export default function ProPage() {
 
         {/* 13. FAQ SECTION (Strengthened) */}
         <section className="py-20 bg-background">
-          <div className="container mx-auto px-4 max-w-3xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-              Поширені запитання
-            </h2>
-            <div className="space-y-8">
-            {faqItems.map((category) => (
-                <div key={category.category}>
-                    <h3 className="text-2xl font-semibold mb-4 border-b pb-2">{category.category}</h3>
-                     <Accordion type="single" collapsible className="w-full">
-                        {category.questions.map((faq, index) => (
-                            <AccordionItem key={index} value={`item-${category.category}-${index}`}>
-                            <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline">
-                                {faq.question}
-                            </AccordionTrigger>
-                            <AccordionContent className="text-base text-muted-foreground">
-                                {faq.answer}
-                            </AccordionContent>
-                            </AccordionItem>
-                        ))}
-                    </Accordion>
-                </div>
-            ))}
+            <div className="container mx-auto px-4 max-w-4xl">
+                <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+                    Поширені запитання
+                </h2>
+                {isLoading ? <Skeleton className="h-64 w-full" /> : (
+                    <>
+                        <Accordion type="single" collapsible className="w-full">
+                            {faqItems.map((faq) => (
+                                <AccordionItem key={faq.id} value={`item-${faq.id}`}>
+                                <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline">
+                                    {faq.question}
+                                </AccordionTrigger>
+                                <AccordionContent className="text-base text-muted-foreground">
+                                    {faq.answer}
+                                </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
+                        {faqItems.length > 0 && (
+                             <div className="text-center mt-12">
+                                <Button asChild variant="outline">
+                                    <Link href="/faq">
+                                        Більше відповідей
+                                    </Link>
+                                </Button>
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
-          </div>
         </section>
 
         {/* 14. FINAL CTA SECTION */}
@@ -743,4 +714,3 @@ export default function ProPage() {
     </>
   );
 }
-
