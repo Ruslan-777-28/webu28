@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Navigation } from '@/components/navigation';
@@ -341,12 +340,6 @@ export default function ProPage() {
                   </div>
                 </div>
               ))}
-            </div>
-             {/* CTA #1 */}
-            <div className="text-center mt-16">
-                <DialogTrigger asChild>
-                    <Button size="lg">Приєднатися до професіоналів</Button>
-                </DialogTrigger>
             </div>
           </div>
         </section>
