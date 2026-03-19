@@ -1,22 +1,35 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, HelpCircle, Users } from 'lucide-react';
+import { FileText, HelpCircle, Users, Link as LinkIcon, Edit3 } from 'lucide-react';
 import Link from 'next/link';
 
 const contentPages = [
     {
-        title: "'FOR EXPERTS' Page",
+        title: "'For Experts' Page Blocks",
         description: "Edit content blocks on the /pro page.",
         href: "/admin/content/pro",
         icon: Users
+    },
+    {
+        title: "Information Pages",
+        description: "Manage content of static pages like 'Terms' or 'Privacy'.",
+        href: "/admin/content/pages",
+        icon: FileText,
     },
     {
         title: "FAQ Management",
         description: "Create, edit, and manage all FAQ items.",
         href: "/admin/content/faq",
         icon: HelpCircle
-    }
+    },
+    {
+        title: "Footer Settings",
+        description: "Manage social media links in the website footer.",
+        href: "/admin/content/footer",
+        icon: LinkIcon,
+    },
 ];
 
 export default function ContentAdminPage() {

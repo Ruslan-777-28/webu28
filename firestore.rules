@@ -1,3 +1,4 @@
+
 rules_version = '2';
 
 service cloud.firestore {
@@ -151,6 +152,18 @@ service cloud.firestore {
     match /faqItems/{faqId} {
       allow read: if true;
       allow write: if isSignedIn();
+    }
+    
+    // ---------- Site Settings (Footer, etc.) ----------
+    match /siteSettings/{docId} {
+        allow read: if true;
+        allow write: if isSignedIn();
+    }
+
+    // ---------- Static Info Pages ----------
+    match /siteInfoPages/{pageId} {
+        allow read: if true;
+        allow write: if isSignedIn();
     }
 
     // ---------- Default deny ----------

@@ -1,26 +1,66 @@
+
+'use client';
+
 import Link from 'next/link';
-import { Twitter, Instagram, Linkedin } from 'lucide-react';
+import { Twitter, Instagram, Linkedin, Youtube, Facebook } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
+import { Skeleton } from '../ui/skeleton';
+
+type SocialLink = {
+    url: string;
+    isActive: boolean;
+};
+
+type FooterSettings = {
+    socialLinks: {
+        [key: string]: SocialLink;
+    };
+};
+
+const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" {...props}>
+        <path d="M448 209.9a210.1 210.1 0 0 1 -122.8-39.25V349.38A162.6 162.6 0 1 1 185 188.31V278.2a74.62 74.62 0 1 0 52.23 71.18V0h88a121.18 121.18 0 0 0 122.77 122.77z" />
+    </svg>
+);
+
+const socialIconMap: { [key: string]: React.ElementType } = {
+    youtube: Youtube,
+    facebook: Facebook,
+    tiktok: TikTokIcon,
+    instagram: Instagram,
+    linkedin: Linkedin,
+    twitter: Twitter,
+};
 
 export default function Footer() {
-  const navigationLinks = [
-    { href: '/', label: 'Головна' },
-    { href: '/pro', label: 'Для професіонала' },
-    { href: '/user', label: 'Для спільноти' },
-    { href: '/blog', label: 'Блог' },
-  ];
+  const [settings, setSettings] = useState<FooterSettings | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const settingsRef = doc(db, 'siteSettings', 'footer');
+    const unsubscribe = onSnapshot(settingsRef, (docSnap) => {
+        if (docSnap.exists()) {
+            setSettings(docSnap.data() as FooterSettings);
+        }
+        setIsLoading(false);
+    }, () => {
+        setIsLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const informationLinks = [
-    { href: '#', label: 'Про платформу' },
-    { href: '#', label: 'Контакти' },
-    { href: '#', label: 'Privacy Policy' },
-    { href: '#', label: 'Terms of Use' },
+    { href: '/info/community-rules', label: 'Правила спільноти' },
+    { href: '/info/contact', label: 'Контакти' },
+    { href: '/info/privacy-policy', label: 'Privacy Policy' },
+    { href: '/info/terms-of-use', label: 'Terms of Use' },
   ];
 
-  const socialLinks = [
-    { href: '#', icon: Twitter, name: 'Twitter' },
-    { href: '#', icon: Instagram, name: 'Instagram' },
-    { href: '#', icon: Linkedin, name: 'LinkedIn' },
-  ];
+  const activeSocialLinks = settings?.socialLinks 
+    ? Object.entries(settings.socialLinks).filter(([, value]) => value.isActive && value.url)
+    : [];
 
   return (
     <footer className="bg-sidebar text-sidebar-foreground">
@@ -36,20 +76,6 @@ export default function Footer() {
 
           {/* Center Column */}
           <div className="md:col-span-4 space-y-4">
-            <h4 className="font-semibold tracking-wider uppercase text-sidebar-foreground/80">Навігація</h4>
-            <ul className="space-y-2">
-              {navigationLinks.map((link) => (
-                <li key={link.label}>
-                  <Link href={link.href} className="text-sm text-sidebar-foreground/70 hover:text-accent transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Right Column */}
-          <div className="md:col-span-3 space-y-4">
             <h4 className="font-semibold tracking-wider uppercase text-sidebar-foreground/80">Інформація</h4>
             <ul className="space-y-2">
               {informationLinks.map((link) => (
@@ -61,19 +87,33 @@ export default function Footer() {
               ))}
             </ul>
           </div>
+
+          {/* Right Column */}
+          <div className="md:col-span-3 space-y-4">
+             <h4 className="font-semibold tracking-wider uppercase text-sidebar-foreground/80">Спільнота</h4>
+             <div className="flex space-x-4">
+                 {isLoading ? (
+                    <div className="flex space-x-4"><Skeleton className="h-6 w-6" /><Skeleton className="h-6 w-6" /><Skeleton className="h-6 w-6" /></div>
+                 ) : activeSocialLinks.length > 0 ? (
+                    activeSocialLinks.map(([platform, link]) => {
+                        const Icon = socialIconMap[platform];
+                        return Icon ? (
+                             <Link key={platform} href={link.url} target="_blank" rel="noopener noreferrer" aria-label={platform} className="text-sidebar-foreground/70 hover:text-accent transition-colors">
+                                <Icon className="h-5 w-5" />
+                            </Link>
+                        ) : null;
+                    })
+                 ) : (
+                    <p className="text-sm text-sidebar-foreground/50">Соціальні мережі не налаштовані.</p>
+                 )}
+            </div>
+          </div>
         </div>
 
         <div className="mt-12 border-t border-border/20 pt-8 flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-xs text-sidebar-foreground/50 order-2 sm:order-1 mt-4 sm:mt-0">
+          <p className="text-xs text-sidebar-foreground/50">
             © 2026 LECTOR. All rights reserved.
           </p>
-          <div className="flex space-x-4 order-1 sm:order-2">
-            {socialLinks.map((social) => (
-              <Link key={social.name} href={social.href} aria-label={social.name} className="text-sidebar-foreground/50 hover:text-accent transition-colors">
-                <social.icon className="h-5 w-5" />
-              </Link>
-            ))}
-          </div>
         </div>
       </div>
     </footer>
