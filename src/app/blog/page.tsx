@@ -1,7 +1,7 @@
 'use client';
 import { Navigation } from '@/components/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Search, Clock, User, Calendar, XCircle } from 'lucide-react';
+import { Search, Clock, Calendar, XCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
@@ -16,10 +16,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { collection, doc, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
+import Link from 'next/link';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 
 const ArticleCard = ({ post, categoryName, subcategoryName, className, isFeatured = false }: { post: Post, categoryName: string, subcategoryName: string, className?: string, isFeatured?: boolean }) => (
-  <Card className={cn("overflow-hidden flex flex-col h-full shadow-md hover:shadow-xl transition-shadow duration-300", className)}>
+  <Card className={cn("overflow-hidden flex flex-col h-full shadow-md hover:shadow-xl transition-shadow duration-300 group relative", className)}>
+    <Link href={`/blog/post/${post.slug ?? '#'}`} className="absolute inset-0 z-10" aria-label={post.title} />
     <div className="relative w-full">
       <Image 
         src={post.coverImageUrl || "https://picsum.photos/seed/placeholder/800/450"} 
@@ -34,14 +37,40 @@ const ArticleCard = ({ post, categoryName, subcategoryName, className, isFeature
         <Badge variant="outline">{subcategoryName ? `${categoryName} / ${subcategoryName}`: categoryName}</Badge>
         <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{post.publishedAt?.toDate().toLocaleDateString() || post.createdAt?.toDate().toLocaleDateString()}</span>
       </div>
-      <h3 className={cn("font-bold mb-2 text-card-foreground leading-tight", isFeatured ? "text-2xl" : "text-xl")}>{post.title}</h3>
+      <h3 className={cn("font-bold mb-2 text-card-foreground leading-tight group-hover:underline", isFeatured ? "text-2xl" : "text-xl")}>{post.title}</h3>
       <p className="text-sm text-muted-foreground mb-4 flex-grow line-clamp-3">{post.excerpt}</p>
       <div className="flex items-center justify-between text-xs text-muted-foreground mt-auto">
-        <span className="flex items-center gap-1"><User className="w-3 h-3" />{post.authorName}</span>
+        <Link href={`/profile/${post.authorId}`} className="relative z-20 flex items-center gap-2 group/author">
+            <Avatar className="h-6 w-6">
+                <AvatarImage src={post.authorAvatarUrl} alt={post.authorName} />
+                <AvatarFallback>{post.authorName?.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <span className="group-hover/author:underline">{post.authorName}</span>
+        </Link>
         <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{Math.ceil((post.content?.split(' ').length || 0) / 200)} хв</span>
       </div>
     </CardContent>
   </Card>
+);
+
+const SmallArticleCard = ({ post, categoryName }: { post: Post, categoryName: string }) => (
+    <Card className="overflow-hidden flex items-center h-full shadow-md hover:shadow-xl transition-shadow duration-300 relative group">
+        <Link href={`/blog/post/${post.slug ?? '#'}`} className="absolute inset-0 z-10" aria-label={post.title} />
+        <div className="relative w-1/3">
+            <Image src={post.coverImageUrl || "https://picsum.photos/seed/placeholder/150/100"} alt={post.title} width={150} height={100} className="w-full h-full object-cover aspect-video"/>
+        </div>
+        <CardContent className="p-3 w-2/3">
+            <Badge variant="outline" className="text-xs mb-1">{categoryName}</Badge>
+            <h4 className="font-bold text-sm mb-1 leading-tight line-clamp-2 group-hover:underline">{post.title}</h4>
+            <Link href={`/profile/${post.authorId}`} className="relative z-20 flex items-center gap-2 text-xs text-muted-foreground mt-2 group/author">
+                <Avatar className="h-5 w-5">
+                    <AvatarImage src={post.authorAvatarUrl} alt={post.authorName} />
+                    <AvatarFallback>{post.authorName?.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <span className="group-hover/author:underline">{post.authorName}</span>
+            </Link>
+        </CardContent>
+    </Card>
 );
 
 export default function BlogPage() {
@@ -191,15 +220,11 @@ export default function BlogPage() {
                     />
                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
                         {posts.slice(1, 4).map(post => (
-                            <Card key={post.id} className="overflow-hidden flex items-center h-full shadow-md hover:shadow-xl transition-shadow duration-300">
-                                <div className="relative w-1/3">
-                                    <Image src={post.coverImageUrl || "https://picsum.photos/seed/placeholder/150/100"} alt={post.title} width={150} height={100} className="w-full h-full object-cover aspect-video"/>
-                                </div>
-                                <CardContent className="p-3 w-2/3">
-                                    <Badge variant="outline" className="text-xs mb-1">{getCategoryName(post.categoryId)}</Badge>
-                                    <h4 className="font-bold text-sm mb-1 leading-tight line-clamp-2">{post.title}</h4>
-                                </CardContent>
-                            </Card>
+                           <SmallArticleCard 
+                                key={post.id}
+                                post={post}
+                                categoryName={getCategoryName(post.categoryId)}
+                            />
                         ))}
                     </div>
                 </div>
