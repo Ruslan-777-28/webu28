@@ -53,6 +53,8 @@ import { db } from '@/lib/firebase/client';
 import type { FaqItem, ProHowUsersSeeYouBlock, ProKnowYourCustomerBlock, ProProfessionalItem, ProProfessionalsBlock } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { AuthModal } from '@/components/auth-modal';
 
 const forYouItems = [
     'астролог',
@@ -195,6 +197,7 @@ export default function ProPage() {
     const [professionalItems, setProfessionalItems] = useState<ProProfessionalItem[]>([]);
     const [faqItems, setFaqItems] = useState<FaqItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isAuthModalOpen, setAuthModalOpen] = useState(false);
     
     useEffect(() => {
         const proPageRef = doc(db, 'sitePages', 'pro');
@@ -249,7 +252,7 @@ export default function ProPage() {
     }, []);
 
   return (
-    <>
+    <Dialog open={isAuthModalOpen} onOpenChange={setAuthModalOpen}>
       <main className="flex flex-col w-full min-h-screen bg-background text-foreground">
         <Navigation />
         
@@ -266,10 +269,9 @@ export default function ProPage() {
               Створюйте власні пропозиції, консультуйте клієнтів з усього світу та перетворюйте досвід, інтуїцію й експертність на преміальний дохід у зручному для вас форматі.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button size="lg">Стати професіоналом</Button>
-              <Button size="lg" variant="outline">
-                Подивитися, як це працює
-              </Button>
+              <DialogTrigger asChild>
+                <Button size="lg">Приєднатися до професіоналів</Button>
+              </DialogTrigger>
             </div>
           </div>
         </section>
@@ -342,7 +344,9 @@ export default function ProPage() {
             </div>
              {/* CTA #1 */}
             <div className="text-center mt-16">
-                <Button size="lg">Почати свій шлях на LECTOR</Button>
+                <DialogTrigger asChild>
+                    <Button size="lg">Приєднатися до професіоналів</Button>
+                </DialogTrigger>
             </div>
           </div>
         </section>
@@ -626,7 +630,9 @@ export default function ProPage() {
                 )}
                  {/* CTA #2 */}
                 <div className="text-center mt-16">
-                    <Button size="lg" variant="default">Приєднатися до спільноти професіоналів</Button>
+                    <DialogTrigger asChild>
+                        <Button size="lg" variant="default">Приєднатися до професіоналів</Button>
+                    </DialogTrigger>
                 </div>
               </div>
             </section>
@@ -706,11 +712,16 @@ export default function ProPage() {
             <p className="max-w-xl mx-auto text-lg text-muted-foreground mb-8">
               Дайте їм професійний простір, глобальну аудиторію та гідний формат монетизації.
             </p>
-            <Button size="lg">Приєднатися як професіонал</Button>
+            <DialogTrigger asChild>
+                <Button size="lg">Приєднатися до професіоналів</Button>
+            </DialogTrigger>
           </div>
         </section>
       </main>
       <Footer />
-    </>
+      <DialogContent>
+        <AuthModal setOpen={setAuthModalOpen} />
+      </DialogContent>
+    </Dialog>
   );
 }
