@@ -22,6 +22,7 @@ import {
   Inbox,
   FileText,
   HelpCircle,
+  PlayCircle,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -32,6 +33,7 @@ const allNavItems = [
   { href: '/admin/users', label: 'Users', icon: Users, roles: ['moderator', 'admin'] },
   { href: '/admin/publication-queue', label: 'Publication Queue', icon: Inbox, roles: ['moderator', 'editor', 'admin'] },
   { href: '/admin/content', label: 'Content', icon: FileText, roles: ['admin'] },
+  { href: '/admin/content/hero', label: 'Hero Media', icon: PlayCircle, roles: ['admin'] },
   { href: '/admin/content/faq', label: 'FAQ', icon: HelpCircle, roles: ['admin'] },
   { href: '/admin/blog', label: 'Blog Dashboard', icon: LayoutDashboard, roles: ['author', 'editor', 'admin'] },
   { href: '/admin/blog/articles', label: 'Articles', icon: Newspaper, roles: ['author', 'editor', 'admin'] },

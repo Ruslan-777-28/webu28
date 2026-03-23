@@ -23,6 +23,9 @@ const generateSlug = (name: string) => name.toLowerCase().trim().replace(/[^a-z0
 const subcategorySchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Назва підкатегорії обов'язкова"),
+  slug: z.string().optional(),
+  sortOrder: z.number().optional(),
+  isActive: z.boolean().optional(),
 }).refine(data => generateSlug(data.name).length > 0, {
     message: "Назва підкатегорії повинна містити літери або цифри.",
     path: ["name"],
@@ -31,6 +34,9 @@ const subcategorySchema = z.object({
 const categorySchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Назва категорії обов'язкова"),
+  slug: z.string().optional(),
+  sortOrder: z.number().optional(),
+  isActive: z.boolean().optional(),
   subcategories: z.array(subcategorySchema),
 }).refine(data => generateSlug(data.name).length > 0, {
     message: "Назва категорії повинна містити літери або цифри.",

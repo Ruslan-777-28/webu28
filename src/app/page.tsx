@@ -12,6 +12,7 @@ import { CountdownTimer } from '@/components/ui/countdown-timer';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { AuthModal } from '@/components/auth-modal';
+import { HeroCircleMedia } from '@/components/hero-circle-media';
 
 export default function HomePage() {
   const pathname = usePathname();
@@ -113,7 +114,8 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row items-center justify-center md:gap-16 w-full">
                 {/* Circle */}
                 <div className="relative w-[350px] h-[350px] md:w-[443px] md:h-[443px] flex-shrink-0">
-                    <div className="absolute inset-0 rounded-full border border-border" />
+                    <div className="absolute inset-0 rounded-full border border-border pointer-events-none z-10" />
+                    <HeroCircleMedia />
                 </div>
                 {/* Timer */}
                 <div className="flex-shrink-0 mt-8 md:mt-0">

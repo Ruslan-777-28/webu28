@@ -1,0 +1,164 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
+import { HomeHeroMediaSettings } from '@/lib/types';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+
+interface PageHeroProps {
+  pageId: 'pro' | 'community';
+  fallbackHeadline?: string;
+  fallbackSubheadline?: string;
+  fallbackButtonLabel?: string;
+  fallbackButtonLink?: string;
+}
+
+export function PageHero({
+  pageId,
+  fallbackHeadline,
+  fallbackSubheadline,
+  fallbackButtonLabel,
+  fallbackButtonLink,
+}: PageHeroProps) {
+  const [settings, setSettings] = useState<HomeHeroMediaSettings | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let docPath = '';
+    if (pageId === 'pro') docPath = 'siteSettings/proHeroMedia';
+    if (pageId === 'community') docPath = 'siteSettings/communityHeroMedia';
+
+    if (!docPath) return;
+
+    const unsub = onSnapshot(doc(db, docPath), (docSnap) => {
+      if (docSnap.exists()) {
+        setSettings(docSnap.data() as HomeHeroMediaSettings);
+      } else {
+        setSettings(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsub();
+  }, [pageId]);
+
+  if (loading) {
+    return (
+      <section className="relative w-full min-h-[50vh] md:min-h-[600px] flex items-center justify-center bg-background/50">
+        <div className="w-8 h-8 rounded-full border-4 border-accent border-b-transparent animate-spin"></div>
+      </section>
+    );
+  }
+
+  // Use values from Firestore or fallbacks
+  const isEnabled = settings?.enabled !== false; // Active by default if not strictly disabled
+  const showMedia = isEnabled && settings?.mediaType;
+  
+  const headline = settings?.headline || fallbackHeadline;
+  const subheadline = settings?.subheadline || fallbackSubheadline;
+  const buttonLabel = settings?.buttonLabel || fallbackButtonLabel;
+  const buttonLink = settings?.buttonLink || fallbackButtonLink || '#';
+
+  const isPro = pageId === 'pro';
+
+  return (
+    <section className="relative w-full bg-background overflow-hidden border-b border-border/50">
+      
+      {/* 1. Pro-specific FULL WIDTH HEADLINE (above the video) */}
+      {isPro && headline && (
+        <div className="relative z-10 w-full px-6 pt-12 pb-4 md:px-12 md:pt-16 max-w-7xl">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight">
+            {headline}
+          </h1>
+        </div>
+      )}
+
+      {/* 2. Main Flex Container */}
+      <div className={`flex flex-col md:flex-row items-stretch w-full ${isPro ? 'min-h-[350px] md:min-h-[400px]' : 'min-h-[400px] md:min-h-[500px]'}`}>
+        
+        {/* Left: Media Area (Wide 21:9 desktop, aspect-video mobile) */}
+        {showMedia && (
+          <div className={`relative w-full flex-shrink-0 bg-muted/20 ${isPro ? 'md:w-[50%]' : 'md:w-[55%]'}`}>
+            {settings.mediaType === 'video' && (settings.desktopVideoUrl || settings.mobileVideoUrl) ? (
+              <>
+                {/* Desktop Video */}
+                {settings.desktopVideoUrl && (
+                  <video
+                    src={settings.desktopVideoUrl}
+                    poster={settings.posterUrl}
+                    className="hidden md:block w-full h-full object-cover aspect-[21/9]"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                )}
+                {/* Mobile Video (fallback to desktop if mobile not provided) */}
+                <video
+                  src={settings.mobileVideoUrl || settings.desktopVideoUrl}
+                  poster={settings.posterUrl}
+                  className="block md:hidden w-full h-full object-cover aspect-video"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                />
+              </>
+            ) : settings.mediaType === 'image' && settings.imageUrl ? (
+              <img
+                src={settings.imageUrl}
+                alt="Hero Media"
+                className="w-full h-full object-cover md:aspect-[21/9] aspect-video"
+              />
+            ) : null}
+
+            {/* Seamless Fade Overlays */}
+            {/* Desktop: fade right edge to blend into background */}
+            <div className="hidden md:block absolute inset-y-0 right-[-1px] w-32 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+            <div className="hidden md:block absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background via-background/80 to-transparent pointer-events-none" />
+            
+            {/* Mobile: fade bottom edge to blend into text */}
+            <div className="block md:hidden absolute inset-x-0 bottom-[-1px] h-24 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+            <div className="block md:hidden absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none" />
+          </div>
+        )}
+
+        {/* Right: Text Content Area */}
+        <div className={`relative flex flex-col justify-center px-6 py-8 md:px-12 z-10 flex-grow w-full ${isPro ? 'md:w-[50%] md:py-8' : 'md:w-[45%] md:py-16'}`}>
+            {(headline || subheadline) && (
+              <div className="max-w-2xl text-left">
+                {/* Only render headline inside the box if NOT Pro */}
+                {!isPro && headline && (
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+                    {headline}
+                  </h1>
+                )}
+                
+                {subheadline && (
+                  <p className={`text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed ${isPro ? 'md:text-2xl mt-0 md:mt-4 max-w-xl' : ''}`}>
+                    {subheadline}
+                  </p>
+                )}
+                
+                {buttonLabel && (
+                  <Button size="lg" asChild className="w-full sm:w-auto">
+                    {buttonLink.startsWith('http') ? (
+                      <a href={buttonLink} target="_blank" rel="noopener noreferrer">
+                        {buttonLabel}
+                      </a>
+                    ) : (
+                      <Link href={buttonLink}>
+                        {buttonLabel}
+                      </Link>
+                    )}
+                  </Button>
+                )}
+              </div>
+            )}
+        </div>
+      </div>
+    </section>
+  );
+}

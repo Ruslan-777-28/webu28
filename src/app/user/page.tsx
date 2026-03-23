@@ -32,6 +32,7 @@ import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestor
 import { db } from '@/lib/firebase/client';
 import type { FaqItem } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PageHero } from '@/components/page-hero';
 
 const whyNeedItItems = [
     {
@@ -131,25 +132,13 @@ export default function CommunityPage() {
                 <Navigation />
 
                 {/* 1. HERO SECTION */}
-                <section className="py-20 md:py-32 text-center bg-background relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-10">
-                        <div className="absolute h-full w-full bg-[radial-gradient(hsl(var(--border))_1px,transparent_1px)] [background-size:16px_16px]"></div>
-                    </div>
-                    <div className="container mx-auto px-4 relative">
-                        <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-                            Знайдіть ясність у змістовній розмові
-                        </h1>
-                        <p className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
-                            LECTOR — це безпечний простір, де ви можете отримати персональну консультацію, новий погляд на ситуацію та живу взаємодію з перевіреними експертами, практиками й провідниками з усього світу.
-                        </p>
-                        <div className="flex flex-col sm:flex-row justify-center gap-4">
-                            <Button size="lg">Зареєструватися</Button>
-                            <Button size="lg" variant="outline">
-                                Дослідити платформу
-                            </Button>
-                        </div>
-                    </div>
-                </section>
+                <PageHero 
+                    pageId="community"
+                    fallbackHeadline="Знайдіть ясність у змістовній розмові"
+                    fallbackSubheadline="LECTOR — це безпечний простір, де ви можете отримати персональну консультацію, новий погляд на ситуацію та живу взаємодію з перевіреними експертами, практиками й провідниками з усього світу."
+                    fallbackButtonLabel="Зареєструватися"
+                    fallbackButtonLink="/"
+                />
 
                 {/* 2. SECTION “Що таке LECTOR” */}
                 <section className="py-20 bg-card">

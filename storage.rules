@@ -17,10 +17,26 @@ service firebase.storage {
         && request.resource.contentType.matches('image/.*');
     }
 
+    function isHeroMediaUpload(maxSizeMB) {
+      return request.resource != null
+        && request.resource.size < maxSizeMB * 1024 * 1024
+        && (
+          request.resource.contentType.matches('image/.*') ||
+          request.resource.contentType.matches('video/.*')
+        );
+    }
+
     // ---------- Site Content CMS ----------
     match /site-content/{allPaths=**} {
       allow read: if true;
       allow create, update: if isSignedIn() && isImageUpload(5);
+      allow delete: if isSignedIn();
+    }
+
+    // ---------- Homepage Hero Media ----------
+    match /site/home-hero/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isSignedIn() && isHeroMediaUpload(50);
       allow delete: if isSignedIn();
     }
 

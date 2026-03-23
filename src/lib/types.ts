@@ -73,11 +73,17 @@ export type Post = {
 export type Subcategory = {
   id: string;
   name: string;
+  slug?: string;
+  sortOrder?: number;
+  isActive?: boolean;
 };
 
 export type BlogCategory = {
   id: string;
   name: string;
+  slug?: string;
+  sortOrder?: number;
+  isActive?: boolean;
   subcategories: Subcategory[];
 };
 
@@ -135,6 +141,7 @@ export type ProfileMetrics = {
 export type UserProfile = {
   uid: string;
   name: string;
+  displayName?: string;
   email: string;
   roles: {
     user: boolean;
@@ -148,7 +155,11 @@ export type UserProfile = {
     isStaff: boolean;
     panelEnabled: boolean;
   };
-  bio?: string;
+  bio?: string; // Legacy
+  shortBio?: string;
+  fullBio?: string;
+  country?: string;
+  timezone?: string;
   avatarUrl?: string;
   coverUrl?: string;
   profileMetrics?: ProfileMetrics;
@@ -256,3 +267,31 @@ export type FaqItem = {
   updatedAt: any; // Firestore Timestamp
   updatedBy: string; // UID of admin
 }
+
+// --- Homepage Settings Types ---
+
+export type HomeHeroMediaSettings = {
+  enabled: boolean;
+  mediaType: 'video' | 'image';
+  
+  desktopVideoUrl?: string;
+  desktopVideoPath?: string;
+  
+  mobileVideoUrl?: string;
+  mobileVideoPath?: string;
+  
+  posterUrl?: string;
+  posterPath?: string;
+  
+  imageUrl?: string;
+  imagePath?: string;
+
+  headline?: string;
+  subheadline?: string;
+  buttonLabel?: string;
+  buttonLink?: string;
+
+  updatedAt?: any; // Firestore Timestamp
+  updatedBy?: string; // UID of admin
+  version?: number;
+};

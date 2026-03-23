@@ -54,6 +54,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { AuthModal } from '@/components/auth-modal';
+import { PageHero } from '@/components/page-hero';
 
 const forYouItems = [
     'астролог',
@@ -256,24 +257,13 @@ export default function ProPage() {
         <Navigation />
         
         {/* 1. HERO SECTION */}
-        <section className="py-20 md:py-32 text-center bg-background relative overflow-hidden">
-          <div className="absolute inset-0 bg-backgroundAlt/50">
-             <div className="absolute h-full w-full bg-[radial-gradient(hsl(var(--border))_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_60%,transparent_100%)] opacity-30"></div>
-          </div>
-          <div className="container mx-auto px-4 relative">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-              Монетизуйте свою цінність без кордонів
-            </h1>
-            <p className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground mb-10">
-              Створюйте власні пропозиції, консультуйте клієнтів з усього світу та перетворюйте досвід, інтуїцію й експертність на преміальний дохід у зручному для вас форматі.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <DialogTrigger asChild>
-                <Button size="lg">Приєднатися до професіоналів</Button>
-              </DialogTrigger>
-            </div>
-          </div>
-        </section>
+        <PageHero 
+            pageId="pro"
+            fallbackHeadline="Монетизуйте свою цінність без кордонів"
+            fallbackSubheadline="Створюйте власні пропозиції, консультуйте клієнтів з усього світу та перетворюйте досвід, інтуїцію й експертність на преміальний дохід у зручному для вас форматі."
+            fallbackButtonLabel="Приєднатися до професіоналів"
+            fallbackButtonLink="/" 
+        />
 
         {/* 2. SECTION “Це для вас, якщо ви...” */}
         <section className="py-20 bg-card">
