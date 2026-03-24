@@ -38,6 +38,7 @@ const profileSchema = z.object({
   bio: z.string().optional(),
   avatarUrl: z.string().url().optional().or(z.literal('')),
   coverUrl: z.string().url().optional().or(z.literal('')),
+  introVideoUrl: z.string().url().optional().or(z.literal('')),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -57,6 +58,7 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
       bio: profile.bio || "",
       avatarUrl: profile.avatarUrl || "",
       coverUrl: profile.coverUrl || "",
+      introVideoUrl: profile.introVideoUrl || "",
     },
   });
 
@@ -149,6 +151,7 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
         bio: values.bio,
         avatarUrl: values.avatarUrl,
         coverUrl: values.coverUrl,
+        introVideoUrl: values.introVideoUrl,
       });
       toast({
         title: "Профіль оновлено!",
@@ -286,6 +289,35 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
                   name="coverUrl"
                   render={({ field }) => ( <FormItem className="hidden"><FormControl><Input {...field} /></FormControl></FormItem> )}
               />
+            </div>
+            
+            {/* Intro Video Section (Placeholder/Future Integration) */}
+            <div className="space-y-3 pt-2 border-t border-muted/30">
+              <div className="flex items-center justify-between">
+                <FormLabel className="text-sm font-bold">Intro-Video (Презентація)</FormLabel>
+                <span className="text-[10px] bg-accent/10 text-accent px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Coming Soon</span>
+              </div>
+              <FormDescription className="text-xs">
+                Коротке відео (до 15 сек) для знайомства з клієнтами. Наразі підтримується тільки пряме посилання.
+              </FormDescription>
+              
+              <FormField
+                control={form.control}
+                name="introVideoUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder="https://example.com/video.mp4" {...field} className="text-xs" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="p-3 border border-dashed border-muted rounded-md bg-muted/5 flex flex-col items-center justify-center gap-2 opacity-60">
+                <Upload className="h-5 w-5 text-muted-foreground" />
+                <p className="text-[10px] text-muted-foreground font-medium uppercase">Завантаження відео буде доступне згодом</p>
+              </div>
             </div>
           </div>
 

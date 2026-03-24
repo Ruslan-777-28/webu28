@@ -138,6 +138,30 @@ export type ProfileMetrics = {
     };
 }
 
+export type Pricing = {
+    ratePerMinute?: number;
+    ratePerFile?: number;
+    ratePerQuestion?: number;
+    ratePerSession?: number;
+    currency: string;
+};
+
+export type CommunicationOffer = {
+    id: string;
+    ownerId: string;
+    type: 'video' | 'file' | 'text';
+    schedulingType: 'instant' | 'scheduled';
+    scheduledStart?: any;
+    scheduledEnd?: any;
+    durationMinutes?: number;
+    categoryId: string;
+    subcategoryId: string;
+    pricing: Pricing;
+    status: 'active' | 'inactive' | 'booked';
+    createdAt: any;
+    updatedAt: any;
+};
+
 export type UserProfile = {
   uid: string;
   name: string;
@@ -168,6 +192,9 @@ export type UserProfile = {
     status: 'available' | 'busy' | 'away';
     until?: import('firebase/firestore').Timestamp | null;
   };
+  introVideoUrl?: string; // Author intro video
+  introVideoPosterUrl?: string; // Poster for the video
+  introVideoDurationSec?: number; // Duration of the video
   createdAt: import('firebase/firestore').Timestamp;
 
   // Platform Admin Fields
@@ -294,4 +321,17 @@ export type HomeHeroMediaSettings = {
   updatedAt?: any; // Firestore Timestamp
   updatedBy?: string; // UID of admin
   version?: number;
+};
+
+export type Product = {
+  id: string;
+  authorId: string;
+  title: string;
+  description: string;
+  price: number;
+  currency: string;
+  status: 'active' | 'inactive';
+  imageUrl?: string;
+  createdAt: any; // Firestore Timestamp
+  updatedAt: any; // Firestore Timestamp
 };
