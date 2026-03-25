@@ -69,6 +69,33 @@ export type Post = {
   revisionSubmittedAt?: any | null;
 };
 
+export type LikeType = 'post' | 'comment' | 'author';
+
+export type Like = {
+  id: string;
+  uid: string;
+  targetId: string;
+  type: LikeType;
+  createdAt: any;
+};
+
+export type FavoriteType = 'user' | 'post' | 'product';
+
+export type Favorite = {
+  id: string;
+  uid: string;
+  targetId: string;
+  type: FavoriteType;
+  createdAt: any;
+};
+
+export type Comment = {
+  id: string;
+  uid: string;
+  text: string;
+  createdAt: any;
+};
+
 
 export type Subcategory = {
   id: string;

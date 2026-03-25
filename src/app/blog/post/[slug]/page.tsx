@@ -14,6 +14,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock } from 'lucide-react';
+import { LikeButton } from '@/components/social/like-button';
+import { CommentButton } from '@/components/social/comment-button';
+import { FavoriteButton } from '@/components/social/favorite-button';
 
 export default function BlogPostPage() {
   const params = useParams();
@@ -159,9 +162,15 @@ export default function BlogPostPage() {
                         <p>Author</p>
                     </div>
                 </Link>
-                 <div className="flex items-center gap-4">
+                 <div className="flex items-center gap-2 md:gap-4">
                     <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> {(post.publishedAt || post.sitePublishedAt || post.createdAt)?.toDate().toLocaleDateString()}</span>
                     <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {readingTime} min read</span>
+                    <div className="h-4 w-px bg-muted mx-1" />
+                    <div className="flex items-center gap-1">
+                        <LikeButton postId={post.id} />
+                        <CommentButton postId={post.id} showText />
+                        <FavoriteButton targetId={post.id} type="post" />
+                    </div>
                  </div>
             </div>
           </header>

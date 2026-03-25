@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Edit, Bookmark, Star, Users, Briefcase, Award, MapPin, Globe, Clock, MessageCircle, LayoutGrid, Zap, X, Calendar, Video, FileText, HelpCircle, MessageSquare, Trophy, CheckCircle, Megaphone, Paperclip, Phone, BookOpen, BookmarkPlus, Flag, Play } from 'lucide-react';
+import { FavoriteButton } from '@/components/social/favorite-button';
 import { EditProfileModal } from '@/components/edit-profile-modal';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import Image from 'next/image';
@@ -296,10 +297,6 @@ export default function PublicProfilePage() {
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [offers, setOffers] = useState<CommunicationOffer[]>([]);
     const [productsCount, setProductsCount] = useState<number>(0);
-    const [favoritesCount, setFavoritesCount] = useState<number>(0);
-    
-    const [isFavorite, setIsFavorite] = useState(false);
-    const [favoriteId, setFavoriteId] = useState<string | null>(null);
     const [isActionModalOpen, setActionModalOpen] = useState(false);
     const [isPlayingIntro, setIsPlayingIntro] = useState(false);
 
@@ -367,62 +364,14 @@ export default function PublicProfilePage() {
             setProductsCount(snapshot.size);
         });
 
-        const allFavsQuery = query(
-            collection(db, 'favorites'),
-            where('favoritedUserId', '==', profileId)
-        );
-        const unsubAllFavs = onSnapshot(allFavsQuery, (snapshot) => {
-            setFavoritesCount(snapshot.size);
-        });
-
         return () => {
             unsubProfile();
             unsubPosts();
             unsubSettings();
             unsubOffers();
             unsubProducts();
-            unsubAllFavs();
         };
     }, [profileId]);
-    
-    useEffect(() => {
-        if (!currentUser || !profileId || currentUser.uid === profileId) return;
-
-        const favQuery = query(
-            collection(db, 'favorites'),
-            where('uid', '==', currentUser.uid),
-            where('favoritedUserId', '==', profileId)
-        );
-
-        const unsubFavorites = onSnapshot(favQuery, (snapshot) => {
-            if (!snapshot.empty) {
-                setIsFavorite(true);
-                setFavoriteId(snapshot.docs[0].id);
-            } else {
-                setIsFavorite(false);
-                setFavoriteId(null);
-            }
-        });
-
-        return () => unsubFavorites();
-
-    }, [currentUser, profileId]);
-
-    const handleFavoriteToggle = async () => {
-        if (!currentUser || currentUser.uid === profileId) return;
-
-        if (isFavorite && favoriteId) {
-            await deleteDoc(doc(db, 'favorites', favoriteId));
-            toast({ title: 'Видалено з улюблених.' });
-        } else {
-            await addDoc(collection(db, 'favorites'), {
-                uid: currentUser.uid,
-                favoritedUserId: profileId,
-                createdAt: new Date(),
-            });
-            toast({ title: 'Додано до улюблених!' });
-        }
-    };
     
     const isOwnProfile = currentUser?.uid === profileId;
 
@@ -559,21 +508,11 @@ export default function PublicProfilePage() {
                                             </Dialog>
                                         ) : (
                                             <div className="flex items-center gap-2">
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="sm" 
-                                                    onClick={handleFavoriteToggle} 
-                                                    className={`h-9 font-bold px-4 rounded-full border transition-all shadow-sm text-xs gap-2.5 ${isFavorite ? 'text-accent border-accent/40 bg-accent/5' : 'text-muted-foreground border-muted/30 hover:border-muted/60 hover:text-foreground'}`}
-                                                >
-                                                    <BookmarkPlus className="h-4.5 w-4.5" />
-                                                    {isFavorite ? 'В улюблених' : 'В улюблені'}
-                                                </Button>
-                                                
-                                                <div className="flex flex-col items-center justify-center px-2 py-0.5 rounded-lg bg-muted/5 border border-muted/10 min-w-[32px]">
-                                                    <span className={`text-[13px] font-bold leading-none ${favoritesCount > 0 ? 'text-accent' : 'text-muted-foreground opacity-60'}`}>
-                                                        {formatZeroMetric(favoritesCount)}
-                                                    </span>
-                                                </div>
+                                                <FavoriteButton 
+                                                    targetId={profileId} 
+                                                    type="user" 
+                                                    className="h-9 px-4 rounded-full border border-muted/30 hover:border-muted/60"
+                                                />
                                             </div>
                                         )}
                                     </div>

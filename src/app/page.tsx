@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home as HomeIcon, Power as PowerIcon } from 'lucide-react';
+import { Home as HomeIcon, Power as PowerIcon, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { useUser } from '@/hooks/use-auth';
@@ -13,38 +13,12 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { AuthModal } from '@/components/auth-modal';
 import { HeroCircleMedia } from '@/components/hero-circle-media';
+import { Navigation } from '@/components/navigation';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 export default function HomePage() {
   const pathname = usePathname();
   const { user, loading } = useUser();
-  const [isAuthModalOpen, setAuthModalOpen] = React.useState(false);
-
-  const navLinks = [
-    { href: '/pro', label: 'FOR EXPERTS' },
-    { href: '/user', label: 'FOR COMMUNITY' },
-    { href: '/blog', label: 'BLOG' },
-  ];
-
-  const renderRightBlockAuthControl = () => {
-    if (loading) {
-      return <Skeleton className="h-10 w-10 rounded-full" />;
-    }
-    if (user) {
-      return <UserNav />;
-    }
-    return (
-      <Dialog open={isAuthModalOpen} onOpenChange={setAuthModalOpen}>
-        <DialogTrigger asChild>
-          <Button variant="ghost" size="icon" className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-            <PowerIcon className="h-6 w-6" />
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <AuthModal setOpen={setAuthModalOpen} />
-        </DialogContent>
-      </Dialog>
-    );
-  };
 
   const esotericWords = [
     { word: 'Астрологія', color: 'text-sidebar-foreground/80', margin: 'ml-4' },
@@ -64,50 +38,10 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="flex flex-col md:flex-row min-h-[100vh] w-full">
+    <div className="flex flex-col md:flex-row min-h-screen w-full">
       {/* Left Block */}
       <div className="relative w-full md:flex-grow md:min-w-0 bg-white flex flex-col" style={{ flexBasis: '85%' }}>
-        <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-sm p-4 md:p-8">
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <Link href="/" className={cn(
-                'pb-1 border-b-2 transition-colors',
-                pathname === '/'
-                    ? 'border-accent'
-                    : 'border-transparent'
-                )}>
-                  <HomeIcon className={cn(
-                      'h-5 w-5',
-                      pathname === '/'
-                        ? 'text-foreground'
-                        : 'text-muted-foreground hover:text-foreground'
-                      )} />
-              </Link>
-              <span className="text-xs text-muted-foreground ml-4">екосистема обміну ціностями</span>
-            </div>
-          
-            <div className="flex items-center gap-4">
-              <nav className="flex items-center gap-4 mr-12">
-                  {navLinks.map((link, index) => (
-                  <React.Fragment key={link.href}>
-                      <Link
-                      href={link.href}
-                      className={cn(
-                          'text-xs font-normal transition-colors pb-1 border-b-2',
-                          pathname.startsWith(link.href)
-                              ? 'text-foreground font-medium border-accent'
-                              : 'text-foreground/80 hover:text-foreground border-transparent'
-                      )}
-                      >
-                      {link.label}
-                      </Link>
-                      {index < navLinks.length - 1 && <span className="text-foreground/30">|</span>}
-                  </React.Fragment>
-                  ))}
-              </nav>
-            </div>
-          </div>
-        </div>
+        <Navigation hideBalance />
         
         {/* Main content area */}
         <main className="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
@@ -139,18 +73,38 @@ export default function HomePage() {
       
       {/* Right Block */}
       <div className="w-full md:w-1/5 bg-sidebar relative z-10 flex flex-col">
-        <div className="sticky top-0 z-20 bg-sidebar p-4 text-center md:pt-8">
-          <h2 className="text-sidebar-foreground font-thin text-sm tracking-widest underline decoration-accent underline-offset-4">LECTOR</h2>
-          <div className="mt-4">
-            {renderRightBlockAuthControl()}
-          </div>
+        {/* Balance Area at the top of Sidebar */}
+        <div className="p-6 md:p-8 flex justify-end items-center">
+            <div className="flex items-center gap-2">
+                <div className="text-xl md:text-2xl font-thin tracking-tighter text-sidebar-foreground/50 font-mono">
+                    000 000.00
+                </div>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <button className="p-1 hover:bg-white/5 rounded-full transition-colors outline-none group">
+                            <Info className="h-3.5 w-3.5 text-sidebar-foreground opacity-40 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-64 p-4 text-[11px] leading-relaxed animate-in fade-in zoom-in duration-200" align="end" sideOffset={12}>
+                        <div className="space-y-2">
+                            <p className="font-bold uppercase tracking-widest text-[10px]">Ваш баланс</p>
+                            <p className="text-muted-foreground">
+                              Це внутрішній доступний баланс вашого рахунку, що використовується для розрахунків усередині платформи LECTOR. 
+                              Нарахування відбуваються внаслідок активності учасника стосовно задекларованих програм активності учасника а саме: реферальна програма, активність стосовно публікацій, рейтинг учасника на платформі. 
+                              Використання можливе активуючи преміум опції на платформі в середовищі взаємодії між користувачами.
+                            </p>
+                            <p className="text-[10px] text-accent font-medium italic">Обмін енергоінформаційних цінностей у реальному часі.</p>
+                        </div>
+                    </PopoverContent>
+                </Popover>
+            </div>
         </div>
         <div className="flex-grow flex justify-center items-start pt-12 overflow-y-auto">
-            <div className="flex flex-col items-start gap-y-0 text-sidebar-foreground text-sm font-thin w-full px-4" style={{paddingTop: '10rem'}}>
+            <div className="flex flex-col items-start gap-y-0 text-sidebar-foreground text-sm font-thin w-full px-12" style={{paddingTop: '10rem'}}>
                 {esotericWords.map(({word, color, margin}) => (
-                    <span key={word} className={cn(color, margin)}>{word}</span>
+                    <span key={word} className={cn(color, margin, 'tracking-[0.3em] font-light')}>{word}</span>
                 ))}
-                <span className={cn('text-sidebar-foreground/60', 'ml-12')}>. . .</span>
+                <span className={cn('text-sidebar-foreground/60', 'ml-12', 'tracking-[0.3em]')}>. . .</span>
             </div>
         </div>
       </div>

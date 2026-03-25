@@ -20,9 +20,12 @@ import { auth } from "@/lib/firebase/client"
 import { signOut } from "firebase/auth"
 import Link from "next/link";
 import { Skeleton } from "./ui/skeleton";
+import { useFavorites } from "@/hooks/use-favorites";
 
 export function UserNav() {
   const { user, profile, loading } = useUser();
+  const { userFavorites: favoriteUsers } = useFavorites(undefined, 'user');
+  const { userFavorites: favoritePosts } = useFavorites(undefined, 'post');
 
   const handleSignOut = async () => {
     await signOut(auth);
@@ -76,6 +79,27 @@ export function UserNav() {
               </DropdownMenuItem>
             </Link>
           )}
+          <DropdownMenuSeparator />
+          <Link href="/favorites/profiles">
+            <DropdownMenuItem className="cursor-pointer flex justify-between items-center">
+              <span>Мої фаворити</span>
+              {favoriteUsers.length > 0 && (
+                <span className="bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  {favoriteUsers.length}
+                </span>
+              )}
+            </DropdownMenuItem>
+          </Link>
+          <Link href="/saved-posts">
+            <DropdownMenuItem className="cursor-pointer flex justify-between items-center">
+              <span>Збережені публікації</span>
+              {favoritePosts.length > 0 && (
+                <span className="bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  {favoritePosts.length}
+                </span>
+              )}
+            </DropdownMenuItem>
+          </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
