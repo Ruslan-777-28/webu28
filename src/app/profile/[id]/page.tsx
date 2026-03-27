@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Edit, Bookmark, Star, Users, Briefcase, Award, MapPin, Globe, Clock, MessageCircle, LayoutGrid, Zap, X, Calendar, Video, FileText, HelpCircle, MessageSquare, Trophy, CheckCircle, Megaphone, Paperclip, Phone, BookOpen, BookmarkPlus, Flag, Play } from 'lucide-react';
 import { FavoriteButton } from '@/components/social/favorite-button';
+import { FriendButton } from '@/components/friend-button';
 import { EditProfileModal } from '@/components/edit-profile-modal';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import Image from 'next/image';
@@ -513,8 +514,13 @@ export default function PublicProfilePage() {
                                                     type="user" 
                                                     className="h-9 px-4 rounded-full border border-muted/30 hover:border-muted/60"
                                                 />
+                                                <FriendButton 
+                                                    targetProfile={profile}
+                                                    className="h-9"
+                                                />
                                             </div>
                                         )}
+
                                     </div>
 
                                     {/* Order 4: country / location with flag */}

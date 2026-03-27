@@ -89,6 +89,31 @@ export type Favorite = {
   createdAt: any;
 };
 
+export type Friendship = {
+  id: string; // uid_friendUid
+  ownerUid: string;
+  friendUid: string;
+  friendDisplayName?: string;
+  friendAvatarUrl?: string;
+  createdAt: any; // Firestore Timestamp
+};
+
+export type InternalShare = {
+  id: string;
+  senderUid: string;
+  senderName: string;
+  senderAvatarUrl?: string;
+  targetUid: string;
+  itemType: 'post' | 'profile';
+  itemId: string; // slug or uid
+  itemTitle?: string;
+  itemUrl: string;
+  message?: string;
+  read: boolean;
+  createdAt: any;
+};
+
+
 export type Comment = {
   id: string;
   uid: string;

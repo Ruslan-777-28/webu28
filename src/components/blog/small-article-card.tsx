@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -9,6 +10,7 @@ import type { Post } from '@/lib/types';
 import { LikeButton } from '@/components/social/like-button';
 import { CommentButton } from '@/components/social/comment-button';
 import { FavoriteButton } from '@/components/social/favorite-button';
+import { usePostSocial } from '@/hooks/use-post-social';
 
 interface SmallArticleCardProps {
     post: Post;
@@ -48,6 +50,13 @@ export const SmallArticleCard = ({ post, categoryName }: SmallArticleCardProps) 
                         {post.authorName}
                     </span>
                 </Link>
+
+                <div className="flex items-center gap-2 text-[10px] text-muted-foreground/50 font-mono ml-auto mr-2">
+                    <span className="flex items-center gap-1">
+                        <Eye className="h-3 w-3" />
+                        {post.views || 0}
+                    </span>
+                </div>
                 
                 <div className="flex items-center gap-0.5 relative z-20">
                     <LikeButton postId={post.id} className="h-6 px-1" />

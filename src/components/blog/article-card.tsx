@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock, Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,6 +11,7 @@ import type { Post } from '@/lib/types';
 import { LikeButton } from '@/components/social/like-button';
 import { CommentButton } from '@/components/social/comment-button';
 import { FavoriteButton } from '@/components/social/favorite-button';
+import { usePostSocial } from '@/hooks/use-post-social';
 
 interface ArticleCardProps {
     post: Post;
@@ -66,6 +67,10 @@ export const ArticleCard = ({ post, categoryName, subcategoryName, className, is
                     <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground/60 font-mono">
                         <Clock className="w-3 h-3" />
                         {Math.ceil((post.content?.split(' ').length || 0) / 200)} хв
+                    </span>
+                    <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground/60 font-mono">
+                        <Eye className="w-3 h-3" />
+                        {post.views || 0}
                     </span>
                 </div>
                 

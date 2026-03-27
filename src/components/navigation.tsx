@@ -84,14 +84,25 @@ export function Navigation({ hideBalance = false, subtitle }: NavigationProps) {
                     <Link
                     href={link.href}
                     className={cn(
-                        'hover:text-primary transition-colors',
-                        pathname.startsWith(link.href) && 'text-primary underline'
+                        'hover:text-primary transition-colors flex items-center relative py-1',
+                        pathname.startsWith(link.href) && 'text-primary'
                     )}
                     >
                     {link.label === 'BLOG' ? (
-                        <span className="flex items-center group/blog">
-                            <BookOpen className="h-4 w-4 text-muted-foreground group-hover/blog:text-primary transition-colors" />
-                        </span>
+                        <>
+                            <span className="flex items-center group/blog">
+                                <BookOpen 
+                                    className={cn(
+                                        "h-4 w-4 transition-all",
+                                        pathname.startsWith('/blog') ? "text-primary" : "text-muted-foreground group-hover/blog:text-primary"
+                                    )} 
+                                    fill={pathname.startsWith('/blog') ? "currentColor" : "none"}
+                                />
+                            </span>
+                            {pathname.startsWith('/blog') && (
+                                <div className="absolute -bottom-1 left-0 right-0 h-[1.5px] bg-primary rounded-full" />
+                            )}
+                        </>
                     ) : (
                         link.label
                     )}
@@ -127,9 +138,8 @@ export function Navigation({ hideBalance = false, subtitle }: NavigationProps) {
                       <div className="space-y-2">
                          <p className="font-bold uppercase tracking-widest text-[10px]">Ваш баланс</p>
                          <p className="text-muted-foreground">
-                           Це внутрішній доступний баланс вашого рахунку, що використовується для розрахунків усередині платформи LECTOR. 
-                           Нарахування відбуваються внаслідок активності учасника стосовно задекларованих програм активності учасника а саме: реферальна програма, активність стосовно публікацій, рейтинг учасника на платформі. 
-                           Використання можливе активуючи преміум опції на платформі в середовищі взаємодії між користувачами.
+                           Внутрішній доступний баланс Вашого рахунку в еквіваленті бонусних кредитів, нарахований платформою за наступні дії : внаслідок активності учасника , активність стосовно публікацій, реферальна програма, рейтинг учасника на платформі, партнерські авторські програми.
+                           Використання можливе активуючи преміум опції на платформі в середовищі взаємодії між користувачами, а також в взаєморозпахунок за комісії під час вивдення коштів з балансу користувача на платіжний рахунок власника балансу. Використовується для розрахунків усередині платформи LECTOR.
                          </p>
                          <p className="text-[10px] text-accent font-medium italic">Обмін енергоінформаційних цінностей у реальному часі.</p>
                       </div>

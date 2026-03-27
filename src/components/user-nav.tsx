@@ -21,11 +21,15 @@ import { signOut } from "firebase/auth"
 import Link from "next/link";
 import { Skeleton } from "./ui/skeleton";
 import { useFavorites } from "@/hooks/use-favorites";
+import { useFriends } from "@/hooks/use-friends";
+import { useShares } from "@/hooks/use-shares";
 
 export function UserNav() {
   const { user, profile, loading } = useUser();
   const { userFavorites: favoriteUsers } = useFavorites(undefined, 'user');
   const { userFavorites: favoritePosts } = useFavorites(undefined, 'post');
+  const { friends } = useFriends();
+  const { unreadCount } = useShares();
 
   const handleSignOut = async () => {
     await signOut(auth);
@@ -80,6 +84,26 @@ export function UserNav() {
             </Link>
           )}
           <DropdownMenuSeparator />
+          <Link href="/my-shared-items">
+            <DropdownMenuItem className="cursor-pointer flex justify-between items-center group">
+              <span>Мені поділилися</span>
+              {unreadCount > 0 && (
+                <span className="bg-primary text-primary-foreground text-[9px] font-black px-1.5 py-0.5 rounded-full animate-pulse shadow-sm shadow-primary/40 group-hover:bg-primary/90 transition-colors">
+                  {unreadCount}
+                </span>
+              )}
+            </DropdownMenuItem>
+          </Link>
+          <Link href="/my-friends">
+            <DropdownMenuItem className="cursor-pointer flex justify-between items-center">
+              <span>Мої друзі</span>
+              {friends.length > 0 && (
+                <span className="bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  {friends.length}
+                </span>
+              )}
+            </DropdownMenuItem>
+          </Link>
           <Link href="/favorites/profiles">
             <DropdownMenuItem className="cursor-pointer flex justify-between items-center">
               <span>Мої фаворити</span>

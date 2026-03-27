@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home as HomeIcon, Power as PowerIcon, Info } from 'lucide-react';
+import { Home as HomeIcon, Power as PowerIcon, Info, MoveRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { useUser } from '@/hooks/use-auth';
@@ -88,12 +88,11 @@ export default function HomePage() {
                     <PopoverContent className="w-64 p-4 text-[11px] leading-relaxed animate-in fade-in zoom-in duration-200" align="end" sideOffset={12}>
                         <div className="space-y-2">
                             <p className="font-bold uppercase tracking-widest text-[10px]">Ваш баланс</p>
-                            <p className="text-muted-foreground">
-                              Це внутрішній доступний баланс вашого рахунку, що використовується для розрахунків усередині платформи LECTOR. 
-                              Нарахування відбуваються внаслідок активності учасника стосовно задекларованих програм активності учасника а саме: реферальна програма, активність стосовно публікацій, рейтинг учасника на платформі. 
-                              Використання можливе активуючи преміум опції на платформі в середовищі взаємодії між користувачами.
-                            </p>
-                            <p className="text-[10px] text-accent font-medium italic">Обмін енергоінформаційних цінностей у реальному часі.</p>
+                             <p className="text-muted-foreground">
+                               Внутрішній доступний баланс Вашого рахунку в еквіваленті бонусних кредитів, нарахований платформою за наступні дії : внаслідок активності учасника , активність стосовно публікацій, реферальна програма, рейтинг учасника на платформі, партнерські авторські програми.
+                               Використання можливе активуючи преміум опції на платформі в середовищі взаємодії між користувачами, а також в взаєморозпахунок за комісії під час вивдення коштів з балансу користувача на платіжний рахунок власника балансу. Використовується для розрахунків усередині платформи LECTOR.
+                             </p>
+                             <p className="text-[10px] text-accent font-medium italic">Обмін енергоінформаційних цінностей у реальному часі.</p>
                         </div>
                     </PopoverContent>
                 </Popover>
@@ -107,6 +106,7 @@ export default function HomePage() {
                 <span className={cn('text-sidebar-foreground/60', 'ml-12', 'tracking-[0.3em]')}>. . .</span>
             </div>
         </div>
+
       </div>
     </div>
   );
