@@ -53,6 +53,8 @@ export default function Footer() {
 
   const informationLinks = [
     { href: '/info/community-rules', label: 'Правила спільноти' },
+    { href: '/status', label: 'Статус' },
+    { href: '/status/legend', label: 'Умовні позначки' },
     { href: '/info/contact', label: 'Контакти' },
     { href: '/info/privacy-policy', label: 'Privacy Policy' },
     { href: '/info/terms-of-use', label: 'Terms of Use' },

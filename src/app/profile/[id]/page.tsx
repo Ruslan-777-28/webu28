@@ -6,6 +6,7 @@ import { doc, onSnapshot, collection, query, where, addDoc, deleteDoc, getDocs }
 import { db } from '@/lib/firebase/client';
 import { useUser } from '@/hooks/use-auth';
 import type { UserProfile, Post, BlogSettings, CommunicationOffer, Product } from '@/lib/types';
+import { ProfileStatusShelf } from '@/components/profile/profile-status-shelf';
 import { Navigation } from '@/components/navigation';
 import Footer from '@/components/layout/footer';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -439,6 +440,10 @@ export default function PublicProfilePage() {
         }
     }, [subcategories, selectedSubcategoryId]);
 
+    const activeSubcategoryName = useMemo(() => {
+        return subcategories.find(s => s.id === selectedSubcategoryId)?.name;
+    }, [subcategories, selectedSubcategoryId]);
+
     const customerMetrics = profile?.profileMetrics?.customer?.[selectedSubcategoryId];
     const professionalMetrics = profile?.profileMetrics?.professional?.[selectedSubcategoryId];
     
@@ -674,8 +679,9 @@ export default function PublicProfilePage() {
                                         />
                                     </div>
                                     
-                                    <div className="mt-8">
+                                    <div className="mt-8 flex flex-col h-full justify-end">
                                         <UnifiedStatsArea customer={customerMetrics} professional={professionalMetrics} />
+                                        <ProfileStatusShelf subcategoryName={activeSubcategoryName} />
                                     </div>
                                 </CardContent>
                             </Card>

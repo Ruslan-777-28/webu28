@@ -23,6 +23,7 @@ import {
   FileText,
   HelpCircle,
   PlayCircle,
+  Crown,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -39,6 +40,7 @@ const allNavItems = [
   { href: '/admin/blog/articles', label: 'Articles', icon: Newspaper, roles: ['author', 'editor', 'admin'] },
   { href: '/admin/blog/categories', label: 'Categories', icon: Folder, roles: ['editor', 'admin'] },
   { href: '/admin/blog/settings', label: 'Settings', icon: Settings, roles: ['admin'] },
+  { href: '/admin/status', label: 'Status Inspector', icon: Crown, roles: ['admin'] },
 ];
 
 export function AdminNav() {
