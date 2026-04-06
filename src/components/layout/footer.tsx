@@ -55,6 +55,8 @@ export default function Footer() {
     { href: '/info/community-rules', label: 'Правила спільноти' },
     { href: '/status', label: 'Статус' },
     { href: '/status/legend', label: 'Умовні позначки' },
+    { href: '/status/hall-of-fame', label: 'Hall of Fame' },
+    { href: '/status/archive', label: 'Архів статусів' },
     { href: '/info/contact', label: 'Контакти' },
     { href: '/info/privacy-policy', label: 'Privacy Policy' },
     { href: '/info/terms-of-use', label: 'Terms of Use' },

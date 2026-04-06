@@ -16,6 +16,7 @@ export type StatusAwardDefinition = {
     visibleInProfile: boolean;
     visibleInLegend: boolean;
     active: boolean; // Definition state overall
+    eligibleForHallOfFame?: boolean; // Can entries with this definition be in HoF?
 };
 
 export type SnapshotType = 'monthly' | 'seasonal' | 'yearly';
@@ -45,6 +46,24 @@ export type StatusAwardRecord = {
     profileSortOrder?: number; // Custom sort precedence within profile
     tableSortOrder?: number; // Custom sort precedence within table
     note?: string;
+    archiveVisible?: boolean; // Should this record be visible in historical archives?
+    isDemo: boolean;
+};
+
+export type HallOfFameSection = 'legendary' | 'yearly' | 'seasonal' | 'picks';
+
+export type HallOfFameEntry = {
+    id: string;
+    userId: string;
+    userDisplayName: string;
+    awardDefinitionId: string;
+    snapshotId: string;
+    subcategoryKey: string;
+    titleOverride?: string;
+    citation: string; // The reason for being in HoF
+    hallSection: HallOfFameSection;
+    featured: boolean;
+    sortOrder: number;
     isDemo: boolean;
 };
 
@@ -57,6 +76,11 @@ export type FormattedProfileAward = StatusAwardRecord & {
 export type FormattedStatusTableRow = StatusAwardRecord & {
     definition: StatusAwardDefinition;
     periodLabel: string;
+};
+
+export type FormattedHallOfFameEntry = HallOfFameEntry & {
+    definition: StatusAwardDefinition;
+    snapshot?: SnapshotMetadata;
 };
 
 export type StatusLegendGroup = {

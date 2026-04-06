@@ -5,13 +5,15 @@ import Link from 'next/link';
 import { Navigation } from '@/components/navigation';
 import Footer from '@/components/layout/footer';
 import { Card, CardContent } from '@/components/ui/card';
-import { Shield, Mic, MessageCircle, Repeat, TrendingUp, Crown, Star, Info, Calendar } from 'lucide-react';
 import { LEVEL_LOCALE } from '@/lib/status/constants';
 import { getActiveStatusSnapshot, getStatusTableRowsForSubcategory } from '@/lib/status/selectors';
+import { StatusHeaderNav } from '@/components/status-header-nav';
 
 const iconMap: Record<string, React.ElementType> = {
     Mic, Shield, MessageCircle, Repeat, TrendingUp, Crown, Star
 };
+
+import { Shield, Mic, MessageCircle, Repeat, TrendingUp, Crown, Star, Calendar } from 'lucide-react';
 
 // Hardcoded for V1 offline demo. Will move to a selector/fetch later.
 const DEMO_SUBCATEGORIES = [
@@ -66,16 +68,11 @@ export default function StatusPage() {
                                     </div>
                                 </div>
                             )}
-
-                            <Link href="/status/legend">
-                                <button className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-muted-foreground bg-transparent border border-muted/20 hover:border-accent/40 hover:text-foreground hover:bg-muted/5 transition-all rounded-lg h-full">
-                                    <Info className="w-4 h-4" />
-                                    Умовні позначки
-                                </button>
-                            </Link>
                         </div>
                     </div>
                 </div>
+
+                <StatusHeaderNav />
 
                 {/* Subcategory Navigation */}
                 <div className="w-full mb-8">

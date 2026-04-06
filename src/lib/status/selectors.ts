@@ -1,6 +1,6 @@
-import { normalizeSubcategoryKey, StatusAwardDefinition, SnapshotMetadata, StatusLegendGroup, FormattedProfileAward, FormattedStatusTableRow, StatusLayerType } from './types';
-import { DEMO_AWARD_DEFINITIONS, DEMO_SNAPSHOTS, DEMO_AWARD_RECORDS, DEMO_CONFIG } from './demo-status-data';
+import { DEMO_AWARD_DEFINITIONS, DEMO_SNAPSHOTS, DEMO_AWARD_RECORDS, DEMO_CONFIG, DEMO_HALL_OF_FAME_ENTRIES } from './demo-status-data';
 import { LAYER_TYPE_LOCALE } from './constants';
+import { normalizeSubcategoryKey, StatusAwardDefinition, SnapshotMetadata, StatusLegendGroup, FormattedProfileAward, FormattedStatusTableRow, StatusLayerType, FormattedHallOfFameEntry, HallOfFameSection } from './types';
 
 /**
  * Returns the currently active global status snapshot.
@@ -118,4 +118,100 @@ export function getStatusTableRowsForSubcategory(subcategoryName?: string): Form
  */
 export function getDemoTargetUserId(): string {
     return DEMO_CONFIG.demoProfileTargetId;
+}
+
+/**
+ * HALL OF FAME SELECTORS
+ */
+
+/**
+ * Retrieves all Hall of Fame entries, joining with definitions and snapshot metadata.
+ */
+export function getHallOfFameEntries(): FormattedHallOfFameEntry[] {
+    const definitions = getStatusDefinitions();
+    
+    return DEMO_HALL_OF_FAME_ENTRIES
+        .map(entry => ({
+            ...entry,
+            definition: definitions.find(d => d.id === entry.awardDefinitionId),
+            snapshot: DEMO_SNAPSHOTS.find(s => s.snapshotId === entry.snapshotId)
+        }))
+        .filter(entry => !!entry.definition) as FormattedHallOfFameEntry[];
+}
+
+/**
+ * Returns Hall of Fame entries grouped by their designated sections.
+ */
+export function getHallOfFameGroupedBySection(): Record<HallOfFameSection, FormattedHallOfFameEntry[]> {
+    const entries = getHallOfFameEntries();
+    const grouped: Record<HallOfFameSection, FormattedHallOfFameEntry[]> = {
+        legendary: [],
+        yearly: [],
+        seasonal: [],
+        picks: []
+    };
+
+    entries.forEach(entry => {
+        if (grouped[entry.hallSection]) {
+            grouped[entry.hallSection].push(entry);
+        }
+    });
+
+    // Sort within sections if sortOrder is provided
+    Object.keys(grouped).forEach(key => {
+        const section = key as HallOfFameSection;
+        grouped[section].sort((a, b) => a.sortOrder - b.sortOrder);
+    });
+
+    return grouped;
+}
+
+/**
+ * ARCHIVE SELECTORS
+ */
+
+/**
+ * Retrieves all published snapshots for the archive, excluding the internal 'permanent' layer.
+ * Sorted by effective date descending (newest first).
+ */
+export function getArchiveSnapshots(): SnapshotMetadata[] {
+    return DEMO_SNAPSHOTS
+        .filter(s => s.published && s.snapshotId !== 'permanent')
+        .sort((a, b) => new Date(b.effectiveDate).getTime() - new Date(a.effectiveDate).getTime());
+}
+
+/**
+ * Retrieves all award records for a specific historical snapshot that are marked as archive-visible.
+ */
+export function getArchiveSnapshotEntries(snapshotId: string): FormattedStatusTableRow[] {
+    const definitions = getStatusDefinitions();
+    const snapshot = DEMO_SNAPSHOTS.find(s => s.snapshotId === snapshotId);
+    
+    if (!snapshot) return [];
+
+    return DEMO_AWARD_RECORDS
+        .filter(rec => rec.snapshotId === snapshotId && rec.archiveVisible)
+        .map(rec => ({
+            ...rec,
+            periodLabel: snapshot.periodLabel,
+            definition: definitions.find(d => d.id === rec.awardDefinitionId)
+        }))
+        .filter(rec => !!rec.definition)
+        .sort((a, b) => (a.tableSortOrder ?? 99) - (b.tableSortOrder ?? 99)) as FormattedStatusTableRow[];
+}
+
+/**
+ * Groups archive entries by their subcategory for better structured presentation.
+ */
+export function getArchiveGroupedBySubcategory(snapshotId: string): Record<string, FormattedStatusTableRow[]> {
+    const entries = getArchiveSnapshotEntries(snapshotId);
+    const grouped: Record<string, FormattedStatusTableRow[]> = {};
+
+    entries.forEach(entry => {
+        const key = entry.subcategoryKey || 'general';
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(entry);
+    });
+
+    return grouped;
 }

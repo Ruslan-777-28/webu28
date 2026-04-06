@@ -1,6 +1,6 @@
-import { StatusAwardDefinition, SnapshotMetadata, StatusAwardRecord } from './types';
-import { DEMO_AWARD_DEFINITIONS, DEMO_SNAPSHOTS, DEMO_AWARD_RECORDS } from './demo-status-data';
-import { getProfileAwardsForSubcategory, getStatusTableRowsForSubcategory } from './selectors';
+import { StatusAwardDefinition, SnapshotMetadata, StatusAwardRecord, FormattedHallOfFameEntry, FormattedStatusTableRow } from './types';
+import { DEMO_AWARD_DEFINITIONS, DEMO_SNAPSHOTS, DEMO_AWARD_RECORDS, DEMO_HALL_OF_FAME_ENTRIES } from './demo-status-data';
+import { getProfileAwardsForSubcategory, getStatusTableRowsForSubcategory, getHallOfFameEntries, getArchiveSnapshotEntries } from './selectors';
 
 export interface AdminStatusSummary {
     definitionsCount: number;
@@ -8,6 +8,8 @@ export interface AdminStatusSummary {
     recordsCount: number;
     uniqueUsersCount: number;
     uniqueSubcategoriesCount: number;
+    hofEntriesCount: number;
+    archiveSnapshotsCount: number;
     activeDefaultSnapshotId: string;
 }
 
@@ -24,6 +26,8 @@ export function getStatusAdminSummary(): AdminStatusSummary {
         recordsCount: DEMO_AWARD_RECORDS.length,
         uniqueUsersCount: uniqueUsers.size,
         uniqueSubcategoriesCount: uniqueSubcategories.size,
+        hofEntriesCount: DEMO_HALL_OF_FAME_ENTRIES.length,
+        archiveSnapshotsCount: DEMO_SNAPSHOTS.filter(s => s.snapshotId !== 'permanent').length,
         activeDefaultSnapshotId: activeSnapshotId
     };
 }
@@ -60,4 +64,12 @@ export function getProfileShelfPreview(userId: string, subcategoryKey: string) {
 
 export function getStatusTablePreview(subcategoryKey: string) {
     return getStatusTableRowsForSubcategory(subcategoryKey);
+}
+
+export function getHallOfFameAdminRows(): FormattedHallOfFameEntry[] {
+    return getHallOfFameEntries();
+}
+
+export function getArchiveSnapshotPreview(snapshotId: string): FormattedStatusTableRow[] {
+    return getArchiveSnapshotEntries(snapshotId);
 }

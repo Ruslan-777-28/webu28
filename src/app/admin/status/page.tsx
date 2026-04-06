@@ -17,7 +17,7 @@ import {
 } from '@/lib/status/admin-selectors';
 import { LEVEL_LOCALE, RARITY_LOCALE, ASSIGNMENT_TYPE_LOCALE } from '@/lib/status/constants';
 
-type TabView = 'definitions' | 'snapshots' | 'records' | 'preview-profile' | 'preview-table';
+type TabView = 'definitions' | 'snapshots' | 'records' | 'hof' | 'archive' | 'preview-profile' | 'preview-table';
 
 export default function StatusAdminPage() {
   const [activeTab, setActiveTab] = useState<TabView>('records');
@@ -35,37 +35,53 @@ export default function StatusAdminPage() {
       </div>
 
       {/* Summary Panel */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         <Card className="bg-card">
           <CardHeader className="p-4 pb-2">
-            <CardDescription className="text-xs font-bold uppercase tracking-widest flex justify-between">
+            <CardDescription className="text-[10px] font-bold uppercase tracking-widest flex justify-between">
               Definitions <Database className="w-3.5 h-3.5 text-muted-foreground/60" />
             </CardDescription>
-            <CardTitle className="text-2xl">{summary.definitionsCount}</CardTitle>
+            <CardTitle className="text-xl">{summary.definitionsCount}</CardTitle>
           </CardHeader>
         </Card>
         <Card className="bg-card">
           <CardHeader className="p-4 pb-2">
-            <CardDescription className="text-xs font-bold uppercase tracking-widest flex justify-between">
+            <CardDescription className="text-[10px] font-bold uppercase tracking-widest flex justify-between">
               Snapshots <History className="w-3.5 h-3.5 text-muted-foreground/60" />
             </CardDescription>
-            <CardTitle className="text-2xl">{summary.snapshotsCount}</CardTitle>
+            <CardTitle className="text-xl">{summary.snapshotsCount}</CardTitle>
           </CardHeader>
         </Card>
         <Card className="bg-card">
           <CardHeader className="p-4 pb-2">
-            <CardDescription className="text-xs font-bold uppercase tracking-widest flex justify-between">
+            <CardDescription className="text-[10px] font-bold uppercase tracking-widest flex justify-between">
               Records <Activity className="w-3.5 h-3.5 text-muted-foreground/60" />
             </CardDescription>
-            <CardTitle className="text-2xl">{summary.recordsCount}</CardTitle>
+            <CardTitle className="text-xl">{summary.recordsCount}</CardTitle>
           </CardHeader>
         </Card>
         <Card className="bg-card">
           <CardHeader className="p-4 pb-2">
-            <CardDescription className="text-xs font-bold uppercase tracking-widest flex justify-between">
-              Unique Users <Crown className="w-3.5 h-3.5 text-muted-foreground/60" />
+            <CardDescription className="text-[10px] font-bold uppercase tracking-widest flex justify-between">
+              HoF <Trophy className="w-3.5 h-3.5 text-accent" />
             </CardDescription>
-            <CardTitle className="text-2xl">{summary.uniqueUsersCount}</CardTitle>
+            <CardTitle className="text-xl">{summary.hofEntriesCount}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card className="bg-card border-accent/20">
+          <CardHeader className="p-4 pb-2">
+            <CardDescription className="text-[10px] font-bold uppercase tracking-widest flex justify-between text-accent">
+              Archives <Archive className="w-3.5 h-3.5" />
+            </CardDescription>
+            <CardTitle className="text-xl">{summary.archiveSnapshotsCount}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card className="bg-card">
+          <CardHeader className="p-4 pb-2">
+            <CardDescription className="text-[10px] font-bold uppercase tracking-widest flex justify-between text-muted-foreground">
+              Users <Crown className="w-3.5 h-3.5" />
+            </CardDescription>
+            <CardTitle className="text-xl">{summary.uniqueUsersCount}</CardTitle>
           </CardHeader>
         </Card>
       </div>
@@ -75,8 +91,12 @@ export default function StatusAdminPage() {
         <Button variant={activeTab === 'definitions' ? 'default' : 'secondary'} size="sm" onClick={() => setActiveTab('definitions')}>Definitions</Button>
         <Button variant={activeTab === 'snapshots' ? 'default' : 'secondary'} size="sm" onClick={() => setActiveTab('snapshots')}>Snapshots</Button>
         <Button variant={activeTab === 'records' ? 'default' : 'secondary'} size="sm" onClick={() => setActiveTab('records')}>Records</Button>
-        <Button variant={activeTab === 'preview-profile' ? 'default' : 'outline'} size="sm" onClick={() => setActiveTab('preview-profile')}>Profile Shelf Preview</Button>
-        <Button variant={activeTab === 'preview-table' ? 'default' : 'outline'} size="sm" onClick={() => setActiveTab('preview-table')}>Status Table Preview</Button>
+        <div className="w-px h-6 bg-muted/20 mx-1 self-center hidden sm:block" />
+        <Button variant={activeTab === 'hof' ? 'default' : 'outline'} size="sm" onClick={() => setActiveTab('hof')} className="border-accent/20">Hall of Fame</Button>
+        <Button variant={activeTab === 'archive' ? 'default' : 'outline'} size="sm" onClick={() => setActiveTab('archive')} className="border-accent/20">Archive Preview</Button>
+        <div className="w-px h-6 bg-muted/20 mx-1 self-center hidden sm:block" />
+        <Button variant={activeTab === 'preview-profile' ? 'default' : 'outline'} size="sm" onClick={() => setActiveTab('preview-profile')}>Shelf Preview</Button>
+        <Button variant={activeTab === 'preview-table' ? 'default' : 'outline'} size="sm" onClick={() => setActiveTab('preview-table')}>Table Preview</Button>
       </div>
 
       {/* Renders */}
@@ -84,12 +104,17 @@ export default function StatusAdminPage() {
         {activeTab === 'definitions' && <DefinitionsTab />}
         {activeTab === 'snapshots' && <SnapshotsTab />}
         {activeTab === 'records' && <RecordsTab />}
+        {activeTab === 'hof' && <HallOfFameTab />}
+        {activeTab === 'archive' && <ArchivePreviewTab />}
         {activeTab === 'preview-profile' && <ProfilePreviewTab />}
         {activeTab === 'preview-table' && <TablePreviewTab />}
       </div>
     </div>
   );
 }
+
+import { Trophy, Archive } from 'lucide-react';
+import { getHallOfFameAdminRows, getArchiveSnapshotPreview } from '@/lib/status/admin-selectors';
 
 // --------------------------------------------------------
 // TABS COMPONENTS
@@ -353,5 +378,124 @@ function TablePreviewTab() {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function HallOfFameTab() {
+  const rows = getHallOfFameAdminRows();
+  return (
+    <Card className="border-muted/20 shadow-sm transition-all border-accent/20">
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Trophy className="w-5 h-5 text-accent" /> Hall of Fame Entries
+        </CardTitle>
+        <CardDescription>Записи, відібрані для публічної вітрини престижу.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-muted/10 text-muted-foreground uppercase text-[10px] tracking-wider">
+              <tr>
+                <th className="px-4 py-3 font-semibold">User</th>
+                <th className="px-4 py-3 font-semibold">Section</th>
+                <th className="px-4 py-3 font-semibold">Award / Title</th>
+                <th className="px-4 py-3 font-semibold">Citation</th>
+                <th className="px-4 py-3 font-semibold text-center">Featured</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-muted/10">
+              {rows.map(row => (
+                <tr key={row.id} className="hover:bg-muted/5 group">
+                  <td className="px-4 py-3">
+                    <div className="font-bold text-foreground">{row.userDisplayName}</div>
+                    <div className="text-[10px] text-muted-foreground/60">{row.userId}</div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge variant="secondary" className="text-[9px] uppercase tracking-widest">{row.hallSection}</Badge>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="font-semibold text-foreground/90">{row.titleOverride || row.definition?.title}</div>
+                    <div className="text-[10px] text-muted-foreground/50">{row.subcategoryKey}</div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="text-xs text-muted-foreground italic max-w-[300px] line-clamp-2">"{row.citation}"</div>
+                  </td>
+                  <td className="px-4 py-3 text-center">{row.featured ? '⭐' : '⚪'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ArchivePreviewTab() {
+  const snapshots = getStatusSnapshotsAdminRows().filter(s => s.snapshotId !== 'permanent');
+  const [selectedSnapshotId, setSelectedSnapshotId] = useState<string>(snapshots[0]?.snapshotId || '');
+  const records = getArchiveSnapshotPreview(selectedSnapshotId);
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <Card className="lg:col-span-4 border-accent/10">
+        <CardHeader className="p-4">
+          <CardTitle className="text-sm uppercase tracking-widest text-muted-foreground">Snapshots</CardTitle>
+        </CardHeader>
+        <CardContent className="p-2 space-y-1">
+          {snapshots.map(s => (
+            <button 
+              key={s.snapshotId}
+              onClick={() => setSelectedSnapshotId(s.snapshotId)}
+              className={`w-full text-left px-4 py-3 rounded-lg text-sm transition-all ${selectedSnapshotId === s.snapshotId ? 'bg-accent/10 text-accent font-bold' : 'hover:bg-muted/5 text-muted-foreground'}`}
+            >
+              {s.title}
+              <div className="text-[10px] font-normal opacity-60 uppercase tracking-tighter">{s.periodLabel}</div>
+            </button>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card className="lg:col-span-8 border-muted/20">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Archive className="w-5 h-5 text-muted-foreground" /> Snapshot Records Preview
+          </CardTitle>
+          <CardDescription>Записи, що будуть видимі в архіві для вибраного періоду.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {records.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-muted/5 text-muted-foreground uppercase text-[9px] tracking-widest">
+                  <tr>
+                    <th className="px-3 py-3 font-semibold">User</th>
+                    <th className="px-3 py-3 font-semibold">Award</th>
+                    <th className="px-3 py-3 font-semibold">Level</th>
+                    <th className="px-3 py-3 font-semibold">Subcat</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-muted/10">
+                  {records.map(r => (
+                    <tr key={r.id} className="hover:bg-muted/5">
+                      <td className="px-3 py-3 font-semibold">{r.userDisplayName}</td>
+                      <td className="px-3 py-3 text-foreground/80">{r.definition?.title}</td>
+                      <td className="px-3 py-3">
+                        <Badge variant="outline" className="text-[9px] uppercase">{LEVEL_LOCALE[r.level || 'holder']}</Badge>
+                      </td>
+                      <td className="px-3 py-3 text-muted-foreground capitalize">{r.subcategoryKey}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="p-12 text-center text-muted-foreground text-sm italic">
+              Зріз не містить записів із позначкою archiveVisible.
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

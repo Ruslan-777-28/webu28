@@ -18,7 +18,8 @@ export const DEMO_AWARD_DEFINITIONS: StatusAwardDefinition[] = [
         displayPriority: 2,
         visibleInProfile: true,
         visibleInLegend: true,
-        active: true
+        active: true,
+        eligibleForHallOfFame: true
     },
     {
         id: 'trust_symbol',
@@ -32,7 +33,8 @@ export const DEMO_AWARD_DEFINITIONS: StatusAwardDefinition[] = [
         displayPriority: 1,
         visibleInProfile: true,
         visibleInLegend: true,
-        active: true
+        active: true,
+        eligibleForHallOfFame: true
     },
     {
         id: 'most_discussed',
@@ -45,7 +47,8 @@ export const DEMO_AWARD_DEFINITIONS: StatusAwardDefinition[] = [
         displayPriority: 3,
         visibleInProfile: true,
         visibleInLegend: true,
-        active: true
+        active: true,
+        eligibleForHallOfFame: true
     },
     {
         id: 'return_magnet',
@@ -58,7 +61,8 @@ export const DEMO_AWARD_DEFINITIONS: StatusAwardDefinition[] = [
         displayPriority: 4,
         visibleInProfile: true,
         visibleInLegend: true,
-        active: true
+        active: true,
+        eligibleForHallOfFame: true
     },
     {
         id: 'season_breakthrough',
@@ -71,7 +75,8 @@ export const DEMO_AWARD_DEFINITIONS: StatusAwardDefinition[] = [
         displayPriority: 2,
         visibleInProfile: true,
         visibleInLegend: true,
-        active: true
+        active: true,
+        eligibleForHallOfFame: true
     },
     {
         id: 'subcategory_legend',
@@ -84,7 +89,8 @@ export const DEMO_AWARD_DEFINITIONS: StatusAwardDefinition[] = [
         displayPriority: 1,
         visibleInProfile: true,
         visibleInLegend: true,
-        active: true
+        active: true,
+        eligibleForHallOfFame: true
     },
     {
         id: 'platform_pick',
@@ -97,7 +103,8 @@ export const DEMO_AWARD_DEFINITIONS: StatusAwardDefinition[] = [
         displayPriority: 3,
         visibleInProfile: true,
         visibleInLegend: true,
-        active: true
+        active: true,
+        eligibleForHallOfFame: true
     }
 ];
 
@@ -131,27 +138,100 @@ export const DEMO_SNAPSHOTS: SnapshotMetadata[] = [
         description: 'Системний шар для постійних маркерів',
         published: true,
         isDemo: true
+    },
+    {
+        snapshotId: 'snapshot-winter-2025',
+        title: 'Зима 2025',
+        snapshotType: 'seasonal',
+        effectiveDate: '2025-01-01T00:00:00.000Z',
+        periodLabel: 'Зима 2025',
+        description: 'Історичний зріз зимового сезону 2025 року.',
+        published: true,
+        isDemo: true
     }
 ];
 
 export const DEMO_AWARD_RECORDS: StatusAwardRecord[] = [
     // TAROT (Таро) for usr1 (Super Mario)
-    { id: 'rec_1', snapshotId: 'snapshot-spring-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'таро', awardDefinitionId: 'voice_of_season', level: 'winner', featuredOnProfile: true, tableSortOrder: 1, isDemo: true },
-    { id: 'rec_2', snapshotId: 'permanent', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'таро', awardDefinitionId: 'trust_symbol', level: 'honor', featuredOnProfile: true, tableSortOrder: 2, isDemo: true },
-    { id: 'rec_3', snapshotId: 'snapshot-spring-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'таро', awardDefinitionId: 'most_discussed', level: 'finalist', featuredOnProfile: true, tableSortOrder: 3, isDemo: true },
-    { id: 'rec_4', snapshotId: 'snapshot-spring-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'таро', awardDefinitionId: 'return_magnet', level: 'winner', featuredOnProfile: true, tableSortOrder: 4, isDemo: true },
-    { id: 'rec_5', snapshotId: 'snapshot-yearly-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'таро', awardDefinitionId: 'platform_pick', level: 'nominee', featuredOnProfile: true, tableSortOrder: 5, isDemo: true },
+    { id: 'rec_1', snapshotId: 'snapshot-spring-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'таро', awardDefinitionId: 'voice_of_season', level: 'winner', featuredOnProfile: true, tableSortOrder: 1, archiveVisible: true, isDemo: true },
+    { id: 'rec_2', snapshotId: 'permanent', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'таро', awardDefinitionId: 'trust_symbol', level: 'honor', featuredOnProfile: true, tableSortOrder: 2, archiveVisible: true, isDemo: true },
+    { id: 'rec_3', snapshotId: 'snapshot-spring-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'таро', awardDefinitionId: 'most_discussed', level: 'finalist', featuredOnProfile: true, tableSortOrder: 3, archiveVisible: true, isDemo: true },
+    { id: 'rec_4', snapshotId: 'snapshot-spring-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'таро', awardDefinitionId: 'return_magnet', level: 'winner', featuredOnProfile: true, tableSortOrder: 4, archiveVisible: true, isDemo: true },
+    { id: 'rec_5', snapshotId: 'snapshot-yearly-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'таро', awardDefinitionId: 'platform_pick', level: 'nominee', featuredOnProfile: true, tableSortOrder: 5, archiveVisible: true, isDemo: true },
     
     // TAROT Others Table entries (Not targeted at usr1)
-    { id: 'rec_6', snapshotId: 'snapshot-spring-2026', userId: 'usr2', userDisplayName: 'Luigi Prophet', userHandle: '@luigi_p', subcategoryKey: 'таро', awardDefinitionId: 'voice_of_season', level: 'finalist', featuredOnProfile: false, tableSortOrder: 2, isDemo: true },
-    { id: 'rec_7', snapshotId: 'snapshot-spring-2026', userId: 'usr3', userDisplayName: 'Peach', userHandle: '@peach_tarot', subcategoryKey: 'таро', awardDefinitionId: 'most_discussed', level: 'winner', featuredOnProfile: false, tableSortOrder: 1, isDemo: true },
+    { id: 'rec_6', snapshotId: 'snapshot-spring-2026', userId: 'usr2', userDisplayName: 'Luigi Prophet', userHandle: '@luigi_p', subcategoryKey: 'таро', awardDefinitionId: 'voice_of_season', level: 'finalist', featuredOnProfile: false, tableSortOrder: 2, archiveVisible: true, isDemo: true },
+    { id: 'rec_7', snapshotId: 'snapshot-spring-2026', userId: 'usr3', userDisplayName: 'Peach', userHandle: '@peach_tarot', subcategoryKey: 'таро', awardDefinitionId: 'most_discussed', level: 'winner', featuredOnProfile: false, tableSortOrder: 1, archiveVisible: true, isDemo: true },
+
+    // HISTORICAL DATA (Winter 2025)
+    { id: 'rec_hist_1', snapshotId: 'snapshot-winter-2025', userId: 'usr2', userDisplayName: 'Luigi Prophet', userHandle: '@luigi_p', subcategoryKey: 'таро', awardDefinitionId: 'voice_of_season', level: 'winner', featuredOnProfile: false, tableSortOrder: 1, archiveVisible: true, isDemo: true },
+    { id: 'rec_hist_2', snapshotId: 'snapshot-winter-2025', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'таро', awardDefinitionId: 'season_breakthrough', level: 'winner', featuredOnProfile: false, tableSortOrder: 2, archiveVisible: true, isDemo: true },
 
     // ASTROLOGY
-    { id: 'rec_8', snapshotId: 'snapshot-spring-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'астрологія', awardDefinitionId: 'season_breakthrough', level: 'winner', featuredOnProfile: true, tableSortOrder: 1, isDemo: true },
-    { id: 'rec_9', snapshotId: 'snapshot-spring-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'астрологія', awardDefinitionId: 'voice_of_season', level: 'nominee', featuredOnProfile: true, tableSortOrder: 2, isDemo: true },
+    { id: 'rec_8', snapshotId: 'snapshot-spring-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'астрологія', awardDefinitionId: 'season_breakthrough', level: 'winner', featuredOnProfile: true, tableSortOrder: 1, archiveVisible: true, isDemo: true },
+    { id: 'rec_9', snapshotId: 'snapshot-spring-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'астрологія', awardDefinitionId: 'voice_of_season', level: 'nominee', featuredOnProfile: true, tableSortOrder: 2, archiveVisible: true, isDemo: true },
 
     // ESOTERICISM
-    { id: 'rec_10', snapshotId: 'permanent', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'езотерика', awardDefinitionId: 'subcategory_legend', level: 'holder', featuredOnProfile: true, tableSortOrder: 1, isDemo: true },
-    { id: 'rec_11', snapshotId: 'snapshot-yearly-2026', userId: 'usr4', userDisplayName: 'Bowser Mystic', userHandle: '@bowser_dark', subcategoryKey: 'езотерика', awardDefinitionId: 'platform_pick', level: 'winner', featuredOnProfile: true, tableSortOrder: 2, isDemo: true },
-    { id: 'rec_12', snapshotId: 'snapshot-yearly-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'езотерика', awardDefinitionId: 'platform_pick', level: 'honor', featuredOnProfile: true, tableSortOrder: 3, isDemo: true }
+    { id: 'rec_10', snapshotId: 'permanent', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'езотерика', awardDefinitionId: 'subcategory_legend', level: 'holder', featuredOnProfile: true, tableSortOrder: 1, archiveVisible: true, isDemo: true },
+    { id: 'rec_11', snapshotId: 'snapshot-yearly-2026', userId: 'usr4', userDisplayName: 'Bowser Mystic', userHandle: '@bowser_dark', subcategoryKey: 'езотерика', awardDefinitionId: 'platform_pick', level: 'winner', featuredOnProfile: true, tableSortOrder: 2, archiveVisible: true, isDemo: true },
+    { id: 'rec_12', snapshotId: 'snapshot-yearly-2026', userId: 'usr1', userDisplayName: 'Super Mario', userHandle: '@supermario', subcategoryKey: 'езотерика', awardDefinitionId: 'platform_pick', level: 'honor', featuredOnProfile: true, tableSortOrder: 3, archiveVisible: true, isDemo: true }
+];
+
+import { HallOfFameEntry } from './types';
+
+export const DEMO_HALL_OF_FAME_ENTRIES: HallOfFameEntry[] = [
+    {
+        id: 'hof_1',
+        userId: 'usr1',
+        userDisplayName: 'Super Mario',
+        awardDefinitionId: 'subcategory_legend',
+        snapshotId: 'permanent',
+        subcategoryKey: 'езотерика',
+        citation: 'За безпрецедентну відданість якості та фундаментальний внесок у розвиток таро-спільноти.',
+        hallSection: 'legendary',
+        featured: true,
+        sortOrder: 1,
+        isDemo: true
+    },
+    {
+        id: 'hof_2',
+        userId: 'usr4',
+        userDisplayName: 'Bowser Mystic',
+        awardDefinitionId: 'platform_pick',
+        snapshotId: 'snapshot-yearly-2026',
+        subcategoryKey: 'езотерика',
+        titleOverride: 'Прорив року',
+        citation: 'Найкращий результат року у сфері езотеричних практик за версією редакційної команди.',
+        hallSection: 'yearly',
+        featured: true,
+        sortOrder: 1,
+        isDemo: true
+    },
+    {
+        id: 'hof_3',
+        userId: 'usr1',
+        userDisplayName: 'Super Mario',
+        awardDefinitionId: 'voice_of_season',
+        snapshotId: 'snapshot-winter-2025',
+        subcategoryKey: 'таро',
+        citation: 'Абсолютне лідерство за довірою користувачів протягом зимового сезону 2025.',
+        hallSection: 'seasonal',
+        featured: true,
+        sortOrder: 1,
+        isDemo: true
+    },
+    {
+        id: 'hof_4',
+        userId: 'usr2',
+        userDisplayName: 'Luigi Prophet',
+        awardDefinitionId: 'trust_symbol',
+        snapshotId: 'permanent',
+        subcategoryKey: 'таро',
+        titleOverride: 'Символ стабільності',
+        citation: 'Вибір платформи за стабільно високий рівень професійної етики.',
+        hallSection: 'picks',
+        featured: true,
+        sortOrder: 1,
+        isDemo: true
+    }
 ];

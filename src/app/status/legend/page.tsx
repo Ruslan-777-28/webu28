@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ASSIGNMENT_TYPE_LOCALE } from '@/lib/status/constants';
 import { getLegendGroups } from '@/lib/status/selectors';
 import { Shield, Mic, MessageCircle, Repeat, TrendingUp, Crown, Star, ArrowLeft, BookOpen } from 'lucide-react';
+import { StatusHeaderNav } from '@/components/status-header-nav';
 
 const iconMap: Record<string, React.ElementType> = {
     Mic, Shield, MessageCircle, Repeat, TrendingUp, Crown, Star
@@ -23,14 +24,7 @@ export default function StatusLegendPage() {
             
             <main className="flex-1 w-full max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-16 mt-[80px]">
                 {/* Header Section */}
-                <div className="flex flex-col gap-10 mb-14">
-                    <Link href="/status" className="inline-flex items-center gap-2.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors w-fit group">
-                        <div className="h-6 w-6 rounded-full bg-muted/10 flex items-center justify-center group-hover:bg-muted/20 transition-colors">
-                            <ArrowLeft className="w-3 h-3" />
-                        </div>
-                        Повернутися до статусів
-                    </Link>
-                    
+                <div className="flex flex-col gap-6 mb-12">
                     <div className="flex flex-col md:flex-row gap-6 md:items-start justify-between">
                         <div className="space-y-5 max-w-2xl">
                             <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-foreground leading-none">
@@ -45,6 +39,8 @@ export default function StatusLegendPage() {
                         </div>
                     </div>
                 </div>
+
+                <StatusHeaderNav />
 
                 {/* Grouped Legend List */}
                 <div className="space-y-16 mb-12">
