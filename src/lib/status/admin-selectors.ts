@@ -1,7 +1,28 @@
-import { StatusAwardDefinition, SnapshotMetadata, StatusAwardRecord, FormattedHallOfFameEntry, FormattedStatusTableRow } from './types';
-import { DEMO_AWARD_DEFINITIONS, DEMO_SNAPSHOTS, DEMO_AWARD_RECORDS, DEMO_HALL_OF_FAME_ENTRIES } from './demo-status-data';
-import { getProfileAwardsForSubcategory, getStatusTableRowsForSubcategory, getHallOfFameEntries, getArchiveSnapshotEntries } from './selectors';
+import { 
+    StatusAwardDefinition, 
+    SnapshotMetadata, 
+    StatusAwardRecord, 
+    FormattedHallOfFameEntry, 
+    FormattedStatusTableRow,
+    HallOfFameEntry 
+} from './types';
+import { 
+    DEMO_AWARD_DEFINITIONS, 
+    DEMO_SNAPSHOTS, 
+    DEMO_AWARD_RECORDS, 
+    DEMO_HALL_OF_FAME_ENTRIES 
+} from './demo-status-data';
+import { 
+    getProfileAwardsForSubcategory, 
+    getStatusTableRowsForSubcategory, 
+    getHallOfFameEntries, 
+    getArchiveSnapshotEntries 
+} from './selectors';
 
+/**
+ * Summary metrics for the Admin Dashboard.
+ * Supports taking a custom data set to reflect "live" unsaved admin changes.
+ */
 export interface AdminStatusSummary {
     definitionsCount: number;
     snapshotsCount: number;
@@ -13,42 +34,54 @@ export interface AdminStatusSummary {
     activeDefaultSnapshotId: string;
 }
 
-export function getStatusAdminSummary(): AdminStatusSummary {
-    const uniqueUsers = new Set(DEMO_AWARD_RECORDS.map(r => r.userId));
-    const uniqueSubcategories = new Set(DEMO_AWARD_RECORDS.map(r => r.subcategoryKey));
+export function getStatusAdminSummary(data?: {
+    definitions?: StatusAwardDefinition[],
+    snapshots?: SnapshotMetadata[],
+    records?: StatusAwardRecord[],
+    hofEntries?: HallOfFameEntry[]
+}): AdminStatusSummary {
+    const definitions = data?.definitions || DEMO_AWARD_DEFINITIONS;
+    const snapshots = data?.snapshots || DEMO_SNAPSHOTS;
+    const records = data?.records || DEMO_AWARD_RECORDS;
+    const hofEntries = data?.hofEntries || DEMO_HALL_OF_FAME_ENTRIES;
+
+    const uniqueUsers = new Set(records.map(r => r.userId));
+    const uniqueSubcategories = new Set(records.map(r => r.subcategoryKey));
     
-    // Derived from the active snapshot definition in the main selector
-    const activeSnapshotId = DEMO_SNAPSHOTS.find(s => s.snapshotId === 'snapshot-spring-2026')?.snapshotId || 'none';
+    // Look for published or a specific demo default
+    const activeSnapshotId = snapshots.find(s => s.published)?.snapshotId 
+        || snapshots.find(s => s.snapshotId === 'snapshot-spring-2026')?.snapshotId 
+        || 'none';
 
     return {
-        definitionsCount: DEMO_AWARD_DEFINITIONS.length,
-        snapshotsCount: DEMO_SNAPSHOTS.length,
-        recordsCount: DEMO_AWARD_RECORDS.length,
+        definitionsCount: definitions.length,
+        snapshotsCount: snapshots.length,
+        recordsCount: records.length,
         uniqueUsersCount: uniqueUsers.size,
         uniqueSubcategoriesCount: uniqueSubcategories.size,
-        hofEntriesCount: DEMO_HALL_OF_FAME_ENTRIES.length,
-        archiveSnapshotsCount: DEMO_SNAPSHOTS.filter(s => s.snapshotId !== 'permanent').length,
+        hofEntriesCount: hofEntries.length,
+        archiveSnapshotsCount: snapshots.filter(s => s.snapshotId !== 'permanent').length,
         activeDefaultSnapshotId: activeSnapshotId
     };
 }
 
-export function getStatusDefinitionsAdminRows(): StatusAwardDefinition[] {
-    // Return all, preserving exact config parameters, without hiding inactive ones unlike public API
-    return [...DEMO_AWARD_DEFINITIONS].sort((a, b) => (a.displayPriority || 99) - (b.displayPriority || 99));
-}
-
-export function getStatusSnapshotsAdminRows(): SnapshotMetadata[] {
-    return [...DEMO_SNAPSHOTS];
-}
-
+/**
+ * Resolved records for the Admin list view (Inspector tab).
+ */
 export type AdminStatusRecordResolved = StatusAwardRecord & {
     resolvedTitle: string;
     resolvedLayer: string;
 };
 
-export function getStatusRecordsAdminRows(): AdminStatusRecordResolved[] {
-    return DEMO_AWARD_RECORDS.map(record => {
-        const def = DEMO_AWARD_DEFINITIONS.find(d => d.id === record.awardDefinitionId);
+export function getStatusRecordsAdminRows(
+    records?: StatusAwardRecord[], 
+    definitions?: StatusAwardDefinition[]
+): AdminStatusRecordResolved[] {
+    const rSource = records || DEMO_AWARD_RECORDS;
+    const dSource = definitions || DEMO_AWARD_DEFINITIONS;
+
+    return rSource.map(record => {
+        const def = dSource.find(d => d.id === record.awardDefinitionId);
         return {
             ...record,
             resolvedTitle: def?.title || 'Unknown Definition',
@@ -57,19 +90,47 @@ export function getStatusRecordsAdminRows(): AdminStatusRecordResolved[] {
     });
 }
 
-// Passthroughs to existing logic (for the inspector logic test previews)
-export function getProfileShelfPreview(userId: string, subcategoryKey: string) {
-    return getProfileAwardsForSubcategory(userId, subcategoryKey);
+/**
+ * PREVIEW SELECTORS
+ * These functions bridge the Admin layer with the Public Selector Logic.
+ */
+
+/**
+ * Simulates the Profile Shelf content with potential live admin edits.
+ */
+export function getProfileShelfPreview(
+    userId: string, 
+    subcategoryKey: string,
+    data?: { definitions?: StatusAwardDefinition[], records?: StatusAwardRecord[], snapshots?: SnapshotMetadata[] }
+) {
+    return getProfileAwardsForSubcategory(userId, subcategoryKey, data);
 }
 
-export function getStatusTablePreview(subcategoryKey: string) {
-    return getStatusTableRowsForSubcategory(subcategoryKey);
+/**
+ * Simulates the Status Table content with potential live admin edits.
+ */
+export function getStatusTablePreview(
+    subcategoryKey: string,
+    data?: { definitions?: StatusAwardDefinition[], records?: StatusAwardRecord[], snapshots?: SnapshotMetadata[] }
+) {
+    return getStatusTableRowsForSubcategory(subcategoryKey, data);
 }
 
-export function getHallOfFameAdminRows(): FormattedHallOfFameEntry[] {
-    return getHallOfFameEntries();
+/**
+ * Resolves Hall of Fame entries for the Admin preview table.
+ */
+export function getHallOfFameAdminRows(
+    data?: { definitions?: StatusAwardDefinition[], hofEntries?: HallOfFameEntry[], snapshots?: SnapshotMetadata[] }
+): FormattedHallOfFameEntry[] {
+    return getHallOfFameEntries(data);
 }
 
-export function getArchiveSnapshotPreview(snapshotId: string): FormattedStatusTableRow[] {
-    return getArchiveSnapshotEntries(snapshotId);
+/**
+ * Resolves Snapshot records for the Archive preview tab.
+ */
+export function getArchiveSnapshotPreview(
+    snapshotId: string,
+    data?: { definitions?: StatusAwardDefinition[], records?: StatusAwardRecord[], snapshots?: SnapshotMetadata[] }
+): FormattedStatusTableRow[] {
+    return getArchiveSnapshotEntries(snapshotId, data);
 }

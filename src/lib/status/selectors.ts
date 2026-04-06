@@ -1,28 +1,42 @@
 import { DEMO_AWARD_DEFINITIONS, DEMO_SNAPSHOTS, DEMO_AWARD_RECORDS, DEMO_CONFIG, DEMO_HALL_OF_FAME_ENTRIES } from './demo-status-data';
 import { LAYER_TYPE_LOCALE } from './constants';
-import { normalizeSubcategoryKey, StatusAwardDefinition, SnapshotMetadata, StatusLegendGroup, FormattedProfileAward, FormattedStatusTableRow, StatusLayerType, FormattedHallOfFameEntry, HallOfFameSection } from './types';
+import { 
+    normalizeSubcategoryKey, 
+    StatusAwardDefinition, 
+    SnapshotMetadata, 
+    StatusLegendGroup, 
+    FormattedProfileAward, 
+    FormattedStatusTableRow, 
+    StatusLayerType, 
+    FormattedHallOfFameEntry, 
+    HallOfFameSection,
+    StatusAwardRecord,
+    HallOfFameEntry
+} from './types';
 
 /**
  * Returns the currently active global status snapshot.
  * In a live environment, this would query a settings document.
  */
-export function getActiveStatusSnapshot(): SnapshotMetadata | undefined {
-    // For V1 Demo, we default to Spring 2026 as the active snapshot
-    return DEMO_SNAPSHOTS.find(s => s.snapshotId === 'snapshot-spring-2026');
+export function getActiveStatusSnapshot(customSnapshots?: SnapshotMetadata[]): SnapshotMetadata | undefined {
+    const source = customSnapshots || DEMO_SNAPSHOTS;
+    // Default to a specific demo snapshot or the first published one
+    return source.find(s => s.published) || source.find(s => s.snapshotId === 'snapshot-spring-2026');
 }
 
 /**
  * Retrieves all definitions.
  */
-export function getStatusDefinitions(): StatusAwardDefinition[] {
-    return DEMO_AWARD_DEFINITIONS.filter(def => def.active);
+export function getStatusDefinitions(customDefinitions?: StatusAwardDefinition[]): StatusAwardDefinition[] {
+    const source = customDefinitions || DEMO_AWARD_DEFINITIONS;
+    return source.filter(def => def.active);
 }
 
 /**
  * Compiles legend groups by looking up all definitions and organizing them by Layer Type.
  */
-export function getLegendGroups(): StatusLegendGroup[] {
-    const definitions = getStatusDefinitions().filter(d => d.visibleInLegend);
+export function getLegendGroups(customDefinitions?: StatusAwardDefinition[]): StatusLegendGroup[] {
+    const definitions = getStatusDefinitions(customDefinitions).filter(d => d.visibleInLegend);
     const groups: Record<string, StatusLegendGroup> = {};
 
     const GROUP_ORDER: StatusLayerType[] = ['permanent', 'yearly', 'seasonal', 'snapshot'];
@@ -55,16 +69,21 @@ export function getLegendGroups(): StatusLegendGroup[] {
  * Resolves all profile-featured awards for a specific user and subcategory.
  * Sorts by `profileSortOrder` first, then by the Definition's `displayPriority`.
  */
-export function getProfileAwardsForSubcategory(userId: string, subcategoryName?: string): FormattedProfileAward[] {
+export function getProfileAwardsForSubcategory(
+    userId: string, 
+    subcategoryName?: string, 
+    data?: { definitions?: StatusAwardDefinition[], records?: StatusAwardRecord[], snapshots?: SnapshotMetadata[] }
+): FormattedProfileAward[] {
     const key = normalizeSubcategoryKey(subcategoryName);
-    const definitions = getStatusDefinitions();
+    const definitions = getStatusDefinitions(data?.definitions);
+    const recordsSource = data?.records || DEMO_AWARD_RECORDS;
+    const snapshotsSource = data?.snapshots || DEMO_SNAPSHOTS;
 
-    const awards = DEMO_AWARD_RECORDS
+    const awards = recordsSource
         .filter(rec => rec.userId === userId && rec.subcategoryKey === key && rec.featuredOnProfile)
         .map(rec => ({
             ...rec,
-            // Fallback periodLabel to the snapshot metadata, or "Permanent"
-            periodLabel: DEMO_SNAPSHOTS.find(s => s.snapshotId === rec.snapshotId)?.periodLabel || 'Permanent', 
+            periodLabel: snapshotsSource.find(s => s.snapshotId === rec.snapshotId)?.periodLabel || 'Permanent', 
             definition: definitions.find(d => d.id === rec.awardDefinitionId)
         }))
         .filter(rec => rec.definition && rec.definition.visibleInProfile) as FormattedProfileAward[];
@@ -73,29 +92,34 @@ export function getProfileAwardsForSubcategory(userId: string, subcategoryName?:
         const sortA = a.profileSortOrder ?? 999;
         const sortB = b.profileSortOrder ?? 999;
         if (sortA !== sortB) return sortA - sortB;
-        return (a.definition.displayPriority || 99) - (b.definition.displayPriority || 99);
+        return (a.definition?.displayPriority || 99) - (b.definition?.displayPriority || 99);
     });
 }
 
 /**
  * Resolves all active table rows for a given subcategory.
  * This pulls records that match the active snapshot AND records from the 'permanent' pseudo-snapshot.
- * Sorts by tableSortOrder, displayPriority, and then userDisplayName.
  */
-export function getStatusTableRowsForSubcategory(subcategoryName?: string): FormattedStatusTableRow[] {
+export function getStatusTableRowsForSubcategory(
+    subcategoryName?: string,
+    data?: { definitions?: StatusAwardDefinition[], records?: StatusAwardRecord[], snapshots?: SnapshotMetadata[] }
+): FormattedStatusTableRow[] {
     const key = normalizeSubcategoryKey(subcategoryName);
-    const definitions = getStatusDefinitions();
-    const activeSnapshot = getActiveStatusSnapshot();
+    const definitions = getStatusDefinitions(data?.definitions);
+    const snapshotsSource = data?.snapshots || DEMO_SNAPSHOTS;
+    const recordsSource = data?.records || DEMO_AWARD_RECORDS;
+    
+    const activeSnapshot = getActiveStatusSnapshot(data?.snapshots);
 
     if (!activeSnapshot) return [];
 
     const allowedSnapshots = [activeSnapshot.snapshotId, 'permanent'];
 
-    const rows = DEMO_AWARD_RECORDS
+    const rows = recordsSource
         .filter(rec => rec.subcategoryKey === key && allowedSnapshots.includes(rec.snapshotId))
         .map(rec => ({
             ...rec,
-            periodLabel: DEMO_SNAPSHOTS.find(s => s.snapshotId === rec.snapshotId)?.periodLabel || 'Permanent',
+            periodLabel: snapshotsSource.find(s => s.snapshotId === rec.snapshotId)?.periodLabel || 'Permanent',
             definition: definitions.find(d => d.id === rec.awardDefinitionId)
         }))
         .filter(rec => rec.definition) as FormattedStatusTableRow[];
@@ -105,19 +129,12 @@ export function getStatusTableRowsForSubcategory(subcategoryName?: string): Form
         const sortB = b.tableSortOrder ?? 999;
         if (sortA !== sortB) return sortA - sortB;
 
-        const prioA = a.definition.displayPriority ?? 99;
-        const prioB = b.definition.displayPriority ?? 99;
+        const prioA = a.definition?.displayPriority ?? 99;
+        const prioB = b.definition?.displayPriority ?? 99;
         if (prioA !== prioB) return prioA - prioB;
 
         return a.userDisplayName.localeCompare(b.userDisplayName);
     });
-}
-
-/**
- * Helper to get the Demo target user ID so components don't hardcode it.
- */
-export function getDemoTargetUserId(): string {
-    return DEMO_CONFIG.demoProfileTargetId;
 }
 
 /**
@@ -127,14 +144,18 @@ export function getDemoTargetUserId(): string {
 /**
  * Retrieves all Hall of Fame entries, joining with definitions and snapshot metadata.
  */
-export function getHallOfFameEntries(): FormattedHallOfFameEntry[] {
-    const definitions = getStatusDefinitions();
+export function getHallOfFameEntries(
+    data?: { definitions?: StatusAwardDefinition[], hofEntries?: HallOfFameEntry[], snapshots?: SnapshotMetadata[] }
+): FormattedHallOfFameEntry[] {
+    const definitions = getStatusDefinitions(data?.definitions);
+    const hofSource = data?.hofEntries || DEMO_HALL_OF_FAME_ENTRIES;
+    const snapshotsSource = data?.snapshots || DEMO_SNAPSHOTS;
     
-    return DEMO_HALL_OF_FAME_ENTRIES
+    return hofSource
         .map(entry => ({
             ...entry,
             definition: definitions.find(d => d.id === entry.awardDefinitionId),
-            snapshot: DEMO_SNAPSHOTS.find(s => s.snapshotId === entry.snapshotId)
+            snapshot: snapshotsSource.find(s => s.snapshotId === entry.snapshotId)
         }))
         .filter(entry => !!entry.definition) as FormattedHallOfFameEntry[];
 }
@@ -142,8 +163,10 @@ export function getHallOfFameEntries(): FormattedHallOfFameEntry[] {
 /**
  * Returns Hall of Fame entries grouped by their designated sections.
  */
-export function getHallOfFameGroupedBySection(): Record<HallOfFameSection, FormattedHallOfFameEntry[]> {
-    const entries = getHallOfFameEntries();
+export function getHallOfFameGroupedBySection(
+    data?: { definitions?: StatusAwardDefinition[], hofEntries?: HallOfFameEntry[], snapshots?: SnapshotMetadata[] }
+): Record<HallOfFameSection, FormattedHallOfFameEntry[]> {
+    const entries = getHallOfFameEntries(data);
     const grouped: Record<HallOfFameSection, FormattedHallOfFameEntry[]> = {
         legendary: [],
         yearly: [],
@@ -171,25 +194,31 @@ export function getHallOfFameGroupedBySection(): Record<HallOfFameSection, Forma
  */
 
 /**
- * Retrieves all published snapshots for the archive, excluding the internal 'permanent' layer.
- * Sorted by effective date descending (newest first).
+ * Retrieves all published snapshots for the archive.
  */
-export function getArchiveSnapshots(): SnapshotMetadata[] {
-    return DEMO_SNAPSHOTS
+export function getArchiveSnapshots(customSnapshots?: SnapshotMetadata[]): SnapshotMetadata[] {
+    const source = customSnapshots || DEMO_SNAPSHOTS;
+    return source
         .filter(s => s.published && s.snapshotId !== 'permanent')
         .sort((a, b) => new Date(b.effectiveDate).getTime() - new Date(a.effectiveDate).getTime());
 }
 
 /**
- * Retrieves all award records for a specific historical snapshot that are marked as archive-visible.
+ * Retrieves all award records for a specific historical snapshot.
  */
-export function getArchiveSnapshotEntries(snapshotId: string): FormattedStatusTableRow[] {
-    const definitions = getStatusDefinitions();
-    const snapshot = DEMO_SNAPSHOTS.find(s => s.snapshotId === snapshotId);
+export function getArchiveSnapshotEntries(
+    snapshotId: string,
+    data?: { definitions?: StatusAwardDefinition[], records?: StatusAwardRecord[], snapshots?: SnapshotMetadata[] }
+): FormattedStatusTableRow[] {
+    const definitions = getStatusDefinitions(data?.definitions);
+    const snapshotsSource = data?.snapshots || DEMO_SNAPSHOTS;
+    const recordsSource = data?.records || DEMO_AWARD_RECORDS;
+    
+    const snapshot = snapshotsSource.find(s => s.snapshotId === snapshotId);
     
     if (!snapshot) return [];
 
-    return DEMO_AWARD_RECORDS
+    return recordsSource
         .filter(rec => rec.snapshotId === snapshotId && rec.archiveVisible)
         .map(rec => ({
             ...rec,
@@ -201,17 +230,8 @@ export function getArchiveSnapshotEntries(snapshotId: string): FormattedStatusTa
 }
 
 /**
- * Groups archive entries by their subcategory for better structured presentation.
+ * Helper to get the Demo target user ID.
  */
-export function getArchiveGroupedBySubcategory(snapshotId: string): Record<string, FormattedStatusTableRow[]> {
-    const entries = getArchiveSnapshotEntries(snapshotId);
-    const grouped: Record<string, FormattedStatusTableRow[]> = {};
-
-    entries.forEach(entry => {
-        const key = entry.subcategoryKey || 'general';
-        if (!grouped[key]) grouped[key] = [];
-        grouped[key].push(entry);
-    });
-
-    return grouped;
+export function getDemoTargetUserId(): string {
+    return DEMO_CONFIG.demoProfileTargetId;
 }
