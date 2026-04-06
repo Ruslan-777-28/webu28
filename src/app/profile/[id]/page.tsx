@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { doc, onSnapshot, collection, query, where, addDoc, deleteDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useUser } from '@/hooks/use-auth';
-import type { UserProfile, Post, BlogSettings, CommunicationOffer } from '@/lib/types';
+import type { UserProfile, Post, BlogSettings, CommunicationOffer, Product } from '@/lib/types';
 import { Navigation } from '@/components/navigation';
 import Footer from '@/components/layout/footer';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -21,6 +21,7 @@ import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link';
+import { calculateProfileCompletion } from '@/lib/utils/profile-completion';
 
 const LANGUAGE_MAP: Record<string, string> = {
     'uk-UA': 'Українська',
@@ -247,38 +248,76 @@ function OffersRow({ offers, onAction, onCalendarClick }: { offers: Communicatio
 function UnifiedStatsArea({ customer, professional }: { customer?: any, professional?: any }) {
     const rows = [
         { label: 'на платформі', icon: Trophy, getValue: (m: any) => formatZeroMetric(m?.platformRank, false, true) },
-        { label: 'завершених комунікацій', icon: CheckCircle, getValue: (m: any) => formatZeroMetric(m?.completedCount) },
+        { label: 'комунікацій', icon: CheckCircle, getValue: (m: any) => formatZeroMetric(m?.completedCount) },
         { label: 'рейтинг', icon: Star, getValue: (m: any) => formatZeroMetric(m?.ratingAvg, true), iconColor: 'text-muted-foreground/60' },
         { label: 'відгуки', icon: Megaphone, getValue: (m: any) => formatZeroMetric(m?.ratingCount), iconColor: 'text-muted-foreground/60' },
     ];
 
     return (
-        <div className="w-full space-y-3 pt-2">
-            <div className="grid grid-cols-3 items-center px-2">
-                <div className="text-center font-bold text-sm uppercase tracking-wider text-muted-foreground">Замовник</div>
+        <div className="w-full space-y-2 pt-1 border-t border-muted/30 mt-4">
+            <div className="grid grid-cols-3 items-center px-1 py-1">
+                <div className="text-center font-bold text-[10px] uppercase tracking-wider text-muted-foreground opacity-70">Замовник</div>
                 <div />
-                <div className="text-center font-bold text-sm uppercase tracking-wider text-muted-foreground">Професіонал</div>
+                <div className="text-center font-bold text-[10px] uppercase tracking-wider text-muted-foreground opacity-70">Професіонал</div>
             </div>
 
-            <div className="space-y-0">
+            <div className="space-y-0.5">
                 {rows.map((row, idx) => {
                     const custVal = row.getValue(customer);
                     const profVal = row.getValue(professional);
                     return (
-                        <div key={idx} className={`grid grid-cols-3 items-center hover:bg-muted/5 transition-colors pt-3 pb-3.5 px-4 ${idx < 3 ? 'border-b border-foreground/10' : ''}`}>
-                            <div className={`text-center text-base ${custVal === '00' ? 'font-medium opacity-60' : 'font-extrabold'}`}>
+                        <div key={idx} className="grid grid-cols-3 items-center hover:bg-muted/5 transition-colors py-1 px-1">
+                            <div className={`text-center text-sm ${custVal === '00' ? 'font-medium opacity-40' : 'font-extrabold text-foreground/80'}`}>
                                 {custVal}
                             </div>
-                            <div className="flex flex-col items-center gap-1.5 px-1">
-                                <row.icon className={`h-4 w-4 ${row.iconColor || 'text-accent'}`} />
-                                <span className="text-[9px] uppercase font-bold text-muted-foreground text-center leading-none">{row.label}</span>
+                            <div className="flex flex-col items-center gap-0.5 px-1 scale-90 md:scale-100">
+                                <row.icon className={`h-3 w-3 ${row.iconColor || 'text-accent/60'}`} />
+                                <span className="text-[8px] uppercase font-bold text-muted-foreground/70 text-center leading-none">{row.label}</span>
                             </div>
-                            <div className={`text-center text-base ${profVal === '00' ? 'font-medium opacity-60' : 'font-extrabold'}`}>
+                            <div className={`text-center text-sm ${profVal === '00' ? 'font-medium opacity-40' : 'font-extrabold text-foreground/80'}`}>
                                 {profVal}
                             </div>
                         </div>
                     );
                 })}
+            </div>
+        </div>
+    );
+}
+
+function CircularProgress({ percentage, size = 48 }: { percentage: number, size?: number }) {
+    const strokeWidth = 3;
+    const radius = (size - strokeWidth) / 2;
+    const circumference = radius * 2 * Math.PI;
+    const offset = circumference - (percentage / 100) * circumference;
+
+    return (
+        <div className="relative flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="rotate-[-90deg]">
+                <circle
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    stroke="currentColor"
+                    strokeWidth={strokeWidth}
+                    fill="transparent"
+                    className="text-muted/20"
+                />
+                <circle
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    stroke="currentColor"
+                    strokeWidth={strokeWidth}
+                    fill="transparent"
+                    strokeDasharray={circumference}
+                    style={{ strokeDashoffset: offset }}
+                    strokeLinecap="round"
+                    className="text-accent transition-all duration-700 ease-in-out"
+                />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-[10px] font-extrabold text-foreground leading-none">{percentage}%</span>
             </div>
         </div>
     );
@@ -297,7 +336,7 @@ export default function PublicProfilePage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [offers, setOffers] = useState<CommunicationOffer[]>([]);
-    const [productsCount, setProductsCount] = useState<number>(0);
+    const [products, setProducts] = useState<Product[]>([]);
     const [isActionModalOpen, setActionModalOpen] = useState(false);
     const [isPlayingIntro, setIsPlayingIntro] = useState(false);
 
@@ -362,7 +401,7 @@ export default function PublicProfilePage() {
             where('authorId', '==', profileId)
         );
         const unsubProducts = onSnapshot(productsQuery, (snapshot) => {
-            setProductsCount(snapshot.size);
+            setProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product)));
         });
 
         return () => {
@@ -384,9 +423,14 @@ export default function PublicProfilePage() {
 
     const subcategories = useMemo(() => {
         const list = mainCategory?.subcategories || [];
-        // Only show subcategories where the author has at least one active offer
-        return list.filter(sub => offers.some(o => o.subcategoryId === sub.id));
-    }, [mainCategory, offers]);
+        // Show subcategories that have active offers OR existing metrics (activity)
+        return list.filter(sub => {
+            const hasActiveOffer = offers.some(o => o.subcategoryId === sub.id);
+            const hasProfessionalMetrics = !!profile?.profileMetrics?.professional?.[sub.id];
+            const hasCustomerMetrics = !!profile?.profileMetrics?.customer?.[sub.id];
+            return hasActiveOffer || hasProfessionalMetrics || hasCustomerMetrics;
+        });
+    }, [mainCategory, offers, profile?.profileMetrics]);
 
     // Auto-select first subcategory when loaded
     useEffect(() => {
@@ -411,7 +455,7 @@ export default function PublicProfilePage() {
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-background relative">
+        <div className="flex flex-col min-h-screen bg-background relative w-full overflow-x-hidden">
             {profile.coverUrl && (
                 <div className="fixed inset-0 z-0 pointer-events-none">
                     <Image src={profile.coverUrl} alt="Background" layout="fill" objectFit="cover" className="opacity-[0.25] blur-xl md:blur-2xl" />
@@ -420,19 +464,18 @@ export default function PublicProfilePage() {
             
             <div className="relative z-10 flex flex-col min-h-screen">
                 <Navigation />
-                <main className="flex-grow pt-2 md:pt-4 pb-12 relative">
-                    <div className="absolute top-2 right-4 md:right-8 lg:right-12 z-50">
-                        <Button variant="ghost" size="icon" className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-background/30 backdrop-blur hover:bg-background/60 shadow-sm border border-muted/20" onClick={handleClose}>
-                            <X className="h-4 w-4 md:h-5 md:w-5 text-foreground/70" />
-                        </Button>
-                    </div>
+                <main className="flex-grow pt-3 md:pt-4 pb-12 relative lg:pt-8 w-full">
+                    <div className="container max-w-[1400px] mx-auto px-3 md:px-4 space-y-4 lg:space-y-0 lg:grid lg:grid-cols-[3fr_6.5fr_2.5fr] lg:gap-4 lg:items-stretch items-start relative z-10 w-full mb-10">
+                        <div className="absolute top-[-36px] right-2 md:top-[-44px] md:right-4 lg:top-[-60px] lg:right-4 z-50">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 md:h-9 md:w-9 rounded-full bg-background/50 backdrop-blur hover:bg-background/80 shadow-sm border border-muted/30" onClick={handleClose}>
+                                <X className="h-3.5 w-3.5 md:h-4 md:w-4 text-foreground/70" />
+                            </Button>
+                        </div>
 
-                    <div className="container max-w-[1200px] mx-auto px-4 md:px-6 space-y-6 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-8 items-start relative z-10 w-full xl:max-w-[1300px]">
-                        
                         {/* LEFT COLUMN: Block A */}
-                        <div className="lg:col-span-4 xl:col-span-3 w-full shrink-0 lg:sticky lg:top-24">
+                        <div className="w-full shrink-0 flex flex-col gap-4 h-full">
                             {/* Block A: Identity Card - Rectangular redesign */}
-                            <Card className="shadow-md border-muted/40 bg-background/80 backdrop-blur-md overflow-hidden relative mt-1 md:mt-2 lg:mt-0 w-full flex flex-col">
+                            <Card className="shadow-md border-muted/40 bg-background/80 backdrop-blur-md overflow-hidden relative mt-1 md:mt-2 lg:mt-0 w-full flex flex-col h-full">
                                 {/* Avatar Block - Rectangular top block */}
                                 <div className="w-full h-40 md:h-48 lg:h-52 shrink-0 relative overflow-hidden bg-muted/20 group">
                                     {isPlayingIntro && profile.introVideoUrl ? (
@@ -483,27 +526,48 @@ export default function PublicProfilePage() {
                                     )}
                                 </div>
 
-                                <CardContent className="p-4 md:p-5 flex flex-col items-center text-center relative z-10 bg-background pt-5 gap-4">
-                                    {/* Order 1: Credo (Bio) */}
-                                    <div className="w-[95%] mx-auto">
-                                        <p className="text-[12px] lg:text-[13px] italic font-medium text-foreground/80 leading-relaxed text-center">
-                                            “{profile.shortBio || profile.bio || 'Користувач ще не додав інформацію про себе.'}”
-                                        </p>
-                                    </div>
-
-                                    {/* Order 2: Nickname / display name */}
-                                    <div className="w-full flex flex-col items-center gap-1">
-                                        <h1 className="text-xl lg:text-2xl font-bold leading-tight line-clamp-2 w-full" title={profile.displayName || profile.name}>
+                                <CardContent className="p-4 flex flex-col items-center text-center relative z-10 bg-background pt-4 gap-3">
+                                    {/* Identity info */}
+                                    <div className="w-full flex flex-col items-center gap-1 mt-1">
+                                        <h1 className="text-xl lg:text-2xl font-black leading-tight tracking-tight text-foreground/90 uppercase" title={profile.displayName || profile.name}>
                                             {profile.displayName || profile.name}
                                         </h1>
+                                        {profile.profileMetrics?.professional?.[selectedSubcategoryId] && (
+                                            <span className="text-[10px] font-black text-accent uppercase tracking-[0.1em] opacity-80">
+                                                {subcategories.find(s => s.id === selectedSubcategoryId)?.name || 'Професіонал'}
+                                            </span>
+                                        )}
                                     </div>
 
-                                    {/* Order 3: Favorites control row */}
-                                    <div className="flex items-center gap-2">
+                                    {/* Metadata: country / language */}
+                                    <div className="flex flex-col items-center gap-1.5 w-full">
+                                        {profile.country && (
+                                            <span className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-foreground/60 uppercase tracking-tight">
+                                                <span className="text-lg leading-none filter grayscale opacity-80 -mt-0.5">{getCountryFlag(profile.country)}</span>
+                                                з {safeFormatDate(profile.createdAt).split('.').pop() || '2024'}
+                                            </span>
+                                        )}
+                                        
+                                        <div className="flex items-center gap-3">
+                                            {profile.preferredLanguage && (
+                                                <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground uppercase opacity-70">
+                                                    укр
+                                                </span>
+                                            )}
+                                            <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30" />
+                                            <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground uppercase opacity-70">
+                                                <Globe className="h-3 w-3 opacity-60 mr-1" />
+                                                {getLanguageLabel(profile.preferredLanguage)}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Action row */}
+                                    <div className="flex items-center gap-2 pt-2">
                                         {isOwnProfile ? (
                                             <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
                                                 <DialogTrigger asChild>
-                                                    <Button variant="outline" size="sm" className="h-8 font-bold px-4 rounded-full border-muted/60 bg-background hover:bg-muted shadow-sm text-xs"><Edit className="mr-2 h-3.5 w-3.5" />Редагувати</Button>
+                                                    <Button variant="outline" size="sm" className="h-8 font-black px-4 rounded-xl border-muted/50 bg-background hover:bg-muted shadow-sm text-[10px] uppercase tracking-wider"><Edit className="mr-1.5 h-3 w-3" />Редагувати</Button>
                                                 </DialogTrigger>
                                                 <EditProfileModal profile={profile} setOpen={setEditModalOpen} />
                                             </Dialog>
@@ -512,60 +576,37 @@ export default function PublicProfilePage() {
                                                 <FavoriteButton 
                                                     targetId={profileId} 
                                                     type="user" 
-                                                    className="h-9 px-4 rounded-full border border-muted/30 hover:border-muted/60"
+                                                    className="h-8 px-3 rounded-xl border border-muted/40 hover:border-muted/60"
                                                 />
                                                 <FriendButton 
                                                     targetProfile={profile}
-                                                    className="h-9"
+                                                    className="h-8 rounded-xl"
                                                 />
                                             </div>
                                         )}
-
                                     </div>
 
-                                    {/* Order 4: country / location with flag */}
-                                    <div className="flex flex-col items-center gap-2 w-full pt-1">
-                                        {profile.country && (
-                                            <span className="flex items-center justify-center gap-2 text-[13px] font-medium text-foreground/80">
-                                                <span className="text-base leading-none">{getCountryFlag(profile.country)}</span>
-                                                {profile.country}
-                                            </span>
-                                        )}
-                                        
-                                        {/* Order 5: language */}
-                                        {profile.preferredLanguage && (
-                                            <span className="flex items-center justify-center gap-2 text-[13px] text-muted-foreground/80">
-                                                <Globe className="h-3.5 w-3.5 opacity-60" /> 
-                                                {getLanguageLabel(profile.preferredLanguage)}
-                                            </span>
-                                        )}
-
-                                        {/* Order 6: reg date */}
-                                        {profile.createdAt && (
-                                            <span className="flex items-center justify-center gap-2 text-[11px] text-muted-foreground/60 mt-1">
-                                                <Calendar className="h-3 w-3 opacity-50" />
-                                                <span>Приєднано: {safeFormatDate(profile.createdAt)}</span>
-                                            </span>
-                                        )}
+                                    {/* Credo / Intro Bio */}
+                                    <div className="w-[90%] mx-auto pt-3 border-t border-muted/10">
+                                        <p className="text-[12px] font-medium text-foreground/60 leading-relaxed text-center">
+                                            {profile.shortBio || profile.bio || 'Користувач ще не додав інформацію про себе.'}
+                                        </p>
                                     </div>
                                     
-                                    {/* Spacer to align Block A with Block C bottom */}
-                                    <div className="h-12 md:h-16 lg:h-20" />
+                                    <div className="h-1" />
                                 </CardContent>
                             </Card>
                         </div>
 
-                        {/* RIGHT COLUMN: Block B & C */}
-                        <div className="lg:col-span-8 xl:col-span-9 w-full flex flex-col gap-4 lg:gap-5 mt-2 lg:mt-0">
-
-                            {/* Block B: Competencies Card */}
-                            <Card className="shadow-sm border-muted/60">
-                                <CardHeader className="p-3 sm:p-4 border-b border-muted/40 bg-muted/5">
-                                    <div className="flex items-center gap-3 sm:gap-4 overflow-x-auto no-scrollbar">
-                                        <span className="font-bold text-xs md:text-sm text-foreground shrink-0 pr-3 sm:pr-4 border-r border-muted uppercase tracking-wider">
+                        {/* CENTER COLUMN: Block B (Main block) */}
+                        <div className="w-full flex flex-col gap-4 h-full relative">
+                            <Card className="shadow-sm border-muted/50 h-full flex flex-col bg-background/60 backdrop-blur-sm overflow-hidden min-h-0">
+                                <CardHeader className="p-3 border-b border-muted/30 bg-muted/5 min-h-[50px] shrink-0">
+                                    <div className="flex items-center gap-3 overflow-x-auto no-scrollbar scroll-smooth">
+                                        <span className="font-black text-[10px] text-foreground shrink-0 pr-4 border-r border-muted/40 uppercase tracking-[0.15em] opacity-80">
                                             {esotericsCategoryName}
                                         </span>
-                                        <div className="flex items-center gap-1 sm:gap-4 flex-nowrap shrink-0">
+                                        <div className="flex items-center gap-2.5 flex-nowrap shrink-0">
                                             {subcategories.filter(sub => sub.id && sub.name).map(sub => {
                                                 const subOffers = offers.filter(o => o.subcategoryId === sub.id);
                                                 const hasVideo = subOffers.some(o => o.type === 'video');
@@ -577,86 +618,159 @@ export default function PublicProfilePage() {
                                                     <button
                                                         key={sub.id}
                                                         onClick={() => setSelectedSubcategoryId(sub.id)}
-                                                        className={`text-[13px] tracking-wide transition-all px-3 py-1 whitespace-nowrap rounded-md flex flex-col items-center gap-1 group ${
+                                                        className={`text-[10px] tracking-[0.1em] transition-all px-2.5 py-2.5 whitespace-nowrap rounded-md flex flex-col items-center gap-1.5 group uppercase ${
                                                             selectedSubcategoryId === sub.id
-                                                                ? 'font-bold text-foreground bg-accent/10'
-                                                                : 'font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                                                                ? 'font-black text-accent bg-accent/5'
+                                                                : 'font-bold text-muted-foreground/60 hover:text-foreground hover:bg-muted/30'
                                                         }`}
                                                     >
-                                                        <div className="flex items-center gap-0.5 h-1">
-                                                            {hasVideo && <div className="w-1 h-1 rounded-full bg-green-500" />}
-                                                            {hasFile && <div className="w-1 h-1 rounded-full bg-blue-500" />}
-                                                            {hasText && <div className="w-1 h-1 rounded-full bg-yellow-500" />}
-                                                            {hasScheduled && <div className="w-1 h-1 rounded-full bg-violet-500" />}
-                                                        </div>
                                                         <span>{sub.name}</span>
+                                                        <div className="flex items-center justify-center gap-1.5 h-2">
+                                                            {hasVideo && (
+                                                                <div 
+                                                                    className={`w-1.5 h-1.5 rounded-sm shadow-[0_0_4px_rgba(34,197,94,0.4)] ${
+                                                                        selectedSubcategoryId === sub.id ? 'bg-accent' : 'bg-green-500/60'
+                                                                    }`} 
+                                                                    title="Відеочат"
+                                                                />
+                                                            )}
+                                                            {hasFile && (
+                                                                <div 
+                                                                    className={`w-1.5 h-1.5 rounded-sm shadow-[0_0_4px_rgba(59,130,246,0.4)] ${
+                                                                        selectedSubcategoryId === sub.id ? 'bg-accent' : 'bg-blue-500/60'
+                                                                    }`} 
+                                                                    title="Файлообмін"
+                                                                />
+                                                            )}
+                                                            {hasText && (
+                                                                <div 
+                                                                    className={`w-1.5 h-1.5 rounded-sm shadow-[0_0_4px_rgba(234,179,8,0.4)] ${
+                                                                        selectedSubcategoryId === sub.id ? 'bg-accent' : 'bg-yellow-500/60'
+                                                                    }`} 
+                                                                    title="Запитати"
+                                                                />
+                                                            )}
+                                                            {hasScheduled && (
+                                                                <div 
+                                                                    className={`w-1.5 h-1.5 rounded-sm shadow-[0_0_4px_rgba(139,92,246,0.4)] ${
+                                                                        selectedSubcategoryId === sub.id ? 'bg-accent' : 'bg-violet-500/60'
+                                                                    }`} 
+                                                                    title="Заплановано"
+                                                                />
+                                                            )}
+                                                        </div>
                                                     </button>
                                                 );
                                             })}
                                         </div>
                                     </div>
                                 </CardHeader>
-                                <CardContent className="p-4 sm:p-5 space-y-5">
-                                    <OffersRow 
-                                        offers={filteredOffers} 
-                                        onAction={handleActionClick}
-                                        onCalendarClick={handleActionClick} 
-                                    />
+                                <CardContent className="p-4 sm:p-6 flex-grow flex flex-col justify-between">
+                                    <div className="space-y-6">
+                                        <OffersRow 
+                                            offers={filteredOffers} 
+                                            onAction={handleActionClick}
+                                            onCalendarClick={handleActionClick} 
+                                        />
+                                    </div>
                                     
-                                    <UnifiedStatsArea customer={customerMetrics} professional={professionalMetrics} />
+                                    <div className="mt-8">
+                                        <UnifiedStatsArea customer={customerMetrics} professional={professionalMetrics} />
+                                    </div>
                                 </CardContent>
                             </Card>
+                        </div>
 
-                            {/* Block C: Navigation Cards */}
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-0">
-                                <Link href={`/blog?author=${profile.uid}`}>
-                                    <Card className="hover:shadow-md hover:border-accent/40 transition-all cursor-pointer h-full group bg-card shadow-sm border-muted/60">
-                                        <CardContent className="p-3 sm:p-4 flex items-center gap-3 min-h-[60px] lg:min-h-[70px]">
-                                            <div className="h-8 w-8 lg:h-9 lg:w-9 rounded-full bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                                <BookOpen className="h-4 w-4 lg:h-5 w-5" />
-                                            </div>
-                                            <div className="min-w-0">
-                                                <h3 className="font-bold text-xs leading-tight">Мій світ</h3>
-                                                <p className="text-[10px] text-muted-foreground mt-0.5 truncate uppercase tracking-tight font-bold">
-                                                    Публікації: {formatZeroMetric(posts?.length)}
-                                                </p>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </Link>
+                        {/* RIGHT COLUMN: 3-Card Stack */}
+                        <div className="w-full flex flex-col gap-4 h-full relative min-h-[260px]">
+                            {/* Card 1: Publications */}
+                            <Link href={`/blog?author=${profile.uid}`} className="flex-1 flex flex-col min-h-[80px]">
+                                <Card className="hover:shadow-md hover:border-accent/40 transition-all cursor-pointer group bg-card/80 backdrop-blur-sm border-muted/40 overflow-hidden flex-1 flex items-center h-full">
+                                    <CardContent className="p-4 xl:p-5 h-full w-full flex flex-col items-start relative">
+                                        <div className="h-8 w-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform mb-3">
+                                            <BookOpen className="h-4 w-4" />
+                                        </div>
+                                        <div className="min-w-0 flex flex-col">
+                                            <h3 className="font-black text-[10px] uppercase tracking-wider text-muted-foreground leading-tight">Публікації</h3>
+                                            <span className="text-[9px] font-bold text-foreground truncate mt-0.5">{profile.displayName || profile.name}</span>
+                                        </div>
+                                        <div className="absolute right-4 bottom-4 flex items-center justify-center h-6 w-6 rounded-full bg-muted/20 text-[10px] font-black text-muted-foreground/80 group-hover:bg-accent/20 group-hover:text-accent transition-colors">
+                                            {posts.length || 0}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </Link>
 
-                                <Link href={`/profile/${profile.uid}/store`}>
-                                    <Card className="hover:shadow-md hover:border-accent/40 transition-all cursor-pointer h-full group bg-card shadow-sm border-muted/60">
-                                        <CardContent className="p-3 sm:p-4 flex items-center gap-3 min-h-[60px] lg:min-h-[70px]">
-                                            <div className="h-8 w-8 lg:h-9 lg:w-9 rounded-full bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                                <LayoutGrid className="h-4 w-4 lg:h-5 w-5" />
-                                            </div>
-                                            <div className="min-w-0">
-                                                <h3 className="font-bold text-xs leading-tight">Мій store</h3>
-                                                <p className="text-[10px] text-muted-foreground mt-0.5 truncate uppercase tracking-tight font-bold">
-                                                    Товари: {formatZeroMetric(productsCount)}
-                                                </p>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </Link>
+                            {/* Card 2: Store */}
+                            <Link href={`/profile/${profile.uid}/store`} className="flex-1 flex flex-col min-h-[80px]">
+                                <Card className="hover:shadow-md hover:border-accent/40 transition-all cursor-pointer group bg-card/80 backdrop-blur-sm border-muted/40 overflow-hidden flex-1 flex items-center h-full">
+                                    <CardContent className="p-4 xl:p-5 h-full w-full flex flex-col items-start relative">
+                                        <div className="h-8 w-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform mb-3">
+                                            <LayoutGrid className="h-4 w-4" />
+                                        </div>
+                                        <div className="min-w-0 flex flex-col">
+                                            <h3 className="font-black text-[10px] uppercase tracking-wider text-muted-foreground leading-tight">Артефакти</h3>
+                                            <span className="text-[9px] font-bold text-foreground truncate mt-0.5">{profile.displayName || profile.name}</span>
+                                        </div>
+                                        <div className="absolute right-4 bottom-4 flex items-center justify-center h-6 w-6 rounded-full bg-muted/20 text-[10px] font-black text-muted-foreground/80 group-hover:bg-accent/20 group-hover:text-accent transition-colors">
+                                            {products.length || 0}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </Link>
 
-                                <Link href={`/profile/${profile.uid}/achievements`}>
-                                    <Card className="hover:shadow-md hover:border-accent/40 transition-all cursor-pointer h-full group bg-card shadow-sm border-muted/60">
-                                        <CardContent className="p-3 sm:p-4 flex items-center gap-3 min-h-[60px] lg:min-h-[70px]">
-                                            <div className="h-8 w-8 lg:h-9 lg:w-9 rounded-full bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                                <Trophy className="h-4 w-4 lg:h-5 w-5" />
-                                            </div>
-                                            <div className="min-w-0">
-                                                <h3 className="font-bold text-xs leading-tight uppercase font-bold">Досягнення</h3>
-                                                <p className="text-[10px] text-muted-foreground mt-0.5 truncate uppercase tracking-tight font-bold">Відзнаки, біографія</p>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </Link>
-                            </div> {/* End Block C */}
-
-                        </div> {/* End Right Column Wrapper */}
+                            {/* Card 3: Biography & Completion */}
+                            <Link href={`/profile/${profile.uid}/achievements`} className="flex-1 flex flex-col min-h-[80px]">
+                                <Card className="hover:shadow-md hover:border-accent/50 transition-all cursor-pointer group bg-card/90 backdrop-blur-sm border-muted/50 overflow-hidden flex-1 flex flex-col justify-center h-full">
+                                    <CardContent className="p-4 xl:p-5 flex flex-col items-start relative h-full">
+                                        <div className="h-8 w-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:rotate-12 transition-transform mb-3">
+                                            <Trophy className="h-4 w-4" />
+                                        </div>
+                                        
+                                        <div className="min-w-0 flex flex-col">
+                                            <h3 className="font-black text-[10px] uppercase tracking-wider text-muted-foreground leading-tight">Біографія, досягнення,</h3>
+                                            <h3 className="font-black text-[10px] uppercase tracking-wider text-muted-foreground leading-tight mt-0.5">подробиці</h3>
+                                        </div>
+                                        
+                                        <div className="absolute right-4 bottom-4">
+                                            {(() => {
+                                                const completion = calculateProfileCompletion(profile, offers);
+                                                return (
+                                                    <div className="flex flex-col items-center shrink-0 min-w-[42px]">
+                                                        <CircularProgress percentage={completion.percentage} size={42} />
+                                                        <span className="text-[6px] font-black uppercase text-accent mt-1 tracking-tighter leading-none text-center">
+                                                            {completion.statusLabel}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })()}
+                                        </div>
+                                        
+                                        {/* Owner hints logic */}
+                                        {isOwnProfile && (() => {
+                                            const completion = calculateProfileCompletion(profile, offers);
+                                            if (completion.percentage < 100) {
+                                                return (
+                                                    <div className="mt-4 pt-3 border-t border-muted/10 w-full mb-12">
+                                                        <div className="flex flex-col gap-1.5">
+                                                            <span className="text-[9px] font-black uppercase text-muted-foreground/50 tracking-tighter">Порада для росту:</span>
+                                                            <div className="flex flex-wrap gap-x-2 gap-y-1">
+                                                                {completion.hints.slice(0, 2).map((hint, i) => (
+                                                                    <span key={i} className="text-[9px] font-bold text-accent/80 flex items-center gap-0.5">
+                                                                        + {hint.label} <span className="opacity-60">+{hint.impact}%</span>
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        })()}
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                        </div>
 
                     </div> {/* End General Container */}
                     

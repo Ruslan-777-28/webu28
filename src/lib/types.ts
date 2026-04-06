@@ -382,6 +382,8 @@ export type Product = {
   description: string;
   price: number;
   currency: string;
+  categoryId?: string;
+  subcategoryId?: string;
   status: 'active' | 'inactive';
   imageUrl?: string;
   createdAt: any; // Firestore Timestamp
