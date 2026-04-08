@@ -4,7 +4,8 @@ import React, { useState, useMemo } from 'react';
 import { Navigation } from '@/components/navigation';
 import Footer from '@/components/layout/footer';
 import { StatusHeaderNav } from '@/components/status-header-nav';
-import { getArchiveSnapshots, getArchiveGroupedBySubcategory } from '@/lib/status/selectors';
+import { getArchiveSnapshots, getArchiveSnapshotEntries } from '@/lib/status/selectors';
+import { FormattedStatusTableRow } from '@/lib/status/types';
 import { Shield, Mic, MessageCircle, Repeat, TrendingUp, Crown, Star, History, Calendar } from 'lucide-react';
 import { LEVEL_LOCALE } from '@/lib/status/constants';
 
@@ -23,7 +24,18 @@ export default function StatusArchivePage() {
     }, [selectedSnapshotId, snapshots]);
 
     const activeGroupedEntries = useMemo(() => {
-        return selectedSnapshotId ? getArchiveGroupedBySubcategory(selectedSnapshotId) : {};
+        if (!selectedSnapshotId) return {} as Record<string, FormattedStatusTableRow[]>;
+        
+        const entries = getArchiveSnapshotEntries(selectedSnapshotId);
+        const grouped: Record<string, FormattedStatusTableRow[]> = {};
+        
+        entries.forEach(entry => {
+            const key = entry.subcategoryKey || 'Загальне';
+            if (!grouped[key]) grouped[key] = [];
+            grouped[key].push(entry);
+        });
+        
+        return grouped;
     }, [selectedSnapshotId]);
 
     const subcategoryKeys = Object.keys(activeGroupedEntries);
@@ -131,7 +143,7 @@ export default function StatusArchivePage() {
                                                     </div>
 
                                                     <div className="space-y-4">
-                                                        {entries.map(entry => {
+                                                        {entries.map((entry: FormattedStatusTableRow) => {
                                                             const def = entry.definition;
                                                             const Icon = iconMap[def.icon] || Star;
                                                             const isWinnerOrHolder = entry.level === 'winner' || entry.level === 'holder';

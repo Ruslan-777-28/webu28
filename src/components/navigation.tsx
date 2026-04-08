@@ -25,10 +25,15 @@ export function Navigation({ hideBalance = false, subtitle }: NavigationProps) {
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
 
   const navLinks = [
-    { href: '/pro', label: 'FOR EXPERTS' },
-    { href: '/user', label: 'FOR COMMUNITY' },
-    { href: '/blog', label: 'BLOG' },
+    { href: '/pro', label: 'FOR EXPERTS', aliases: ['/for-experts'] },
+    { href: '/user', label: 'FOR COMMUNITY', aliases: ['/for-community'] },
+    { href: '/blog', label: 'BLOG', aliases: [] },
   ];
+
+  const isActive = (href: string, aliases: string[] = []) => {
+    if (pathname === href || pathname.startsWith(href)) return true;
+    return aliases.some(alias => pathname === alias || pathname.startsWith(alias));
+  };
 
   const renderAuthControl = () => {
     if (loading) {
@@ -85,7 +90,7 @@ export function Navigation({ hideBalance = false, subtitle }: NavigationProps) {
                     href={link.href}
                     className={cn(
                         'hover:text-primary transition-colors flex items-center relative py-1',
-                        pathname.startsWith(link.href) && 'text-primary'
+                        isActive(link.href, link.aliases) && 'text-primary'
                     )}
                     >
                     {link.label === 'BLOG' ? (
@@ -94,17 +99,22 @@ export function Navigation({ hideBalance = false, subtitle }: NavigationProps) {
                                 <BookOpen 
                                     className={cn(
                                         "h-4 w-4 transition-all",
-                                        pathname.startsWith('/blog') ? "text-primary" : "text-muted-foreground group-hover/blog:text-primary"
+                                        isActive('/blog') ? "text-primary" : "text-muted-foreground group-hover/blog:text-primary"
                                     )} 
-                                    fill={pathname.startsWith('/blog') ? "currentColor" : "none"}
+                                    fill={isActive('/blog') ? "currentColor" : "none"}
                                 />
                             </span>
-                            {pathname.startsWith('/blog') && (
+                            {isActive('/blog') && (
                                 <div className="absolute -bottom-1 left-0 right-0 h-[1.5px] bg-primary rounded-full" />
                             )}
                         </>
                     ) : (
-                        link.label
+                        <>
+                            {link.label}
+                            {isActive(link.href, link.aliases) && (
+                                <div className="absolute -bottom-1 left-0 right-0 h-[1.5px] bg-primary rounded-full" />
+                            )}
+                        </>
                     )}
                     </Link>
                     {index < navLinks.length - 1 && (

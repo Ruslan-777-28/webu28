@@ -17,6 +17,11 @@ export type StatusAwardDefinition = {
     visibleInLegend: boolean;
     active: boolean; // Definition state overall
     eligibleForHallOfFame?: boolean; // Can entries with this definition be in HoF?
+    
+    // Explanation fields for info-layer
+    explanationType?: string;
+    explanationReason?: string;
+    explanationHowToGet?: string;
 };
 
 export type SnapshotType = 'monthly' | 'seasonal' | 'yearly';
@@ -47,6 +52,7 @@ export type StatusAwardRecord = {
     tableSortOrder?: number; // Custom sort precedence within table
     note?: string;
     archiveVisible?: boolean; // Should this record be visible in historical archives?
+    userAvatarUrl?: string; // Denormalized for display in tables
     isDemo: boolean;
 };
 

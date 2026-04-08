@@ -116,7 +116,12 @@ export function getStatusTableRowsForSubcategory(
     const allowedSnapshots = [activeSnapshot.snapshotId, 'permanent'];
 
     const rows = recordsSource
-        .filter(rec => rec.subcategoryKey === key && allowedSnapshots.includes(rec.snapshotId))
+        .filter(rec => {
+            const matchesSnapshot = allowedSnapshots.includes(rec.snapshotId);
+            if (!matchesSnapshot) return false;
+            if (!key || key === 'all' || key === 'усі') return true;
+            return rec.subcategoryKey === key;
+        })
         .map(rec => ({
             ...rec,
             periodLabel: snapshotsSource.find(s => s.snapshotId === rec.snapshotId)?.periodLabel || 'Permanent',

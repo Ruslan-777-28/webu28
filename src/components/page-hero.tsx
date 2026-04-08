@@ -39,6 +39,10 @@ export function PageHero({
         setSettings(null);
       }
       setLoading(false);
+    }, (error) => {
+      console.error(`Error loading hero settings for ${pageId}:`, error);
+      setSettings(null);
+      setLoading(false);
     });
 
     return () => unsub();
@@ -54,7 +58,25 @@ export function PageHero({
 
   // Use values from Firestore or fallbacks
   const isEnabled = settings?.enabled !== false; // Active by default if not strictly disabled
-  const showMedia = isEnabled && settings?.mediaType;
+  
+  // Resilient media type detection
+  let effectiveMediaType = settings?.mediaType;
+  if (!effectiveMediaType && settings) {
+    if (settings.desktopVideoUrl || settings.mobileVideoUrl) effectiveMediaType = 'video';
+    else if (settings.imageUrl) effectiveMediaType = 'image';
+  }
+
+  // Final check for media presence (including fallbacks)
+  const hasVideo = !!(settings?.desktopVideoUrl || settings?.mobileVideoUrl);
+  const hasImage = !!settings?.imageUrl;
+  
+  // Decide what to actually render based on priority and availability
+  const finalRenderType = (effectiveMediaType === 'video' && hasVideo) ? 'video' : 
+                         (effectiveMediaType === 'image' && hasImage) ? 'image' : 
+                         hasVideo ? 'video' : 
+                         hasImage ? 'image' : null;
+
+  const showMedia = isEnabled && !!finalRenderType;
   
   const headline = settings?.headline || fallbackHeadline;
   const subheadline = settings?.subheadline || fallbackSubheadline;
@@ -81,7 +103,7 @@ export function PageHero({
         {/* Left: Media Area (Wide 21:9 desktop, aspect-video mobile) */}
         {showMedia && (
           <div className={`relative w-full flex-shrink-0 bg-muted/20 ${isPro ? 'md:w-[50%]' : 'md:w-[55%]'}`}>
-            {settings.mediaType === 'video' && (settings.desktopVideoUrl || settings.mobileVideoUrl) ? (
+            {finalRenderType === 'video' && settings ? (
               <>
                 {/* Desktop Video */}
                 {settings.desktopVideoUrl && (
@@ -106,7 +128,7 @@ export function PageHero({
                   playsInline
                 />
               </>
-            ) : settings.mediaType === 'image' && settings.imageUrl ? (
+            ) : (finalRenderType === 'image' && settings?.imageUrl) ? (
               <img
                 src={settings.imageUrl}
                 alt="Hero Media"

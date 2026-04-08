@@ -19,6 +19,10 @@ export function HeroCircleMedia() {
         setSettings(null);
       }
       setLoading(false);
+    }, (error) => {
+      console.error("Error loading home hero media:", error);
+      setSettings(null);
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -32,13 +36,33 @@ export function HeroCircleMedia() {
     );
   }
 
-  if (!settings || !settings.enabled) {
+  // Use values from Firestore
+  const isEnabled = settings?.enabled !== false; // Active by default if not strictly disabled
+  
+  // Resilient media type detection
+  let effectiveMediaType = settings?.mediaType;
+  if (!effectiveMediaType && settings) {
+    if (settings.desktopVideoUrl || settings.mobileVideoUrl) effectiveMediaType = 'video';
+    else if (settings.imageUrl) effectiveMediaType = 'image';
+  }
+
+  // Final check for media presence (including fallbacks)
+  const hasVideo = !!(settings?.desktopVideoUrl || settings?.mobileVideoUrl);
+  const hasImage = !!settings?.imageUrl;
+  
+  // Decide what to actually render based on priority and availability
+  const finalRenderType = (effectiveMediaType === 'video' && hasVideo) ? 'video' : 
+                         (effectiveMediaType === 'image' && hasImage) ? 'image' : 
+                         hasVideo ? 'video' : 
+                         hasImage ? 'image' : null;
+
+  if (!isEnabled || !finalRenderType || !settings) {
     return null; // Fallback to just the border from parent
   }
 
   return (
     <div className="absolute inset-0 rounded-full overflow-hidden z-0">
-      {settings.mediaType === 'video' ? (
+      {finalRenderType === 'video' ? (
         <video
           className="w-full h-full object-cover"
           autoPlay
@@ -46,17 +70,9 @@ export function HeroCircleMedia() {
           loop
           playsInline
           poster={settings.posterUrl}
-        >
-          {settings.desktopVideoUrl && (
-            <source src={settings.desktopVideoUrl} type="video/mp4" />
-          )}
-          {/* Typically mobile video could be handled by a responsive logic if needed, 
-              but standard HTML5 video takes multiple sources or CSS media queries.
-              Since we want minimal, prioritizing the primary video source here.
-              If we want strict mobile src swapping, we'd need a window resize listener,
-              but for simplicity and standard support, using desktopVideoUrl as primary. */}
-        </video>
-      ) : settings.imageUrl ? (
+          src={settings.desktopVideoUrl || settings.mobileVideoUrl}
+        />
+      ) : (finalRenderType === 'image' && settings.imageUrl) ? (
         <img
           src={settings.imageUrl}
           alt="Hero representation"

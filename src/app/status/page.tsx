@@ -1,19 +1,23 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import { Navigation } from '@/components/navigation';
-import Footer from '@/components/layout/footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { LEVEL_LOCALE } from '@/lib/status/constants';
 import { getActiveStatusSnapshot, getStatusTableRowsForSubcategory } from '@/lib/status/selectors';
 import { StatusHeaderNav } from '@/components/status-header-nav';
+import { Shield, Mic, MessageCircle, Repeat, TrendingUp, Crown, Star, Calendar, X, User } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { BlogSettings, Subcategory } from '@/lib/types';
+import { Button } from '@/components/ui/button';
 
 const iconMap: Record<string, React.ElementType> = {
     Mic, Shield, MessageCircle, Repeat, TrendingUp, Crown, Star
 };
-
-import { Shield, Mic, MessageCircle, Repeat, TrendingUp, Crown, Star, Calendar } from 'lucide-react';
 
 // Hardcoded for V1 offline demo. Will move to a selector/fetch later.
 const DEMO_SUBCATEGORIES = [
@@ -24,22 +28,75 @@ const DEMO_SUBCATEGORIES = [
 ];
 
 export default function StatusPage() {
-    const [activeSubcategoryId, setActiveSubcategoryId] = useState<string>(DEMO_SUBCATEGORIES[0].id);
+    const router = useRouter();
+    const [blogSettings, setBlogSettings] = useState<BlogSettings | null>(null);
+    const [activeSubcategoryId, setActiveSubcategoryId] = useState<string>('all');
 
-    // Instead of assembling properties here, we leverage our pure selector layer.
+    // Fetch taxonomy from Firestore
+    useEffect(() => {
+        const settingsRef = doc(db, 'blogSettings', 'main');
+        const unsub = onSnapshot(settingsRef, (snap) => {
+            if (snap.exists()) {
+                setBlogSettings(snap.data() as BlogSettings);
+            }
+        });
+        return () => unsub();
+    }, []);
+
+    // Flatten taxonomy subcategories
+    const taxonomyTabs = useMemo(() => {
+        const allTab = { id: 'all', name: 'УСІ' };
+        if (!blogSettings?.categories) return [allTab];
+        
+        const subs: { id: string; name: string }[] = [];
+        blogSettings.categories.forEach(cat => {
+            if (cat.isActive && cat.subcategories) {
+                cat.subcategories.forEach(sub => {
+                    if (sub.isActive) {
+                        subs.push({ id: sub.id || sub.slug || sub.name, name: sub.name });
+                    }
+                });
+            }
+        });
+        
+        // Sorting or filtering by specific taxonomy order if needed
+        return [allTab, ...subs];
+    }, [blogSettings]);
+
     const activeSnapshot = getActiveStatusSnapshot();
     
-    const activeSubcat = useMemo(() => {
-        return DEMO_SUBCATEGORIES.find(s => s.id === activeSubcategoryId);
-    }, [activeSubcategoryId]);
+    const activeSubcatName = useMemo(() => {
+        if (activeSubcategoryId === 'all') return undefined;
+        return taxonomyTabs.find(t => t.id === activeSubcategoryId)?.name;
+    }, [activeSubcategoryId, taxonomyTabs]);
 
     const tableRows = useMemo(() => {
-        return getStatusTableRowsForSubcategory(activeSubcat?.name);
-    }, [activeSubcat?.name]);
+        return getStatusTableRowsForSubcategory(activeSubcatName);
+    }, [activeSubcatName]);
+
+    const handleClose = () => {
+        if (typeof window !== 'undefined' && window.history.length > 2) {
+            router.back();
+        } else {
+            router.push('/');
+        }
+    };
 
     return (
-        <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-accent/30 selection:text-accent">
+        <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-accent/30 selection:text-accent relative">
             <Navigation />
+            
+            {/* Close Button UI (B) */}
+            <div className="absolute top-6 right-6 md:top-10 md:right-10 z-50">
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={handleClose}
+                    className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-muted/10 border border-muted/20 hover:bg-muted/20 hover:border-muted/40 transition-all group"
+                >
+                    <X className="w-5 h-5 md:w-6 h-6 text-muted-foreground group-hover:text-foreground" />
+                </Button>
+            </div>
             
             <main className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-16 mt-[80px]">
                 {/* Header Section */}
@@ -74,10 +131,10 @@ export default function StatusPage() {
 
                 <StatusHeaderNav />
 
-                {/* Subcategory Navigation */}
+                {/* Subcategory Navigation (A) */}
                 <div className="w-full mb-8">
                     <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
-                        {DEMO_SUBCATEGORIES.map((sub) => (
+                        {taxonomyTabs.map((sub) => (
                             <button
                                 key={sub.id}
                                 onClick={() => setActiveSubcategoryId(sub.id)}
@@ -111,7 +168,7 @@ export default function StatusPage() {
                                         <tr className="border-b border-muted/10 bg-muted/5">
                                             <th className="px-6 py-5 text-[10px] uppercase font-black tracking-widest text-muted-foreground/50 w-2/5">Номінація / Статус</th>
                                             <th className="px-6 py-5 text-[10px] uppercase font-black tracking-widest text-muted-foreground/50">Рівень</th>
-                                            <th className="px-6 py-5 text-[10px] uppercase font-black tracking-widest text-muted-foreground/50 w-1/4">Користувач</th>
+                                            <th className="px-6 py-5 text-[10px] uppercase font-black tracking-widest text-muted-foreground/50 flex-grow">Користувач</th>
                                             <th className="px-6 py-5 text-[10px] uppercase font-black tracking-widest text-muted-foreground/50">Період</th>
                                         </tr>
                                     </thead>
@@ -150,13 +207,26 @@ export default function StatusPage() {
                                                         )}
                                                     </td>
                                                     <td className="px-6 py-5">
-                                                        <div className="flex flex-col">
-                                                            <span className="text-[13px] font-black text-foreground group-hover:text-accent transition-colors cursor-pointer w-fit">
-                                                                {row.userDisplayName}
-                                                            </span>
-                                                            {row.userHandle && (
-                                                                <span className="text-[10px] font-medium text-muted-foreground mt-0.5">{row.userHandle}</span>
-                                                            )}
+                                                        <div className="flex items-center gap-4">
+                                                            {/* User Avatar (C) */}
+                                                            <Link href={`/profile/${row.userId}`}>
+                                                                <Avatar className="h-10 w-10 border-2 border-background ring-1 ring-muted/10 hover:ring-accent/40 transition-all shadow-sm">
+                                                                    <AvatarImage src={row.userAvatarUrl} alt={row.userDisplayName} />
+                                                                    <AvatarFallback className="bg-muted text-[10px] font-black uppercase tracking-widest">
+                                                                        {row.userDisplayName?.charAt(0) || <User className="w-4 h-4" />}
+                                                                    </AvatarFallback>
+                                                                </Avatar>
+                                                            </Link>
+                                                            <div className="flex flex-col">
+                                                                <Link href={`/profile/${row.userId}`}>
+                                                                    <span className="text-[13px] font-black text-foreground group-hover:text-accent transition-colors cursor-pointer w-fit">
+                                                                        {row.userDisplayName}
+                                                                    </span>
+                                                                </Link>
+                                                                {row.userHandle && (
+                                                                    <span className="text-[10px] font-medium text-muted-foreground mt-0.5">{row.userHandle}</span>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-5">
@@ -186,8 +256,6 @@ export default function StatusPage() {
                     </CardContent>
                 </Card>
             </main>
-            
-            <Footer />
         </div>
     );
 }
