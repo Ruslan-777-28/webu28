@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Trophy, History, Info, LayoutList } from 'lucide-react';
+import { Trophy, History, Info, LayoutList, Award } from 'lucide-react';
 
 export function StatusHeaderNav() {
     const pathname = usePathname();
 
     const links = [
         { href: '/status', label: 'Усі статуси', icon: LayoutList },
+        { href: '/status/nominations', label: 'Вітрина', icon: Award },
         { href: '/status/hall-of-fame', label: 'Hall of Fame', icon: Trophy },
         { href: '/status/archive', label: 'Архів', icon: History },
         { href: '/status/legend', label: 'Легенда', icon: Info },

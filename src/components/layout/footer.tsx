@@ -58,6 +58,7 @@ export default function Footer() {
   const informationLinks = [
     { href: '/info/community-rules', label: 'Правила спільноти' },
     { href: '/status', label: 'Статус' },
+    { href: '/status/nominations', label: 'Вітрина номінацій' },
     { href: '/status/legend', label: 'Умовні позначки' },
     { href: '/status/hall-of-fame', label: 'Hall of Fame' },
     { href: '/status/archive', label: 'Архів статусів' },
