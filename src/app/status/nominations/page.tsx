@@ -23,8 +23,8 @@ export default function NominationsPage() {
                 </div>
 
                 {/* Header Section: Two-column layout with status accent */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-                    <div className="flex-1 flex flex-row items-baseline gap-4 md:gap-5">
+                <div className="flex flex-col md:flex-row md:items-end gap-10 md:gap-16 mb-8">
+                    <div className="flex flex-row items-baseline gap-4 md:gap-5">
                         <h1 className="text-3xl md:text-6xl font-black uppercase tracking-tighter text-foreground leading-[0.8] whitespace-nowrap">
                             Вітрина <span className="text-muted-foreground/30">номінацій</span>
                         </h1>
@@ -33,9 +33,9 @@ export default function NominationsPage() {
                         </div>
                     </div>
                     
-                    <div className="max-w-[400px] md:text-right pb-1">
+                    <div className="max-w-[400px] text-left pb-1">
                         <p className="text-[10px] md:text-[11px] leading-relaxed text-muted-foreground/60 font-medium uppercase tracking-[0.05em]">
-                            Типи професійних статусів та почесних відзнак платформи.
+                            Типи професійних статусів <br /> та почесних відзнак платформи.
                         </p>
                     </div>
                 </div>

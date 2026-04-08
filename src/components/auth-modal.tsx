@@ -35,7 +35,8 @@ const loginSchema = z.object({
 const registerSchema = z.object({
     email: z.string().email({ message: "Неправильна адреса електронної пошти." }),
     password: z.string().min(6, { message: "Пароль має містити щонайменше 6 символів." }),
-    confirmPassword: z.string()
+    confirmPassword: z.string(),
+    promoCode: z.string().optional(),
 }).refine(data => data.password === data.confirmPassword, {
     message: "Паролі не співпадають.",
     path: ["confirmPassword"],
@@ -57,7 +58,8 @@ export function AuthModal({ setOpen }: { setOpen?: (open: boolean) => void }) {
     defaultValues: {
       email: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
+      promoCode: ""
     },
   });
 
@@ -81,7 +83,10 @@ export function AuthModal({ setOpen }: { setOpen?: (open: boolean) => void }) {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
       
-      await setDoc(doc(db, "users", user.uid), {
+      const normalizedPromoCode = values.promoCode?.trim().toUpperCase();
+      const generatedReferralCode = user.uid.slice(-6).toUpperCase();
+      
+      const userData: any = {
           uid: user.uid,
           email: user.email,
           name: user.email?.split('@')[0] || 'New User',
@@ -105,7 +110,42 @@ export function AuthModal({ setOpen }: { setOpen?: (open: boolean) => void }) {
             panelEnabled: false,
           },
           createdAt: serverTimestamp(),
-      });
+          referralCode: generatedReferralCode,
+      };
+
+      if (normalizedPromoCode) {
+          userData.usedReferralCode = normalizedPromoCode;
+      }
+
+      await setDoc(doc(db, "users", user.uid), userData);
+
+      // Stage 2B: Referral Linkage
+      if (normalizedPromoCode) {
+          try {
+              const idToken = await user.getIdToken();
+              const response = await fetch('/api/referral/link', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${idToken}`
+                  },
+                  body: JSON.stringify({ promoCode: normalizedPromoCode })
+              });
+              
+              const result = await response.json();
+              if (!response.ok) {
+                  console.warn("Referral linkage failed:", result.message);
+                  toast({
+                      variant: "default",
+                      title: "Промокод не застосовано",
+                      description: result.message || "Сталася помилка при валідації коду."
+                  });
+              }
+          } catch (err) {
+              console.error("Referral linkage error:", err);
+          }
+      }
+
       toast({ title: "Реєстрація успішна!" });
       setOpen?.(false);
     } catch (error: any) {
@@ -211,6 +251,19 @@ export function AuthModal({ setOpen }: { setOpen?: (open: boolean) => void }) {
                         <FormLabel>Підтвердіть пароль</FormLabel>
                         <FormControl>
                           <Input type="password" placeholder="••••••••" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={registerForm.control}
+                    name="promoCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Промокод</FormLabel>
+                        <FormControl>
+                          <Input placeholder="КОД123 (необов'язково)" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

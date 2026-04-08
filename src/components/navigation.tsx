@@ -135,9 +135,13 @@ export function Navigation({ hideBalance = false, subtitle }: NavigationProps) {
       {!hideBalance && (
         <div className="flex items-center">
           <div className="flex items-center gap-2">
-              <div className="text-xl md:text-2xl font-extralight tracking-tighter text-muted-foreground/60 font-mono">
+              <Link 
+                href="/referral-sprint-program"
+                className="text-xl md:text-2xl font-extralight tracking-tighter text-muted-foreground/60 font-mono hover:text-primary transition-colors cursor-pointer"
+                title="Referral Sprint Program"
+              >
                   000 000.00
-              </div>
+              </Link>
               <Popover>
                   <PopoverTrigger asChild>
                       <button className="p-1 hover:bg-muted rounded-full transition-colors outline-none group">
@@ -146,10 +150,10 @@ export function Navigation({ hideBalance = false, subtitle }: NavigationProps) {
                   </PopoverTrigger>
                   <PopoverContent className="w-64 p-4 text-[11px] leading-relaxed animate-in fade-in zoom-in duration-200" align="end" sideOffset={12}>
                       <div className="space-y-2">
-                         <p className="font-bold uppercase tracking-widest text-[10px]">Ваш баланс</p>
+                         <p className="font-bold uppercase tracking-widest text-[10px]">Bonus Credits</p>
                          <p className="text-muted-foreground">
-                           Внутрішній доступний баланс Вашого рахунку в еквіваленті бонусних кредитів, нарахований платформою за наступні дії : внаслідок активності учасника , активність стосовно публікацій, реферальна програма, рейтинг учасника на платформі, партнерські авторські програми.
-                           Використання можливе активуючи преміум опції на платформі в середовищі взаємодії між користувачами, а також в взаєморозпахунок за комісії під час вивдення коштів з балансу користувача на платіжний рахунок власника балансу. Використовується для розрахунків усередині платформи LECTOR.
+                           Внутрішній індикатор Вашої активності в еквіваленті бонусних кредитів. Нараховується платформою за вклад у розвиток спільноти: реферальну активність, публікації, рейтинг учасника та участь у партнерських програмах.
+                           Використовуються виключно для активації преміум-опцій та цифрових сервісів усередині екосистеми LECTOR. Внутрішній ресурс для використання тільки в межах платформи.
                          </p>
                          <p className="text-[10px] text-accent font-medium italic">Обмін енергоінформаційних цінностей у реальному часі.</p>
                       </div>

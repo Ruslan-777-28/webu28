@@ -44,6 +44,18 @@ service cloud.firestore {
       allow read: if isSignedIn() && resource.data.uid == request.auth.uid;
       allow create, update, delete: if false;
     }
+    
+    // ---------- Referrals ----------
+    match /referrals/{referredUid} {
+      allow read: if isSignedIn() && (request.auth.uid == referredUid || resource.data.referrerUid == request.auth.uid);
+      allow write: if false; // Only server-side creation
+    }
+
+    // ---------- Bonus Ledger ----------
+    match /bonusLedger/{txId} {
+      allow read: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow write: if false; // Server-only
+    }
 
     // ---------- Wallet Ledger ----------
     match /walletLedger/{txId} {

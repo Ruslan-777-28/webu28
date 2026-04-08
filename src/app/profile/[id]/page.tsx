@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, Bookmark, Star, Users, Briefcase, Award, MapPin, Globe, Clock, MessageCircle, LayoutGrid, Zap, X, Calendar, Video, FileText, HelpCircle, MessageSquare, Trophy, CheckCircle, Megaphone, Paperclip, Phone, BookOpen, BookmarkPlus, Flag, Play } from 'lucide-react';
+import { Edit, Bookmark, Star, Users, Briefcase, Award, MapPin, Globe, Clock, MessageCircle, LayoutGrid, Zap, X, Calendar, Video, FileText, HelpCircle, MessageSquare, Trophy, CheckCircle, Megaphone, Paperclip, Phone, BookOpen, BookmarkPlus, Flag, Play, Copy, Check } from 'lucide-react';
 import { FavoriteButton } from '@/components/social/favorite-button';
 import { FriendButton } from '@/components/friend-button';
 import { EditProfileModal } from '@/components/edit-profile-modal';
@@ -342,6 +342,7 @@ export default function PublicProfilePage() {
     const [isPlayingIntro, setIsPlayingIntro] = useState(false);
 
     const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string>('');
+    const [copiedCode, setCopiedCode] = useState(false);
 
     const handleActionClick = () => {
         setActionModalOpen(true);
@@ -363,6 +364,13 @@ export default function PublicProfilePage() {
         window.location.href = `connectu://profile/${profileId}`;
 
         window.addEventListener('pagehide', () => clearTimeout(fallbackTimer), { once: true });
+    };
+
+    const handleCopyPromoCode = (code: string) => {
+        navigator.clipboard.writeText(code);
+        setCopiedCode(true);
+        toast({ title: "Промокод скопійовано" });
+        setTimeout(() => setCopiedCode(false), 2000);
     };
 
     useEffect(() => {
@@ -568,14 +576,31 @@ export default function PublicProfilePage() {
                                     </div>
 
                                     {/* Action row */}
-                                    <div className="flex items-center gap-2 pt-2">
+                                    <div className="flex flex-col items-center gap-3 pt-2">
                                         {isOwnProfile ? (
-                                            <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
-                                                <DialogTrigger asChild>
-                                                    <Button variant="outline" size="sm" className="h-8 font-black px-4 rounded-xl border-muted/50 bg-background hover:bg-muted shadow-sm text-[10px] uppercase tracking-wider"><Edit className="mr-1.5 h-3 w-3" />Редагувати</Button>
-                                                </DialogTrigger>
-                                                <EditProfileModal profile={profile} setOpen={setEditModalOpen} />
-                                            </Dialog>
+                                            <>
+                                                <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
+                                                    <DialogTrigger asChild>
+                                                        <Button variant="outline" size="sm" className="h-8 font-black px-4 rounded-xl border-muted/50 bg-background hover:bg-muted shadow-sm text-[10px] uppercase tracking-wider"><Edit className="mr-1.5 h-3 w-3" />Редагувати</Button>
+                                                    </DialogTrigger>
+                                                    <EditProfileModal profile={profile} setOpen={setEditModalOpen} />
+                                                </Dialog>
+
+                                                <div 
+                                                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent/5 border border-accent/10 cursor-pointer hover:bg-accent/10 transition-colors group"
+                                                    onClick={() => handleCopyPromoCode(profile.referralCode || profile.uid.slice(-6).toUpperCase())}
+                                                >
+                                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Ваш промокод:</span>
+                                                    <span className="text-[11px] font-black text-accent tracking-widest">{profile.referralCode || profile.uid.slice(-6).toUpperCase()}</span>
+                                                    <div className="ml-1">
+                                                        {copiedCode ? (
+                                                            <Check className="h-3 w-3 text-green-500" />
+                                                        ) : (
+                                                            <Copy className="h-3 w-3 text-accent opacity-40 group-hover:opacity-100 transition-opacity" />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </>
                                         ) : (
                                             <div className="flex items-center gap-2">
                                                 <FavoriteButton 

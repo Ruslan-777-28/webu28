@@ -263,6 +263,12 @@ export type UserProfile = {
     setAt: import('firebase/firestore').Timestamp;
     setBy: string; // UID of admin
   };
+  
+  // --- Referral Sprint Fields ---
+  referralCode?: string;
+  usedReferralCode?: string;
+  bonusBalance?: number;
+  referralCreditsEarned?: number;
 };
 
 export type AdminActionLog = {
@@ -388,4 +394,35 @@ export type Product = {
   imageUrl?: string;
   createdAt: any; // Firestore Timestamp
   updatedAt: any; // Firestore Timestamp
+};
+
+export type ReferralLink = {
+  referredUid: string;
+  referrerUid: string;
+  codeUsed: string;
+  status: 'linked';
+  source: 'site_signup';
+  signupBonusAwarded: boolean;
+  activationBonusAwarded: boolean;
+  createdAt: any; // Firestore Timestamp
+};
+
+export type BonusLedgerEntry = {
+  uid: string;
+  kind: 'referral_signup_bonus';
+  amount: number;
+  source: 'referral_program';
+  referralId: string; // The referredUid
+  createdAt: any;
+};
+
+export type AppNotification = {
+  uid: string; // Target user
+  channel: string; // e.g., 'user' | 'system'
+  kind: string; // was 'type'
+  title: string;
+  body: string; // was 'message'
+  readAt: any | null; // was 'read: boolean'
+  createdAt: any;
+  data?: any;
 };
