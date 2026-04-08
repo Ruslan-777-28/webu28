@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { adminAuth, adminDb } from '../lib/firebase/admin';
+import { getAdminAuth, getAdminDb } from '../lib/firebase/admin';
 import type { UserProfile } from '@/lib/types';
 
 // This script grants a user full administrative privileges.
@@ -13,6 +13,9 @@ async function setAdmin() {
     console.log('Usage: npm run set-admin <user_uid>');
     process.exit(1);
   }
+
+  const adminAuth = getAdminAuth();
+  const adminDb = getAdminDb();
 
   console.log(`Attempting to grant admin privileges to user with UID: ${uid}`);
 

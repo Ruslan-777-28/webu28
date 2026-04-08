@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { adminAuth, adminDb } from '@/lib/firebase/admin';
+import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin';
 import type { UserProfile } from '@/lib/types';
+
+export const dynamic = 'force-dynamic';
 
 type UserRole = keyof UserProfile['roles'];
 
@@ -9,6 +11,9 @@ const STAFF_ROLES: UserRole[] = ['admin', 'editor', 'author', 'moderator'];
 
 export async function POST(req: NextRequest) {
     try {
+        const adminAuth = getAdminAuth();
+        const adminDb = getAdminDb();
+
         // 1. Verify the caller is an admin by checking their ID token's custom claims.
         const idToken = req.headers.get('authorization')?.split('Bearer ')[1];
         if (!idToken) {

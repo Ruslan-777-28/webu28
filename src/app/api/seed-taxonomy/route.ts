@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase/admin';
+import { getAdminDb } from '@/lib/firebase/admin';
 import type { BlogSettings, BlogCategory, Subcategory } from '@/lib/types';
+
+export const dynamic = 'force-dynamic';
 
 const newSubcategories: Subcategory[] = [
   { id: 'tarot', name: 'Tarot', slug: 'tarot', sortOrder: 1, isActive: true },
@@ -18,6 +20,7 @@ const newSubcategories: Subcategory[] = [
 
 export async function GET() {
     try {
+        const adminDb = getAdminDb();
         const ref = adminDb.collection('blogSettings').doc('main');
         const docSnap = await ref.get();
         

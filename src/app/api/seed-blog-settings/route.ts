@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase/admin';
+import { getAdminDb } from '@/lib/firebase/admin';
 import type { BlogSettings } from '@/lib/types';
 
+export const dynamic = 'force-dynamic';
+
 const blogSettingsData: BlogSettings = {
+// ... existing data ...
   blogPageTitle: "Блог про духовні практики",
   blogPageSubtitle: "Ідеї, практики, аналітика, поради та матеріали, які допомагають краще зрозуміти себе, знайти фахівця, інструмент або рішення.",
   heroDescription: "Досліджуйте статті, ідеї та експертні матеріали з екосистеми платформи.",
@@ -50,6 +53,7 @@ const blogSettingsData: BlogSettings = {
 
 export async function POST() {
     try {
+        const adminDb = getAdminDb();
         const ref = adminDb.collection('blogSettings').doc('main');
         
         await ref.set(blogSettingsData, { merge: true });

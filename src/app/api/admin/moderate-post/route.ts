@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { adminAuth, adminDb } from '@/lib/firebase/admin';
+import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { EditorialStatus, PostStatus } from '@/lib/types';
+
+export const dynamic = 'force-dynamic';
 
 interface ModeratePostRequestBody {
     postId: string;
@@ -14,6 +16,9 @@ interface ModeratePostRequestBody {
 
 export async function POST(req: NextRequest) {
     try {
+        const adminAuth = getAdminAuth();
+        const adminDb = getAdminDb();
+
         const idToken = req.headers.get('authorization')?.split('Bearer ')[1];
         if (!idToken) {
             return NextResponse.json({ success: false, message: 'Unauthorized: No token provided.' }, { status: 401 });

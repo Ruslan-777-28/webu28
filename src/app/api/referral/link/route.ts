@@ -1,9 +1,14 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { adminAuth, adminDb } from '@/lib/firebase/admin';
+import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
     try {
+        const adminAuth = getAdminAuth();
+        const adminDb = getAdminDb();
+
         // 1. Verify the caller is authenticated via Firebase ID token
         const idToken = req.headers.get('authorization')?.split('Bearer ')[1];
         if (!idToken) {

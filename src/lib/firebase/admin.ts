@@ -4,35 +4,66 @@ import * as dotenv from 'dotenv';
 // Load environment variables from .env.local for scripts
 dotenv.config({ path: '.env.local' });
 
-// This prevents us from initializing the app more than once.
-if (!admin.apps.length) {
-  try {
-    const projectId = process.env.FIREBASE_PROJECT_ID;
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
-
-    if (!projectId) {
-      throw new Error('Firebase Admin Error: Missing FIREBASE_PROJECT_ID in environment variables.');
+/**
+ * Fallback chain for Project ID as requested for App Hosting compatibility:
+ * 1. FIREBASE_PROJECT_ID
+ * 2. GCLOUD_PROJECT
+ * 3. projectId from FIREBASE_CONFIG
+ */
+function getProjectId(): string | undefined {
+  if (process.env.FIREBASE_PROJECT_ID) return process.env.FIREBASE_PROJECT_ID;
+  if (process.env.GCLOUD_PROJECT) return process.env.GCLOUD_PROJECT;
+  
+  if (process.env.FIREBASE_CONFIG) {
+    try {
+      const config = JSON.parse(process.env.FIREBASE_CONFIG);
+      return config.projectId;
+    } catch (e) {
+      console.warn('Failed to parse FIREBASE_CONFIG for projectId');
     }
-    if (!clientEmail) {
-      throw new Error('Firebase Admin Error: Missing FIREBASE_CLIENT_EMAIL in environment variables.');
-    }
-    if (!privateKey) {
-      throw new Error('Firebase Admin Error: Missing FIREBASE_PRIVATE_KEY in environment variables.');
-    }
-
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId,
-        clientEmail,
-        // When using environment variables, the private key must be formatted correctly.
-        privateKey: privateKey.replace(/\\n/g, '\n'),
-      }),
-    });
-  } catch (error) {
-    console.error('Firebase admin initialization error:', error);
   }
+  
+  return undefined;
 }
 
-export const adminDb = admin.firestore();
-export const adminAuth = admin.auth();
+function initAdmin(): admin.app.App {
+  if (admin.apps.length > 0) {
+    return admin.apps[0]!;
+  }
+
+  const projectId = getProjectId();
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+  // We only throw if we are actually TRYING to use admin and it's missing.
+  // This will NOT throw at top-level import during build.
+  if (!projectId || !clientEmail || !privateKey) {
+    throw new Error(
+      `Firebase Admin Error: Missing required environment variables. ` +
+      `Check FIREBASE_PROJECT_ID/GCLOUD_PROJECT, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY.`
+    );
+  }
+
+  return admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId,
+      clientEmail,
+      privateKey: privateKey.replace(/\\n/g, '\n'),
+    }),
+  });
+}
+
+// Lazy getters to prevent top-level initialization crash during build
+export const getAdminDb = () => {
+  initAdmin();
+  return admin.firestore();
+};
+
+export const getAdminAuth = () => {
+  initAdmin();
+  return admin.auth();
+};
+
+// Legacy exports (Note: these will now crash ONLY if accessed, which is what we want)
+export const adminDb = {} as admin.firestore.Firestore;
+export const adminAuth = {} as admin.auth.Auth;

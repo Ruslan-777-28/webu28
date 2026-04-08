@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase/admin';
-import * as admin from 'firebase-admin';
+import { getAdminDb } from '@/lib/firebase/admin';
+import { FieldValue } from 'firebase-admin/firestore';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
     try {
+        const adminDb = getAdminDb();
         const body = await req.json();
         const { postId } = body;
 
@@ -15,7 +18,7 @@ export async function POST(req: NextRequest) {
         const postRef = adminDb.collection('posts').doc(postId);
         
         await postRef.update({
-            views: admin.firestore.FieldValue.increment(1)
+            views: FieldValue.increment(1)
         });
 
         return NextResponse.json({ success: true });

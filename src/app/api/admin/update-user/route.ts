@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { adminAuth, adminDb } from '@/lib/firebase/admin';
+import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { UserAccountStatus, UserProfile } from '@/lib/types';
+
+export const dynamic = 'force-dynamic';
 
 interface UpdateRequestBody {
     uid: string;
@@ -11,6 +13,9 @@ interface UpdateRequestBody {
 
 export async function POST(req: NextRequest) {
     try {
+        const adminAuth = getAdminAuth();
+        const adminDb = getAdminDb();
+
         // 1. Verify the caller is an admin or moderator by checking their ID token.
         const idToken = req.headers.get('authorization')?.split('Bearer ')[1];
         if (!idToken) {
