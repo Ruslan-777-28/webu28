@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Twitter, Instagram, Linkedin, Youtube, Facebook } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Skeleton } from '../ui/skeleton';
 
@@ -39,16 +39,20 @@ export default function Footer() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const settingsRef = doc(db, 'siteSettings', 'footer');
-    const unsubscribe = onSnapshot(settingsRef, (docSnap) => {
-        if (docSnap.exists()) {
-            setSettings(docSnap.data() as FooterSettings);
+    const fetchFooter = async () => {
+        try {
+            const settingsRef = doc(db, 'siteSettings', 'footer');
+            const docSnap = await getDoc(settingsRef);
+            if (docSnap.exists()) {
+                setSettings(docSnap.data() as FooterSettings);
+            }
+        } catch (error) {
+            console.error("Error loading footer settings:", error);
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
-    }, () => {
-        setIsLoading(false);
-    });
-    return () => unsubscribe();
+    };
+    fetchFooter();
   }, []);
 
   const informationLinks = [

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { HomeHeroMediaSettings } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -32,20 +32,18 @@ export function PageHero({
 
     if (!docPath) return;
 
-    const unsub = onSnapshot(doc(db, docPath), (docSnap) => {
+    getDoc(doc(db, docPath)).then((docSnap) => {
       if (docSnap.exists()) {
         setSettings(docSnap.data() as HomeHeroMediaSettings);
       } else {
         setSettings(null);
       }
       setLoading(false);
-    }, (error) => {
+    }).catch((error) => {
       console.error(`Error loading hero settings for ${pageId}:`, error);
       setSettings(null);
       setLoading(false);
     });
-
-    return () => unsub();
   }, [pageId]);
 
   if (loading) {

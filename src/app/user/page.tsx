@@ -28,7 +28,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import Footer from '@/components/layout/footer';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { FaqItem } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -107,23 +107,26 @@ export default function CommunityPage() {
     const [isLoadingFaq, setIsLoadingFaq] = useState(true);
 
     useEffect(() => {
-        const faqQuery = query(
-            collection(db, 'faqItems'),
-            where('isActive', '==', true),
-            where('showOnCommunityPage', '==', true),
-            orderBy('sortOrder', 'asc')
-        );
+        const fetchFaq = async () => {
+            try {
+                const faqQuery = query(
+                    collection(db, 'faqItems'),
+                    where('isActive', '==', true),
+                    where('showOnCommunityPage', '==', true),
+                    orderBy('sortOrder', 'asc')
+                );
 
-        const unsubscribe = onSnapshot(faqQuery, (snapshot) => {
-            const fetchedFaqs = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as FaqItem));
-            setFaqItems(fetchedFaqs);
-            setIsLoadingFaq(false);
-        }, (error) => {
-            console.error("Error fetching community FAQ items: ", error);
-            setIsLoadingFaq(false);
-        });
+                const snapshot = await getDocs(faqQuery);
+                const fetchedFaqs = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as FaqItem));
+                setFaqItems(fetchedFaqs);
+            } catch (error) {
+                console.error("Error fetching community FAQ items: ", error);
+            } finally {
+                setIsLoadingFaq(false);
+            }
+        };
 
-        return () => unsubscribe();
+        fetchFaq();
     }, []);
 
     return (

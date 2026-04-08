@@ -47,7 +47,7 @@ import React, { useEffect, useState } from 'react';
 import Footer from '@/components/layout/footer';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { collection, doc, onSnapshot, orderBy, query, limit, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, orderBy, query, limit, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { FaqItem, ProHowUsersSeeYouBlock, ProKnowYourCustomerBlock, ProProfessionalItem, ProProfessionalsBlock } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -200,53 +200,52 @@ export default function ProPage() {
     const [isAuthModalOpen, setAuthModalOpen] = useState(false);
     
     useEffect(() => {
-        const proPageRef = doc(db, 'sitePages', 'pro');
-        const contentBlocksRef = collection(proPageRef, 'contentBlocks');
+        const fetchAllData = async () => {
+            try {
+                const proPageRef = doc(db, 'sitePages', 'pro');
+                const contentBlocksRef = collection(proPageRef, 'contentBlocks');
 
-        const unsubCustomer = onSnapshot(doc(contentBlocksRef, 'know-your-customer'), (docSnap) => {
-            if (docSnap.exists()) {
-                setCustomerBlock(docSnap.data() as ProKnowYourCustomerBlock);
-            }
-        });
+                // 1. Fetch content blocks
+                const [customerSnap, profileSnap, proSnap] = await Promise.all([
+                    getDoc(doc(contentBlocksRef, 'know-your-customer')),
+                    getDoc(doc(contentBlocksRef, 'how-users-see-you')),
+                    getDoc(doc(contentBlocksRef, 'professionals-already-with-us'))
+                ]);
 
-        const unsubProfile = onSnapshot(doc(contentBlocksRef, 'how-users-see-you'), (docSnap) => {
-             if (docSnap.exists()) {
-                setProfileBlock(docSnap.data() as ProHowUsersSeeYouBlock);
-            }
-        });
-        
-        const unsubProBlock = onSnapshot(doc(contentBlocksRef, 'professionals-already-with-us'), (docSnap) => {
-            if (docSnap.exists()) {
-                setProfessionalsBlock(docSnap.data() as ProProfessionalsBlock);
-                const itemsRef = collection(docSnap.ref, 'items');
-                const itemsQuery = query(itemsRef, orderBy('sortOrder', 'asc'));
-                const unsubItems = onSnapshot(itemsQuery, (querySnap) => {
-                    const items = querySnap.docs.map(d => ({...d.data(), id: d.id } as ProProfessionalItem));
+                if (customerSnap.exists()) setCustomerBlock(customerSnap.data() as ProKnowYourCustomerBlock);
+                if (profileSnap.exists()) setProfileBlock(profileSnap.data() as ProHowUsersSeeYouBlock);
+                
+                if (proSnap.exists()) {
+                    setProfessionalsBlock(proSnap.data() as ProProfessionalsBlock);
+                    const itemsSnap = await getDocs(query(collection(proSnap.ref, 'items'), orderBy('sortOrder', 'asc')));
+                    const items = itemsSnap.docs.map(d => ({ ...d.data(), id: d.id } as ProProfessionalItem));
                     setProfessionalItems(items.filter(item => item.isActive));
-                });
-                return unsubItems;
-            }
-        });
+                }
 
-        const faqQuery = query(
-            collection(db, 'faqItems'),
-            where('isActive', '==', true),
-            where('showOnProPage', '==', true),
-            orderBy('sortOrder', 'asc'),
-            limit(5)
-        );
-        const unsubFaq = onSnapshot(faqQuery, (snapshot) => {
-            const fetchedFaqs = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as FaqItem));
-            setFaqItems(fetchedFaqs);
-        });
+                // 2. Fetch FAQ items
+                const faqQuery = query(
+                    collection(db, 'faqItems'),
+                    where('isActive', '==', true),
+                    where('showOnProPage', '==', true),
+                    orderBy('sortOrder', 'asc'),
+                    limit(5)
+                );
+                const faqSnap = await getDocs(faqQuery);
+                const fetchedFaqs = faqSnap.docs.map(doc => ({ ...doc.data(), id: doc.id } as FaqItem));
+                setFaqItems(fetchedFaqs);
+
+            } catch (error) {
+                console.error("Error fetching pro page data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchAllData();
         
-        const timer = setTimeout(() => setIsLoading(false), 1500);
+        const timer = setTimeout(() => setIsLoading(false), 3000); // Fail-safe loading indicator
 
         return () => {
-            unsubCustomer();
-            unsubProfile();
-            unsubProBlock();
-            unsubFaq();
             clearTimeout(timer);
         }
     }, []);

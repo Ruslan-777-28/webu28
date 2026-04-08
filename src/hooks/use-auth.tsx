@@ -23,26 +23,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let unsubProfile: (() => void) | null = null;
+
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+      // 1. Always cleanup previous profile listener if it exists
+      if (unsubProfile) {
+        unsubProfile();
+        unsubProfile = null;
+      }
+
       setUser(authUser);
+      
       if (authUser) {
         authUser.getIdTokenResult().then((idTokenResult) => {
             setClaims(idTokenResult.claims);
         });
 
         const profileDocRef = doc(db, 'users', authUser.uid);
-        const unsubProfile = onSnapshot(profileDocRef, (doc) => {
+        unsubProfile = onSnapshot(profileDocRef, (doc) => {
           if (doc.exists()) {
             setProfile(doc.data() as UserProfile);
           } else {
             setProfile(null);
           }
           setLoading(false);
-        }, () => {
-            // on error
+        }, (error) => {
+            console.error("Auth profile listener error:", error);
             setLoading(false);
         });
-        return () => unsubProfile(); // Cleanup profile listener on user change
       } else {
         // User is signed out
         setUser(null);
@@ -52,7 +60,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    return () => unsubscribe(); // Cleanup auth listener
+    return () => {
+      unsubscribe();
+      if (unsubProfile) unsubProfile();
+    };
   }, []);
 
   return (

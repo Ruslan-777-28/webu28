@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { HomeHeroMediaSettings } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,20 +12,19 @@ export function HeroCircleMedia() {
 
   useEffect(() => {
     const docRef = doc(db, 'siteSettings', 'homeHeroMedia');
-    const unsubscribe = onSnapshot(docRef, (snap) => {
+    
+    getDoc(docRef).then((snap) => {
       if (snap.exists()) {
         setSettings(snap.data() as HomeHeroMediaSettings);
       } else {
         setSettings(null);
       }
       setLoading(false);
-    }, (error) => {
+    }).catch((error) => {
       console.error("Error loading home hero media:", error);
       setSettings(null);
       setLoading(false);
     });
-
-    return () => unsubscribe();
   }, []);
 
   if (loading) {
