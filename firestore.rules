@@ -1,5 +1,16 @@
 rules_version = '2';
 
+// ############################################################################
+// # MASTER SOURCE OF TRUTH: LECTOR (Website Repo)
+// # --------------------------------------------------------------------------
+// # This file is the CANONICAL home for shared Firestore security rules.
+// # It covers both LECTOR (Site) and ConnectU (App) platforms.
+// #
+// # RULES MUST BE DEPLOYED EXCLUSIVELY FROM THIS REPOSITORY.
+// # DO NOT DEPLOY RULES FROM THE APP REPO (ConnectU) AS IT WILL OVERWRITE 
+// # CRITICAL PUBLIC CMS ACCESS RULES.
+// ############################################################################
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
