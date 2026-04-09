@@ -15,7 +15,11 @@ export function useFavorites(targetId?: string, type?: FavoriteType) {
     // 1. Listen to ALL favorites for this target (to get the global count)
     // If targetId is provided, we listen to that specific target
     useEffect(() => {
-        if (!targetId || !type) return;
+        if (!targetId || !type || !user) {
+            setFavorites([]);
+            setLoading(false);
+            return;
+        }
 
         const q = query(
             collection(db, 'favorites'),
@@ -33,7 +37,7 @@ export function useFavorites(targetId?: string, type?: FavoriteType) {
         });
 
         return () => unsub();
-    }, [targetId, type]);
+    }, [targetId, type, user?.uid]);
 
     // 2. Listen to OWN favorites (to show counts in user menu or list pages)
     // If targetId is NOT provided, we can use this to get lists of what user favorited

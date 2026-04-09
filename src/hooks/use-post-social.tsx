@@ -15,24 +15,29 @@ export function usePostSocial(postId: string) {
     useEffect(() => {
         if (!postId) return;
 
-        // Likes listener
-        const likesQuery = query(
-            collection(db, 'likes'),
-            where('targetId', '==', postId),
-            where('type', '==', 'post')
-        );
+        let unsubLikes = () => {};
+        let unsubComments = () => {};
 
-        const unsubLikes = onSnapshot(likesQuery, (snapshot) => {
-            setLikes(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Like)));
-        });
+        // Likes listener - only for authenticated users per firestore rules
+        if (user) {
+            const likesQuery = query(
+                collection(db, 'likes'),
+                where('targetId', '==', postId),
+                where('type', '==', 'post')
+            );
 
-        // Comments listener
+            unsubLikes = onSnapshot(likesQuery, (snapshot) => {
+                setLikes(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Like)));
+            });
+        }
+
+        // Comments listener - allowed for guests
         const commentsQuery = query(
             collection(db, 'posts', postId, 'comments'),
             orderBy('createdAt', 'desc')
         );
 
-        const unsubComments = onSnapshot(commentsQuery, (snapshot) => {
+        unsubComments = onSnapshot(commentsQuery, (snapshot) => {
             setComments(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Comment)));
             setLoading(false);
         }, (error) => {
@@ -44,7 +49,7 @@ export function usePostSocial(postId: string) {
             unsubLikes();
             unsubComments();
         };
-    }, [postId]);
+    }, [postId, user?.uid]);
 
     const isLiked = user ? likes.some(l => l.uid === user.uid) : false;
     const userLike = user ? likes.find(l => l.uid === user.uid) : null;
