@@ -1,4 +1,4 @@
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { initializeApp, getApps, getApp, FirebaseApp, FirebaseOptions } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
@@ -6,12 +6,37 @@ import { getStorage, FirebaseStorage } from 'firebase/storage';
 const isBrowser = typeof window !== 'undefined';
 
 /**
- * Fallback chain for Web Firebase Config as requested for App Hosting compatibility:
- * 1. NEXT_PUBLIC_FIREBASE_* variables
- * 2. FIREBASE_WEBAPP_CONFIG (JSON string)
+ * Global state for client-side Firebase app
  */
-function getFirebaseWebConfig() {
-  const config = {
+let app: FirebaseApp | null = null;
+let _auth: Auth;
+let _db: Firestore;
+let _storage: FirebaseStorage;
+
+/**
+ * Dynamic initialization for the browser runtime.
+ * This is called by the FirebaseClientInitializer component with config passed from the server.
+ */
+export function setFirebaseConfig(config: FirebaseOptions) {
+  if (!isBrowser) return;
+  if (app) return; // Already initialized
+
+  try {
+    if (getApps().length > 0) {
+      app = getApp();
+    } else if (config.apiKey) {
+      app = initializeApp(config);
+    }
+  } catch (error) {
+    console.error('Firebase Client Initialization Error:', error);
+  }
+}
+
+/**
+ * Fallback config resolution for build-time / SSR if NEXT_PUBLIC vars are present.
+ */
+function getStaticConfig(): FirebaseOptions {
+  return {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -20,53 +45,32 @@ function getFirebaseWebConfig() {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
   };
-
-  if (!config.apiKey && process.env.FIREBASE_WEBAPP_CONFIG) {
-    try {
-      const webappConfig = JSON.parse(process.env.FIREBASE_WEBAPP_CONFIG);
-      return {
-        apiKey: webappConfig.apiKey,
-        authDomain: webappConfig.authDomain,
-        projectId: webappConfig.projectId,
-        storageBucket: webappConfig.storageBucket,
-        messagingSenderId: webappConfig.messagingSenderId,
-        appId: webappConfig.appId,
-        measurementId: webappConfig.measurementId,
-      };
-    } catch (e) {
-      if (isBrowser) console.error('Failed to parse FIREBASE_WEBAPP_CONFIG', e);
-    }
-  }
-
-  return config;
 }
 
-// 1. Resolve config
-const firebaseConfig = getFirebaseWebConfig();
-
-// 2. Initialize App strictly browser-only to prevent build-time crashes (auth/invalid-api-key)
-// during prerendering on the server.
-const app = isBrowser && firebaseConfig.apiKey
-  ? (getApps().length ? getApp() : initializeApp(firebaseConfig))
-  : null;
-
-// 3. Lazy/Safe initialization of services
-let _auth: Auth;
-let _db: Firestore;
-let _storage: FirebaseStorage;
+// Initial attempt for environment where NEXT_PUBLIC vars are baked in
+if (isBrowser && !app) {
+    const staticConfig = getStaticConfig();
+    if (staticConfig.apiKey) {
+        setFirebaseConfig(staticConfig);
+    }
+}
 
 /**
  * These proxies provide lazy access to Firebase services.
- * IMPORTANT: In SSR/Prerender context (isBrowser === false), they return a harmless 
- * empty object. This prevents calling getAuth(app) on the server, which avoids the
- * "invalid-api-key" crash during 'next build'.
+ * In the browser, they will use 'app' once it is initialized via setFirebaseConfig.
+ * In SSR/Prerender context, they return a harmless empty object.
  */
 export const auth = isBrowser 
   ? new Proxy({} as Auth, {
       get: (target, prop: keyof Auth) => {
-        if (!app) throw new Error('Firebase Client Error: App not initialized. Check your environment variables.');
+        if (!app) {
+           // We don't throw here immediately as it might be a race condition during load.
+           // But if someone calls a function, we need the real auth.
+           console.warn('Firebase Client Warning: Auth accessed before initialization.');
+           return undefined;
+        }
         if (!_auth) _auth = getAuth(app);
-        const value = _auth[prop];
+        const value = (_auth as any)[prop];
         return typeof value === 'function' ? value.bind(_auth) : value;
       }
     })
@@ -75,9 +79,9 @@ export const auth = isBrowser
 export const db = isBrowser
   ? new Proxy({} as Firestore, {
       get: (target, prop: keyof Firestore) => {
-        if (!app) throw new Error('Firebase Client Error: App not initialized. Check your environment variables.');
+        if (!app) return undefined;
         if (!_db) _db = getFirestore(app);
-        const value = _db[prop];
+        const value = (_db as any)[prop];
         return typeof value === 'function' ? value.bind(_db) : value;
       }
     })
@@ -86,9 +90,9 @@ export const db = isBrowser
 export const storage = isBrowser
   ? new Proxy({} as FirebaseStorage, {
       get: (target, prop: keyof FirebaseStorage) => {
-        if (!app) throw new Error('Firebase Client Error: App not initialized. Check your environment variables.');
+        if (!app) return undefined;
         if (!_storage) _storage = getStorage(app);
-        const value = _storage[prop];
+        const value = (_storage as any)[prop];
         return typeof value === 'function' ? value.bind(_storage) : value;
       }
     })
