@@ -1,7 +1,5 @@
 import type {Metadata} from 'next';
 import './globals.css';
-import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider } from '@/hooks/use-auth';
 import { Inter } from 'next/font/google';
 
 const inter = Inter({
@@ -10,24 +8,26 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Welcomely',
-  description: 'Your new homepage, beautifully designed and ready to go.',
+  title: 'LECTOR',
+  description: 'LECTOR - Екосистема обміну живою енергією, сенсами та знаннями.',
 };
 
+/**
+ * Fundamental Root Layout.
+ * Contains only the HTML/Body shell, fonts, and global CSS.
+ * Is NOT dependent on Firebase runtime, making standalone routes (like /gate) safe.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="uk" className={inter.variable}>
       <head>
       </head>
       <body className="font-body antialiased">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
-        <Toaster />
+        {children}
       </body>
     </html>
   );
