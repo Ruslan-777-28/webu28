@@ -1,204 +1,308 @@
 'use client';
 
 import React from 'react';
+import { 
+  ShieldCheck, 
+  Fingerprint, 
+  Briefcase, 
+  Award, 
+  CheckCircle2, 
+  Circle, 
+  Clock, 
+  AlertCircle 
+} from 'lucide-react';
+import { useUser } from '@/hooks/use-auth';
+import { getUserTrustState } from '@/lib/trust/get-user-trust-state';
+import { TrustStrip } from '@/components/profile/trust-strip';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
 import { Navigation } from '@/components/navigation';
 import Footer from '@/components/layout/footer';
-import { ShieldCheck, CheckCircle2, ArrowUpCircle, Info } from 'lucide-react';
-import { TRUST_COLORS } from '@/lib/trust/get-user-trust-state';
 
-/**
- * TrustVerificationPage - Informational hub for LECTOR's Trust & Verification system.
- * Explains how Trust Levels work, the difference between various indicators, and why it matters.
- */
+type StepStatus = 'obtained' | 'available' | 'not_available' | 'action_required';
+
+interface TrustLevelStep {
+  level: number;
+  title: string;
+  icon: any;
+  description: string;
+  requirements: { label: string; met: boolean }[];
+  status: StepStatus;
+  statusLabel: string;
+}
+
 export default function TrustVerificationPage() {
+  const { user, profile, loading: isLoading } = useUser();
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navigation />
+        <main className="flex-grow container mx-auto max-w-3xl p-4 md:p-8 space-y-6 pt-10">
+          <Skeleton className="h-40 w-full rounded-3xl" />
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-36 w-full rounded-2xl" />
+            ))}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!user || !profile) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navigation />
+        <main className="flex-grow flex flex-col items-center justify-center p-8 text-center">
+          <h1 className="text-2xl font-black uppercase tracking-tight mb-2">Приватний розділ</h1>
+          <p className="text-muted-foreground max-w-xs">Ця сторінка доступна лише для зареєстрованих користувачів.</p>
+          <Link href="/" className="mt-6 text-primary font-bold hover:underline">На головну</Link>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const trustState = getUserTrustState(profile);
+  const currentLevel = trustState.level;
+  const v = profile.verification;
+
+  // Define the 4 levels with exact parity to app
+  const steps: TrustLevelStep[] = [
+    {
+      level: 1,
+      title: "Підтверджений акаунт",
+      icon: ShieldCheck,
+      description: "Перший крок до довіри спільноти. Підтвердьте ваші контактні дані для безпечної взаємодії.",
+      requirements: [
+        { label: "Електронна пошта підтверджена", met: !!v?.emailVerified },
+        { label: "Номер телефону підтверджено", met: !!v?.phoneVerified },
+        { label: "Завершено базове налаштування профілю", met: !!profile.displayName },
+      ],
+      status: currentLevel >= 1 ? 'obtained' : 'action_required',
+      statusLabel: currentLevel >= 1 ? 'Отримано' : 'Потрібні кроки'
+    },
+    {
+      level: 2,
+      title: "Підтверджена особа",
+      icon: Fingerprint,
+      description: "Додаткове підтвердження особи за запитом системи для забезпечення вищих стандартів безпеки.",
+      requirements: [
+        { label: "Перевірка документів (KYC) за запитом", met: v?.identityVerificationStatus === 'verified' },
+        { label: "Відсутність порушень на платформі", met: v?.noModerationFlags !== false },
+      ],
+      status: v?.identityVerificationStatus === 'verified' 
+        ? 'obtained' 
+        : (currentLevel === 1 ? 'available' : 'not_available'),
+      statusLabel: v?.identityVerificationStatus === 'verified' 
+        ? 'Отримано' 
+        : (currentLevel === 1 ? 'Наступний етап' : 'Ще не доступно')
+    },
+    {
+      level: 3,
+      title: "Активний професіонал",
+      icon: Briefcase,
+      description: "Статус для тих, хто активно надає послуги та має успішні підтверджені взаємодії.",
+      requirements: [
+        { label: "Наявність активних професійних пропозицій", met: (v?.activeProfessionalOffersCount || 0) > 0 },
+        { label: "Досвід успішних платних сесій", met: (v?.completedPaidInteractions || 0) > 0 },
+        { label: "Позитивний рейтинг та відгуки", met: !!profile.profileMetrics?.professional },
+      ],
+      status: currentLevel >= 3 ? 'obtained' : (currentLevel >= 2 ? 'available' : 'not_available'),
+      statusLabel: currentLevel >= 3 ? 'Отримано' : (currentLevel >= 2 ? 'Наступний етап' : 'Ще не доступно')
+    },
+    {
+      level: 4,
+      title: "Перевірено платформою",
+      icon: Award,
+      description: "Найвищий статус довіри, що надається на основі стабільної історії та бездоганної репутації.",
+      requirements: [
+        { label: "Повна верифікація від платформи", met: v?.publicTrustState === 'platform_verified' },
+        { label: "Тривала історія бездоганної роботи", met: (v?.accountAgeDays || 0) > 90 },
+        { label: "Відсутність системних ризиків", met: !!v?.noRefundRisk },
+      ],
+      status: currentLevel === 4 ? 'obtained' : 'not_available',
+      statusLabel: currentLevel === 4 ? 'Отримано' : 'Ще не доступно'
+    }
+  ];
+
   return (
-    <div className="flex flex-col min-h-screen bg-background relative w-full overflow-x-hidden">
+    <div className="flex flex-col min-h-screen bg-background">
       <Navigation />
       
-      <main className="flex-grow pt-8 md:pt-12 pb-20">
-        {/* Header Hero */}
-        <section className="py-16 md:py-24 border-b border-muted/10 bg-gradient-to-b from-muted/[0.05] to-transparent">
-          <div className="container max-w-5xl mx-auto px-4 text-center">
-            <div className="inline-flex items-center justify-center p-4 rounded-[24px] bg-accent/5 mb-8 shadow-sm border border-accent/10">
-              <ShieldCheck className="h-12 w-12 text-accent" />
+      <main className="flex-grow container mx-auto max-w-4xl p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700 pt-10">
+        {/* Hero Header */}
+        <section className="relative overflow-hidden rounded-[32px] border border-primary/10 bg-card/40 backdrop-blur-md p-6 md:p-12 shadow-sm">
+          <div className="absolute top-0 left-0 right-0 h-1.5 overflow-hidden">
+            <TrustStrip profile={profile} />
+          </div>
+          
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mt-4">
+            <div className="space-y-3">
+              <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-none">
+                Довіра і верифікація
+              </h1>
+              <p className="text-muted-foreground max-w-md font-medium text-lg leading-snug">
+                Спеціальна система рівнів для прозорої взаємодії та безпеки у спільноті LECTOR.
+              </p>
             </div>
-            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-foreground mb-6 leading-[0.9]">
-              Довіра і верифікація
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-medium">
-              LECTOR створює простір, де взаємодія базується на прозорості та якості. 
-              Система рівнів довіри допомагає кожному знайти надійного партнера для спілкування та обміну знаннями.
+            
+            <div className="flex flex-col items-center md:items-end gap-3 shrink-0">
+              <div className={cn(
+                "px-6 py-3 rounded-2xl font-black text-xl shadow-lg border border-white/10 uppercase tracking-tight",
+                currentLevel === 4 ? "bg-[#C5A059] text-white" : "bg-primary/5 text-primary"
+              )}
+              style={currentLevel < 4 ? { color: trustState.color, borderColor: `${trustState.color}20` } : {}}
+              >
+                {trustState.label}
+              </div>
+              <div className="flex flex-col items-center md:items-end opacity-60">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                  Рівень {currentLevel} з 4
+                </span>
+                <div className="flex gap-1 mt-1.5">
+                    {[1, 2, 3, 4].map(i => (
+                        <div key={i} className={cn(
+                            "h-1 w-6 rounded-full transition-all",
+                            i <= currentLevel ? "bg-primary" : "bg-muted"
+                        )} />
+                    ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Intro Note */}
+        <div className="p-5 rounded-3xl bg-muted/5 border border-muted/20 flex gap-5 items-start">
+          <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+            <AlertCircle className="w-6 h-6 text-primary" />
+          </div>
+          <div className="text-sm space-y-1.5 pt-0.5">
+            <p className="font-black uppercase tracking-wider text-[11px]">Про систему рівнів</p>
+            <p className="text-muted-foreground leading-relaxed font-medium">
+              Ваш рівень довіри оновлюється автоматично на основі активності та верифікації контактів. 
+              Ми розділяємо статус довіри (надійність) та статус онлайн (доступність). Високий рівень довіри відкриває доступ до преміальних функцій платформи.
             </p>
           </div>
-        </section>
+        </div>
 
-        {/* Core Principles */}
-        <section className="py-16 md:py-24">
-          <div className="container max-w-6xl mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div className="space-y-8">
-                <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-foreground leading-[1.1]">
-                  Чому ми <span className="text-accent underline underline-offset-8 decoration-accent/20">це впроваджуємо</span>?
-                </h2>
-                <div className="space-y-6">
-                  <p className="text-muted-foreground leading-relaxed text-base font-medium">
-                    Ми віримо, що преміальний сервіс неможливий без довіри. 
-                    Trust Strip (верхня смужка профілю) — це не просто декоративний елемент, 
-                    а динамічний індикатор вашого статусу та репутації на платформі.
-                  </p>
-                  <p className="text-muted-foreground leading-relaxed text-base font-medium">
-                    Кожен рівень відкриває нові можливості: від базового спілкування до активації 
-                    професійних пропозицій, монетизації та виплати отриманих коштів.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="bg-muted/[0.03] rounded-[40px] p-8 md:p-12 border border-muted/20 shadow-sm backdrop-blur-sm">
-                <div className="space-y-8">
-                  <div className="flex gap-5 group">
-                    <div className="h-12 w-12 rounded-2xl bg-accent/10 flex items-center justify-center shrink-0 border border-accent/10 group-hover:scale-105 transition-transform">
-                      <ShieldCheck className="h-6 w-6 text-accent" />
-                    </div>
-                    <div>
-                      <h4 className="font-black uppercase text-xs tracking-[0.1em] mb-1.5 text-foreground">Верхня смужка (Trust Strip)</h4>
-                      <p className="text-sm text-muted-foreground leading-snug">Ваш інтегральний рівень перевіреності та довіри платформи.</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-5 group">
-                    <div className="h-12 w-12 rounded-2xl bg-green-500/10 flex items-center justify-center shrink-0 border border-green-500/10 group-hover:scale-105 transition-transform">
-                      <div className="h-2 w-6 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-                    </div>
-                    <div>
-                      <h4 className="font-black uppercase text-xs tracking-[0.1em] mb-1.5 text-foreground">Нижня смужка (Online Indicator)</h4>
-                      <p className="text-sm text-muted-foreground leading-snug">Ваш поточний статус у мережі: онлайн, готовий до виклику або консультації.</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-5 group">
-                    <div className="h-12 w-12 rounded-2xl bg-blue-500/10 flex items-center justify-center shrink-0 border border-blue-500/10 group-hover:scale-105 transition-transform">
-                      <ArrowUpCircle className="h-6 w-6 text-blue-500" />
-                    </div>
-                    <div>
-                      <h4 className="font-black uppercase text-xs tracking-[0.1em] mb-1.5 text-foreground">Наповненість профілю (Completion)</h4>
-                      <p className="text-sm text-muted-foreground leading-snug">Показник того, наскільки детально ви розповіли про себе спільноті.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Progress Path */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 px-1">
+             <div className="h-4 w-1 bg-primary rounded-full" />
+             <h2 className="text-2xl font-black uppercase tracking-tight">Етапи зростання</h2>
           </div>
-        </section>
-
-        {/* Levels Section */}
-        <section className="py-20 md:py-32 bg-muted/[0.02] border-y border-muted/10">
-          <div className="container max-w-7xl mx-auto px-4">
-            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-center mb-20 leading-none">
-              4 Рівні Довіри
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[
-                { 
-                  level: 1, 
-                  title: 'Підтверджений акаунт', 
-                  desc: 'Мінімальний поріг для входу в спільноту та безпечної взаємодії.', 
-                  req: ['Email підтверджено', 'Телефон підтверджено', 'Базові дані профілю'],
-                  color: TRUST_COLORS[1]
-                },
-                { 
-                  level: 2, 
-                  title: 'Підтверджена особа', 
-                  desc: 'Свідчить про проходження офіційної верифікації та готовність до виплат.', 
-                  req: ['Верифікація особистості', 'Налаштування реквізитів', 'Payer readiness'],
-                  color: TRUST_COLORS[2]
-                },
-                { 
-                  level: 3, 
-                  title: 'Активний професіонал', 
-                  desc: 'Для спеціалістів, які активно створюють цінність на платформі.', 
-                  req: ['Активні пропозиції', 'Перші закриті запити', 'Відсутність претензій'],
-                  color: TRUST_COLORS[3]
-                },
-                { 
-                  level: 4, 
-                  title: 'Верифіковано платформою', 
-                  desc: 'Вищий статус довіри, амбасадорський рівень із особливим статусом.', 
-                  req: ['Високий Trust Score', 'Чиста тривала історія', 'Експертний перегляд'],
-                  color: TRUST_COLORS[4]
-                }
-              ].map((item) => (
-                <div key={item.level} className="bg-background rounded-[32px] p-8 border border-muted/40 shadow-sm flex flex-col h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                  <div className="mb-8 flex items-center justify-between">
-                    <div className="h-12 w-12 rounded-2xl flex items-center justify-center bg-muted/5 font-black text-2xl border border-muted/10" style={{ color: item.color }}>
-                      {item.level}
+          
+          <div className="grid gap-4">
+            {steps.map((step) => (
+              <Card 
+                key={step.level}
+                className={cn(
+                  "group relative overflow-hidden transition-all duration-300 border-muted/20 rounded-3xl",
+                  step.status === 'obtained' ? "bg-muted/5 border-primary/10 shadow-sm" : "bg-card/50",
+                  step.status === 'not_available' && "grayscale-[0.5] opacity-60"
+                )}
+              >
+                <CardContent className="p-6 md:p-8">
+                  <div className="flex flex-col md:flex-row gap-8">
+                    {/* Icon Column */}
+                    <div className={cn(
+                      "w-20 h-20 rounded-3xl flex items-center justify-center shrink-0 border border-white/10 shadow-xl transition-transform group-hover:scale-105 duration-500",
+                      step.status === 'obtained' ? "bg-primary text-white" : "bg-muted/20 text-muted-foreground"
+                    )}>
+                      <step.icon className="w-10 h-10" />
                     </div>
-                    <div className="flex gap-1.5">
-                      {[1, 2, 3, 4].map((seg) => (
-                        <div key={seg} className="h-1.5 w-6 rounded-full overflow-hidden bg-muted/10">
-                          {seg <= item.level && (
-                            <div className="h-full w-full opacity-60" style={{ backgroundColor: item.color }} />
+
+                    {/* Content Column */}
+                    <div className="flex-1 space-y-6">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">Рівень {step.level}</span>
+                            <CardTitle className="text-2xl font-black uppercase tracking-tight">{step.title}</CardTitle>
+                          </div>
+                          <CardDescription className="text-base font-medium leading-relaxed max-w-xl">{step.description}</CardDescription>
+                        </div>
+                        
+                        <div className="flex shrink-0">
+                          {step.status === 'obtained' ? (
+                            <Badge variant="outline" className="bg-green-500/5 text-green-600 border-green-500/20 gap-2 py-2 px-4 rounded-full font-black text-xs uppercase tracking-wider">
+                              <CheckCircle2 className="w-4 h-4" />
+                              {step.statusLabel}
+                            </Badge>
+                          ) : step.status === 'available' ? (
+                            <Badge variant="outline" className="bg-indigo-500/5 text-indigo-600 border-indigo-500/20 gap-2 py-2 px-4 rounded-full font-black text-xs uppercase tracking-wider">
+                              <Clock className="w-4 h-4" />
+                              {step.statusLabel}
+                            </Badge>
+                          ) : step.status === 'action_required' ? (
+                            <Badge variant="outline" className="bg-amber-500/5 text-amber-600 border-amber-500/20 gap-2 py-2 px-4 rounded-full font-black text-xs uppercase tracking-wider">
+                              <AlertCircle className="w-4 h-4" />
+                              {step.statusLabel}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-slate-500/5 text-slate-500 border-slate-500/10 gap-2 py-2 px-4 rounded-full font-black text-xs uppercase tracking-wider opacity-60">
+                              <Circle className="w-4 h-4" />
+                              {step.statusLabel}
+                            </Badge>
                           )}
                         </div>
-                      ))}
+                      </div>
+
+                      <div className="grid sm:grid-cols-2 gap-y-3 gap-x-12 pt-6 border-t border-muted/10">
+                        {step.requirements.map((req, idx) => (
+                          <div key={idx} className="flex items-center gap-3">
+                            {req.met ? (
+                              <div className="h-5 w-5 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                              </div>
+                            ) : (
+                              <div className="h-5 w-5 rounded-full bg-muted/20 flex items-center justify-center shrink-0">
+                                <Circle className="w-3.5 h-3.5 text-muted-foreground/30" />
+                              </div>
+                            )}
+                            <span className={cn(
+                              "text-sm font-bold tracking-tight",
+                              req.met ? "text-foreground" : "text-muted-foreground opacity-70"
+                            )}>
+                              {req.label}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                  <h3 className="text-lg font-black uppercase tracking-tight mb-4 leading-tight">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground font-medium mb-10 flex-grow leading-relaxed">{item.desc}</p>
-                  
-                  <div className="space-y-3 pt-6 border-t border-muted/20">
-                    <h4 className="text-[10px] font-black uppercase text-muted-foreground/30 tracking-[0.2em] mb-3">Вимоги:</h4>
-                    {item.req.map((r, i) => (
-                      <div key={i} className="flex gap-3 text-[11px] font-bold text-foreground/70 items-center">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0 opacity-60" />
-                        <span>{r}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </section>
+        </div>
 
-        {/* FAQ Style Section */}
-        <section className="py-20 md:py-32">
-          <div className="container max-w-4xl mx-auto px-4">
-            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-center mb-16 leading-none">
-              Питання та відповіді
-            </h2>
-            <div className="space-y-8">
-              {[
-                {
-                  q: 'Як росте мій Trust Level?',
-                  a: 'Рівень зростає автоматично при виконанні певних кроків: підтвердження контактів, проходження верифікації особи та ведення успішної професійної діяльності.'
-                },
-                {
-                  q: 'Чи можна втратити статус?',
-                  a: 'Довіра — це те, що потрібно підтримувати. Порушення правил спільноти, обґрунтовані скарги або нечесна діяльність призводять до зниження рівня аж до блокування акаунта.'
-                },
-                {
-                  q: 'Чи обов’язково бути верифікованою особою?',
-                  a: 'Це не обов’язково для простого спілкування, але необхідно для тих, за ким стоїть фінансова активність (консультації, продаж артефактів), щоб гарантувати безпеку транзакцій.'
-                },
-                {
-                  q: 'Як перевірити свій поточний рівень?',
-                  a: 'Ви бачите свою Trust Strip безпосередньо у власному профілі. Натисніть на неї, щоб побачити детальне пояснення та кроки для переходу на наступний етап.'
-                }
-              ].map((faq, i) => (
-                <div key={i} className="bg-muted/[0.03] rounded-[32px] p-8 border border-muted/20 group hover:bg-muted/[0.05] transition-colors">
-                  <h4 className="text-xl font-black text-foreground mb-4 flex gap-3">
-                    <span className="text-accent opacity-30">#</span>
-                    {faq.q}
-                  </h4>
-                  <p className="text-muted-foreground leading-relaxed font-medium pl-7 text-sm ml-0.5 border-l border-accent/10 italic">
-                    {faq.a}
-                  </p>
-                </div>
-              ))}
-            </div>
+        <footer className="text-center space-y-4 py-12">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] opacity-40">
+            Система верифікації працює у автоматичному режимі. Всі дані захищені протоколами LECTOR.
+          </p>
+          <div className="flex justify-center gap-6">
+            <Link 
+              href="/" 
+              className="text-xs font-black text-primary uppercase tracking-widest hover:underline"
+            >
+              На головну
+            </Link>
+            <Link 
+              href="/profile" 
+              className="text-xs font-black text-primary uppercase tracking-widest hover:underline"
+            >
+              Мій профіль
+            </Link>
           </div>
-        </section>
+        </footer>
       </main>
 
       <Footer />
