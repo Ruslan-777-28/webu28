@@ -29,6 +29,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Shield } from 'lucide-react';
 
+import { UserTrustAdminSection } from './user-trust-admin-section';
+
 
 async function updateUser(uid: string, action: string, payload: any, token: string) {
     const response = await fetch('/api/admin/update-user', {
@@ -129,6 +131,7 @@ export function UserAdminView({ userProfile }: { userProfile: UserProfile }) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
+                <UserTrustAdminSection userProfile={userProfile} />
                 <Card>
                     <CardHeader>
                         <CardTitle>User Information</CardTitle>
@@ -271,7 +274,7 @@ export function UserAdminView({ userProfile }: { userProfile: UserProfile }) {
 
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
-                                        <Button variant="destructive" outline disabled={isUpdatingStatus}>Ban User</Button>
+                                        <Button variant="outline" className="border-destructive text-destructive" disabled={isUpdatingStatus}>Ban User</Button>
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>
                                         <AlertDialogHeader>

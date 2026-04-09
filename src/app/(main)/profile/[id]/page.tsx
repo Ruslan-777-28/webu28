@@ -23,6 +23,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link';
 import { calculateProfileCompletion } from '@/lib/utils/profile-completion';
+import { TrustStrip } from '@/components/profile/trust-strip';
 
 const LANGUAGE_MAP: Record<string, string> = {
     'uk-UA': 'Українська',
@@ -489,6 +490,7 @@ export default function PublicProfilePage() {
                         <div className="w-full shrink-0 flex flex-col gap-4 h-full">
                             {/* Block A: Identity Card - Rectangular redesign */}
                             <Card className="shadow-md border-muted/40 bg-background/80 backdrop-blur-md overflow-hidden relative mt-1 md:mt-2 lg:mt-0 w-full flex flex-col h-full">
+                                <TrustStrip profile={profile} />
                                 {/* Avatar Block - Rectangular top block */}
                                 <div className="w-full h-40 md:h-48 lg:h-52 shrink-0 relative overflow-hidden bg-muted/20 group">
                                     {isPlayingIntro && profile.introVideoUrl ? (

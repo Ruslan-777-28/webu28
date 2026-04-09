@@ -213,6 +213,55 @@ export type CommunicationOffer = {
     createdAt: any;
     updatedAt: any;
 };
+export type VerificationLevel = 0 | 1 | 2 | 3 | 4;
+
+export type PublicTrustState = 
+  | "none"
+  | "confirmed_account"
+  | "verified_identity"
+  | "active_professional"
+  | "platform_verified";
+
+export type ManualTrustOverride = {
+  enabled: boolean;
+  trustLevel: VerificationLevel | null;
+  reason: string | null;
+  setBy: string | null;
+  setAt: import('firebase/firestore').Timestamp | null;
+};
+
+export type UserVerification = {
+  trustLevel: VerificationLevel;
+  publicTrustState: PublicTrustState;
+
+  trustScore: number;
+  riskLevel: "low" | "medium" | "high" | "blocked";
+
+  emailVerified: boolean;
+  phoneVerified: boolean;
+
+  profileCompletionEligible: boolean;
+  accountAgeDays: number;
+
+  identityVerificationStatus: "none" | "pending" | "verified" | "rejected";
+
+  payoutReadinessStatus: "not_required_yet" | "incomplete" | "pending_review" | "ready" | "blocked";
+
+  completedPaidInteractions: number;
+  activeProfessionalOffersCount: number;
+
+  noModerationFlags: boolean;
+  noRefundRisk: boolean;
+
+  trustFlags: string[];
+  trustReasons: string[];
+
+  grantedAt: import('firebase/firestore').Timestamp | null;
+  updatedAt: import('firebase/firestore').Timestamp | null;
+  verificationSyncedAt: import('firebase/firestore').Timestamp | null;
+
+  manualOverride?: ManualTrustOverride;
+};
 
 export type UserProfile = {
   uid: string;
@@ -269,6 +318,9 @@ export type UserProfile = {
   usedReferralCode?: string;
   bonusBalance?: number;
   referralCreditsEarned?: number;
+
+  // --- Trust & Verification Fields ---
+  verification?: UserVerification;
 };
 
 export type AdminActionLog = {

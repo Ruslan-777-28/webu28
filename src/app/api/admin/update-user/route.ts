@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 interface UpdateRequestBody {
     uid: string;
-    action: 'SET_STATUS' | 'UPDATE_NOTES';
+    action: 'SET_STATUS' | 'UPDATE_NOTES' | 'UPDATE_TRUST_OVERRIDE';
     payload: any;
 }
 
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
         // 2. Parse request body
         const { uid, action, payload } = (await req.json()) as UpdateRequestBody;
-        if (!uid || !action || !payload) {
+        if (!uid || !action || payload === undefined) {
             return NextResponse.json({ success: false, message: 'Invalid request body.' }, { status: 400 });
         }
 
@@ -87,6 +87,41 @@ export async function POST(req: NextRequest) {
                 updateData['adminMeta.lastReviewedBy'] = adminUid;
                 logAction = 'updateNotes';
                 logPayload = { notes: payload.notes.substring(0, 100) + '...' }; // Log a snippet
+                break;
+            }
+
+            case 'UPDATE_TRUST_OVERRIDE': {
+                if (payload.enabled === undefined) {
+                     return NextResponse.json({ success: false, message: 'Invalid override payload.' }, { status: 400 });
+                }
+                
+                updateData['verification.manualOverride'] = {
+                    enabled: payload.enabled,
+                    trustLevel: payload.enabled ? (payload.trustLevel ?? 0) : null,
+                    reason: payload.enabled ? (payload.reason ?? '') : null,
+                    setBy: adminName,
+                    setAt: FieldValue.serverTimestamp()
+                };
+                
+                // If enabling override, we also update the effective trustLevel and internal publicState
+                if (payload.enabled) {
+                    const level = payload.trustLevel ?? 0;
+                    updateData['verification.trustLevel'] = level;
+                    
+                    const states: Record<number, string> = {
+                        0: 'none', 
+                        1: 'confirmed_account', 
+                        2: 'verified_identity', 
+                        3: 'active_professional', 
+                        4: 'platform_verified'
+                    };
+                    updateData['verification.publicTrustState'] = states[level] || 'none';
+                }
+                
+                updateData['verification.updatedAt'] = FieldValue.serverTimestamp();
+                
+                logAction = 'updateTrustOverride';
+                logPayload = { ...payload };
                 break;
             }
 

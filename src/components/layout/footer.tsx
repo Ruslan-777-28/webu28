@@ -59,6 +59,7 @@ export default function Footer() {
     { href: '/info/community-rules', label: 'Правила спільноти' },
     { href: '/status', label: 'Статус' },
     { href: '/status/nominations', label: 'Вітрина номінацій' },
+    { href: '/trust-verification', label: 'Довіра і верифікація' },
     { href: '/status/legend', label: 'Умовні позначки' },
     { href: '/status/hall-of-fame', label: 'Hall of Fame' },
     { href: '/status/archive', label: 'Архів статусів' },

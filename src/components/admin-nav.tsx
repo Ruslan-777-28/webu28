@@ -24,6 +24,7 @@ import {
   HelpCircle,
   PlayCircle,
   Crown,
+  ShieldCheck,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -33,6 +34,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 const allNavItems = [
   { href: '/admin/users', label: 'Users', icon: Users, roles: ['moderator', 'admin'] },
   { href: '/admin/publication-queue', label: 'Publication Queue', icon: Inbox, roles: ['moderator', 'editor', 'admin'] },
+  { href: '/admin/trust', label: 'Trust Operations', icon: ShieldCheck, roles: ['moderator', 'admin'] },
   { href: '/admin/content', label: 'Content', icon: FileText, roles: ['admin'] },
   { href: '/admin/content/hero', label: 'Hero Media', icon: PlayCircle, roles: ['admin'] },
   { href: '/admin/content/faq', label: 'FAQ', icon: HelpCircle, roles: ['admin'] },

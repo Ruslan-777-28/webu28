@@ -76,6 +76,11 @@ export function UserNav() {
               Мої публікації
             </DropdownMenuItem>
           </Link>
+          <Link href="/trust-verification">
+            <DropdownMenuItem className="cursor-pointer font-bold text-primary">
+              Довіра і верифікація
+            </DropdownMenuItem>
+          </Link>
           {canAccessAdmin && (
             <Link href="/admin">
               <DropdownMenuItem className="cursor-pointer">
