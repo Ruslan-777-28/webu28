@@ -14,7 +14,6 @@ import {
   Shield,
   BookOpen,
   Users,
-  Users,
   AlertTriangle,
   Landmark,
   Sparkles,
@@ -199,7 +198,7 @@ export default function CommunityArchitectsPage() {
                     <div className="flex items-start gap-3 mb-4">
                       <Link href={`/profile/${architect.userId}`}>
                         <Avatar className="h-12 w-12 border-2 border-muted/30 shadow-sm cursor-pointer hover:border-accent/40 transition-colors">
-                          <AvatarImage src={architect.userAvatarUrl} alt={architect.userDisplayName} />
+                          <AvatarImage src={architect.userAvatarUrl ?? undefined} alt={architect.userDisplayName} />
                           <AvatarFallback className="text-xs font-bold bg-muted/30">
                             {(architect.userDisplayName || '?').slice(0, 2).toUpperCase()}
                           </AvatarFallback>
@@ -332,8 +331,6 @@ export default function CommunityArchitectsPage() {
               </div>
             </div>
           </div>
-        </section>
-
         </section>
         
         {/* Architect Council Prestige Block */}

@@ -22,6 +22,8 @@ import {
     TrendingUp,
     TrendingUp as trendingUp,
     Send,
+    AlertTriangle,
+    Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -29,7 +31,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import type { CouncilThread, CouncilThreadType, CouncilMember } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
@@ -213,8 +215,9 @@ export default function ArchitectCouncilPage() {
                                         </div>
                                         
                                         <CreateThreadForm onFlush={() => { 
-                                            const token = user ? user.getIdToken() : null;
-                                            token.then(t => fetchThreads(t));
+                                            if (user) {
+                                                user.getIdToken().then(t => fetchThreads(t));
+                                            }
                                         }} isAdmin={status?.status === 'admin'} />
                                     </DialogContent>
                                 </Dialog>
