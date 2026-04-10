@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { doc, onSnapshot, collection, query, where, addDoc, deleteDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useUser } from '@/hooks/use-auth';
-import type { UserProfile, Post, BlogSettings, CommunicationOffer, Product } from '@/lib/types';
+import type { UserProfile, Post, BlogSettings, CommunicationOffer, Product, CommunityArchitectAssignment } from '@/lib/types';
 import { ProfileStatusShelf } from '@/components/profile/profile-status-shelf';
 import { Navigation } from '@/components/navigation';
 import Footer from '@/components/layout/footer';
@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, Bookmark, Star, Users, Briefcase, Award, MapPin, Globe, Clock, MessageCircle, LayoutGrid, Zap, X, Calendar, Video, FileText, HelpCircle, MessageSquare, Trophy, CheckCircle, Megaphone, Paperclip, Phone, BookOpen, BookmarkPlus, Flag, Play, Copy, Check } from 'lucide-react';
+import { Edit, Bookmark, Star, Users, Briefcase, Award, MapPin, Globe, Clock, MessageCircle, LayoutGrid, Zap, X, Calendar, Video, FileText, HelpCircle, MessageSquare, Trophy, CheckCircle, Megaphone, Paperclip, Phone, BookOpen, BookmarkPlus, Flag, Play, Copy, Check, Landmark } from 'lucide-react';
 import { FavoriteButton } from '@/components/social/favorite-button';
 import { FriendButton } from '@/components/friend-button';
 import { EditProfileModal } from '@/components/edit-profile-modal';
@@ -344,6 +344,7 @@ export default function PublicProfilePage() {
 
     const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string>('');
     const [copiedCode, setCopiedCode] = useState(false);
+    const [architectAssignment, setArchitectAssignment] = useState<CommunityArchitectAssignment | null>(null);
 
     const handleActionClick = () => {
         setActionModalOpen(true);
@@ -414,6 +415,22 @@ export default function PublicProfilePage() {
             setProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product)));
         });
 
+        // Fetch Community Architect assignment via server-side API (sanitized, no notesInternal)
+        const fetchArchitect = async () => {
+            try {
+                const res = await fetch(`/api/community-architects?userId=${profileId}`);
+                const json = await res.json();
+                if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+                    setArchitectAssignment(json.data[0]);
+                } else {
+                    setArchitectAssignment(null);
+                }
+            } catch {
+                setArchitectAssignment(null);
+            }
+        };
+        fetchArchitect();
+
         return () => {
             unsubProfile();
             unsubPosts();
@@ -470,11 +487,16 @@ export default function PublicProfilePage() {
 
     return (
         <div className="flex flex-col min-h-screen bg-background relative w-full overflow-x-hidden">
-            {profile.coverUrl && (
+            {/* Background: Architect custom theme takes priority, then coverUrl */}
+            {architectAssignment?.profileThemeEnabled && architectAssignment?.profileThemeUrl ? (
+                <div className="fixed inset-0 z-0 pointer-events-none">
+                    <Image src={architectAssignment.profileThemeUrl} alt="Background" layout="fill" objectFit="cover" className="opacity-[0.18] blur-xl md:blur-2xl" />
+                </div>
+            ) : profile.coverUrl ? (
                 <div className="fixed inset-0 z-0 pointer-events-none">
                     <Image src={profile.coverUrl} alt="Background" layout="fill" objectFit="cover" className="opacity-[0.25] blur-xl md:blur-2xl" />
                 </div>
-            )}
+            ) : null}
             
             <div className="relative z-10 flex flex-col min-h-screen">
                 <Navigation />
@@ -491,6 +513,17 @@ export default function PublicProfilePage() {
                             {/* Block A: Identity Card - Rectangular redesign */}
                             <Card className="shadow-md border-muted/40 bg-background/80 backdrop-blur-md overflow-hidden relative mt-1 md:mt-2 lg:mt-0 w-full flex flex-col h-full">
                                 <TrustStrip profile={profile} />
+                                {/* Community Architect Role Strip */}
+                                {architectAssignment && (
+                                    <Link href="/community-architects" className="block">
+                                        <div className="relative z-30 w-full px-3 py-1.5 bg-sidebar/95 backdrop-blur-sm flex items-center justify-center gap-2 cursor-pointer hover:bg-sidebar transition-colors">
+                                            <Landmark className="h-3 w-3 text-sidebar-foreground/60" />
+                                            <span className="text-[9px] font-black uppercase tracking-[0.15em] text-sidebar-foreground/80">
+                                                Community Architect — {architectAssignment.subcategoryName}, {architectAssignment.countryName}
+                                            </span>
+                                        </div>
+                                    </Link>
+                                )}
                                 {/* Avatar Block - Rectangular top block */}
                                 <div className="w-full h-40 md:h-48 lg:h-52 shrink-0 relative overflow-hidden bg-muted/20 group">
                                     {isPlayingIntro && profile.introVideoUrl ? (
@@ -624,6 +657,29 @@ export default function PublicProfilePage() {
                                             {profile.shortBio || profile.bio || 'Користувач ще не додав інформацію про себе.'}
                                         </p>
                                     </div>
+
+                                    {/* Community Architect Public Role Block */}
+                                    {architectAssignment && (
+                                        <div className="w-[90%] mx-auto pt-3 border-t border-muted/10">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Landmark className="h-3 w-3 text-accent/60" />
+                                                <span className="text-[9px] font-black uppercase tracking-[0.15em] text-accent/70">Community Architect</span>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] font-bold text-foreground/70">
+                                                    {architectAssignment.subcategoryName} · {architectAssignment.countryName}
+                                                </p>
+                                                {architectAssignment.publicStatement && (
+                                                    <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-3">
+                                                        {architectAssignment.publicStatement}
+                                                    </p>
+                                                )}
+                                                <Link href="/community-architects" className="inline-flex items-center gap-1 text-[9px] font-bold text-accent/60 hover:text-accent transition-colors uppercase tracking-widest mt-1">
+                                                    Дізнатись більше
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    )}
                                     
                                     <div className="h-1" />
                                 </CardContent>

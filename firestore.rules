@@ -210,6 +210,15 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ---------- Community Architect Assignments ----------
+    // Public reads go through server-side API (/api/community-architects)
+    // which uses Admin SDK and strips notesInternal + admin-only fields.
+    // Direct client reads: admin-only (for admin management pages).
+    match /communityArchitectAssignments/{assignmentId} {
+      allow read: if isSignedIn() && request.auth.token.admin == true;
+      allow create, update, delete: if isSignedIn() && request.auth.token.admin == true;
+    }
+
     // ---------- Default deny ----------
     match /{document=**} {
       allow read, write: if false;

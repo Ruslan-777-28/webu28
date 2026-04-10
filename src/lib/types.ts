@@ -478,3 +478,37 @@ export type AppNotification = {
   createdAt: any;
   data?: any;
 };
+
+// --- Community Architect Governance ---
+
+export type CommunityArchitectAssignment = {
+  id: string; // Firestore document ID
+  userId: string;
+  countryCode: string;
+  countryName: string;
+  categoryId: string;
+  categoryName: string;
+  subcategoryId: string;
+  subcategoryName: string;
+  publicTitle: string;
+  publicStatement: string;
+  isActive: boolean;
+  isBlocked: boolean;
+  blockReason: string | null;
+  termStartAt: any; // Firestore Timestamp
+  termEndAt: any; // Firestore Timestamp
+  renewalCount: number;
+  isFeatured: boolean;
+  profileThemeEnabled: boolean;
+  profileThemeMode: "custom" | "curated";
+  profileThemeUrl: string | null;
+  // Future-ready governance fields (not surfaced in v1 UI)
+  councilEligible: boolean;
+  futureEditorialScopeEnabled: boolean;
+  assignedBy: string; // UID of admin
+  assignedAt: any; // Firestore Timestamp
+  updatedAt: any; // Firestore Timestamp
+  blockedAt: any | null; // Firestore Timestamp
+  blockedBy: string | null; // UID of admin who blocked
+  notesInternal: string | null;
+};

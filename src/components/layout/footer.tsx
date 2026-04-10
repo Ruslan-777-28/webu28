@@ -64,6 +64,7 @@ export default function Footer() {
     { href: '/status/hall-of-fame', label: 'Hall of Fame' },
     { href: '/status/archive', label: 'Архів статусів' },
     { href: '/referral-sprint-program', label: 'Referral Sprint Program' },
+    { href: '/community-architects', label: 'Community Architects' },
     { href: '/info/contact', label: 'Контакти' },
     { href: '/info/privacy-policy', label: 'Privacy Policy' },
     { href: '/info/terms-of-use', label: 'Terms of Use' },
