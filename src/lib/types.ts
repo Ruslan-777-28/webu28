@@ -512,3 +512,79 @@ export type CommunityArchitectAssignment = {
   blockedBy: string | null; // UID of admin who blocked
   notesInternal: string | null;
 };
+
+// --- Architect Council Governance ---
+
+export type CouncilThreadType = 
+  | "announcement" 
+  | "idea" 
+  | "launch_discussion" 
+  | "local_initiative" 
+  | "shortlist_nomination" 
+  | "product_feedback" 
+  | "internal_note";
+
+export type CouncilThreadStatus = "open" | "in_review" | "planned" | "done" | "archived";
+
+export type CouncilThread = {
+  id: string;
+  authorUid: string;
+  authorName: string;
+  authorAvatarUrl: string | null;
+  authorCountryCode?: string;
+  authorCountryName?: string;
+  authorSubcategoryId?: string;
+  authorSubcategoryName?: string;
+  title: string;
+  body: string;
+  type: CouncilThreadType;
+  tags: string[];
+  status: CouncilThreadStatus;
+  isPinned: boolean;
+  isLocked: boolean;
+  isAnnouncement: boolean;
+  visibility: "council"; // Always 'council' in v1
+  voteCount: number;
+  commentCount: number;
+  createdAt: any; // Firestore Timestamp
+  updatedAt: any; // Firestore Timestamp
+  lastActivityAt: any; // Firestore Timestamp
+  lastCommentAt?: any; // Firestore Timestamp
+  lastCommentBy?: string; // UID
+  councilContextCountryCode?: string;
+  councilContextSubcategoryId?: string;
+  createdByRole: "architect" | "admin";
+};
+
+export type CouncilComment = {
+  id: string;
+  threadId: string;
+  authorUid: string;
+  authorName: string;
+  authorAvatarUrl: string | null;
+  body: string;
+  createdAt: any; // Firestore Timestamp
+  updatedAt: any; // Firestore Timestamp
+  isDeleted: boolean;
+};
+
+export type CouncilVote = {
+  id: string; // ${threadId}_${uid}
+  threadId: string;
+  uid: string;
+  createdAt: any; // Firestore Timestamp
+};
+
+export type CouncilMember = {
+  uid: string;
+  isActive: boolean;
+  isBlocked: boolean;
+  councilEligible: boolean;
+  roleTitle: string;
+  countryCode: string;
+  countryName: string;
+  subcategoryId: string;
+  subcategoryName: string;
+  termEndAt: any; // Firestore Timestamp
+  updatedAt: any; // Firestore Timestamp
+};

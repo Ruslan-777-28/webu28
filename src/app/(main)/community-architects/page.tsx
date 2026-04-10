@@ -14,9 +14,11 @@ import {
   Shield,
   BookOpen,
   Users,
+  Users,
   AlertTriangle,
   Landmark,
   Sparkles,
+  Crown,
 } from 'lucide-react';
 
 type PublicArchitect = {
@@ -332,39 +334,56 @@ export default function CommunityArchitectsPage() {
           </div>
         </section>
 
-        {/* How to Become */}
-        <section className="py-20 px-4 border-t border-border/30">
-          <div className="container mx-auto max-w-3xl">
-            <div className="text-center mb-14">
-              <h2 className="text-2xl font-bold tracking-tight text-foreground mb-3">
-                Як стати Community Architect
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Кілька ключових принципів визначення
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              {[
-                { text: 'Роль не купується і не є автоматичною', desc: 'Community Architect — це визнання від платформи, а не товар для придбання.' },
-                { text: 'Роль надається платформою строково', desc: 'Стандартний термін — 6 місяців з можливістю продовження.' },
-                { text: 'Враховуються репутація та якість присутності', desc: 'Good standing, внесок у спільноту, якість взаємодій.' },
-                { text: 'Рішення ухвалюється після перегляду', desc: 'Продовження або нове призначення — завжди по результатам ревю.' },
-              ].map((item, i) => (
-                <div key={i} className="p-6 border border-border/40 rounded-2xl hover:bg-slate-50/50 transition-colors">
-                  <p className="text-xs font-bold uppercase tracking-widest mb-2 text-foreground/80">{item.text}</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+        </section>
+        
+        {/* Architect Council Prestige Block */}
+        <section className="py-24 px-4 bg-black text-white overflow-hidden relative">
+          {/* Subtle background pattern/glow */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0,transparent_70%)] pointer-events-none" />
+          
+          <div className="container mx-auto max-w-4xl relative z-10">
+            <div className="flex flex-col md:flex-row items-center gap-12">
+              <div className="flex-1 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-[10px] uppercase tracking-[0.2em] font-medium mb-6">
+                  <Landmark className="h-3 w-3" />
+                  Privileged Access
                 </div>
-              ))}
-            </div>
-
-            {/* Closing line */}
-            <div className="mt-16 text-center">
-              <div className="inline-block p-[1px] bg-gradient-to-r from-border/10 via-accent/30 to-border/10 w-full mb-8" />
-              <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground/50 mb-3">Lector Governance</p>
-              <p className="text-sm font-light italic text-foreground/60">
-                Будуємо інфраструктуру визнання, засновану на якості та довірі.
-              </p>
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6">
+                  Architect Council
+                </h2>
+                <p className="text-white/60 text-sm md:text-base leading-relaxed mb-8 max-w-xl">
+                  Закрите коло стратегічного впливу для найбільш активних та відданих Community Architects. 
+                  Council — це не просто простір, це символ найвищої довіри, де ваші ідеї та зворотний зв’язок 
+                  стають частиною дорожньої карти розвитку платформи.
+                </p>
+                <div className="flex flex-wrap items-center gap-6 justify-center md:justify-start">
+                  {[
+                    "Сила впливу",
+                    "Стратегічне бачення",
+                    "Відповідальність",
+                    "Майбутнє платформи"
+                  ].map((text, i) => (
+                    <div key={i} className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-white/40">
+                      <span className="w-1 h-1 rounded-full bg-accent shrink-0" />
+                      {text}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="shrink-0 w-full md:w-auto">
+                <Link 
+                  href="/architect-council"
+                  className="group relative flex flex-col items-center justify-center p-8 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-center min-w-[280px]"
+                >
+                  <div className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <Crown className="h-6 w-6 text-white" />
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] mb-2">Enter the Square</span>
+                  <span className="text-[10px] text-white/40">Private Governance Workspace</span>
+                  <ArrowRight className="h-4 w-4 mt-4 text-white/20 group-hover:text-white transition-colors group-hover:translate-x-1" />
+                </Link>
+              </div>
             </div>
           </div>
         </section>

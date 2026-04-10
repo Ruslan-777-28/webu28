@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, Bookmark, Star, Users, Briefcase, Award, MapPin, Globe, Clock, MessageCircle, LayoutGrid, Zap, X, Calendar, Video, FileText, HelpCircle, MessageSquare, Trophy, CheckCircle, Megaphone, Paperclip, Phone, BookOpen, BookmarkPlus, Flag, Play, Copy, Check, Landmark } from 'lucide-react';
+import { Edit, Bookmark, Star, Users, Briefcase, Award, MapPin, Globe, Clock, MessageCircle, LayoutGrid, Zap, X, Calendar, Video, FileText, HelpCircle, MessageSquare, Trophy, CheckCircle, Megaphone, Paperclip, Phone, BookOpen, BookmarkPlus, Flag, Play, Copy, Check, Landmark, ArrowRight, Crown } from 'lucide-react';
 import { FavoriteButton } from '@/components/social/favorite-button';
 import { FriendButton } from '@/components/friend-button';
 import { EditProfileModal } from '@/components/edit-profile-modal';
@@ -677,6 +677,26 @@ export default function PublicProfilePage() {
                                                 <Link href="/community-architects" className="inline-flex items-center gap-1 text-[9px] font-bold text-accent/60 hover:text-accent transition-colors uppercase tracking-widest mt-1">
                                                     Дізнатись більше
                                                 </Link>
+
+                                                {/* Architect Council Entry CTA: Only for eligible member viewing own profile */}
+                                                {isOwnProfile && architectAssignment && architectAssignment.councilEligible && (
+                                                    <div className="mt-3 pt-3 border-t border-muted/5 flex flex-col gap-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">Privileged Access</span>
+                                                        </div>
+                                                        <Link 
+                                                            href="/architect-council" 
+                                                            className="flex items-center justify-between group/council p-2 px-3 rounded-lg border border-accent/10 bg-accent/5 hover:bg-accent/10 transition-all"
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <Crown className="h-3 w-3 text-accent" />
+                                                                <span className="text-[10px] font-bold uppercase tracking-widest text-accent group-hover/council:text-accent/80">Enter Architect Council</span>
+                                                            </div>
+                                                            <ArrowRight className="h-3 w-3 text-accent/40 group-hover/council:translate-x-0.5 transition-transform" />
+                                                        </Link>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     )}

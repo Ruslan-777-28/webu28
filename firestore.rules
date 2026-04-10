@@ -210,6 +210,26 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ---------- Architect Council (Governance) ----------
+    // Access is managed strictly through server-side API routes (/api/architect-council).
+    // API uses Admin SDK to verify council eligibility and membership.
+    // Direct client access is locked to admin only.
+    match /architectCouncilThreads/{threadId} {
+      allow read, write: if isSignedIn() && request.auth.token.admin == true;
+      
+      match /comments/{commentId} {
+        allow read, write: if isSignedIn() && request.auth.token.admin == true;
+      }
+    }
+    
+    match /architectCouncilVotes/{voteId} {
+      allow read, write: if isSignedIn() && request.auth.token.admin == true;
+    }
+    
+    match /architectCouncilMembers/{uid} {
+      allow read, write: if isSignedIn() && request.auth.token.admin == true;
+    }
+
     // ---------- Community Architect Assignments ----------
     // Public reads go through server-side API (/api/community-architects)
     // which uses Admin SDK and strips notesInternal + admin-only fields.
