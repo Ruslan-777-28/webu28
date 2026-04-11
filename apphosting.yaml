@@ -5,3 +5,11 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+
+env:
+  - variable: FIREBASE_PROJECT_ID
+    value: "your-project-id" # Replace with actual project ID
+  - variable: FIREBASE_CLIENT_EMAIL
+    value: "your-service-account-email" # Replace with actual service account email
+  - variable: FIREBASE_PRIVATE_KEY
+    secret: FIREBASE_PRIVATE_KEY # Reference to secret in Secret Manager

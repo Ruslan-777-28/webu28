@@ -1,29 +1,36 @@
 'use client';
 
-import React, { useState } from 'react';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useUser } from '@/hooks/use-auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Landmark, ArrowLeft, Save } from 'lucide-react';
+import { Landmark, ArrowLeft, Save, User, Mail, Hash } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
+import type { UserProfile } from '@/lib/types';
 import Link from 'next/link';
 
 export default function NewCommunityArchitectPage() {
   const { user } = useUser();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const prefilledUserId = searchParams?.get('userId');
   const { toast } = useToast();
+  
   const [isSaving, setIsSaving] = useState(false);
+  const [isCtxLoading, setIsCtxLoading] = useState(!!prefilledUserId);
+  const [userCtx, setUserCtx] = useState<Partial<UserProfile> | null>(null);
 
   // Form state
-  const [userId, setUserId] = useState('');
+  const [userId, setUserId] = useState(prefilledUserId || '');
   const [countryCode, setCountryCode] = useState('');
   const [countryName, setCountryName] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -39,6 +46,24 @@ export default function NewCommunityArchitectPage() {
   const [councilEligible, setCouncilEligible] = useState(false);
   const [futureEditorialScopeEnabled, setFutureEditorialScopeEnabled] = useState(false);
   const [notesInternal, setNotesInternal] = useState('');
+
+  React.useEffect(() => {
+    if (!prefilledUserId) return;
+    
+    const fetchCtx = async () => {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', prefilledUserId));
+        if (userDoc.exists()) {
+          setUserCtx({ uid: userDoc.id, ...userDoc.data() } as UserProfile);
+        }
+      } catch (err) {
+        console.error('Error fetching user context:', err);
+      } finally {
+        setIsCtxLoading(false);
+      }
+    };
+    fetchCtx();
+  }, [prefilledUserId]);
 
   const handleCreate = async () => {
     if (!user || !userId.trim()) {
@@ -114,6 +139,62 @@ export default function NewCommunityArchitectPage() {
         </div>
       </div>
 
+      {/* User Context Shortcut */}
+      {(prefilledUserId || userCtx) && (
+        <Card className="border-accent/20 bg-accent/5 shadow-sm overflow-hidden animate-in slide-in-from-top-4 duration-500">
+          <CardHeader className="py-3 px-5 border-b border-accent/10 flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+               <User className="w-3.5 h-3.5 text-accent" />
+               <span className="text-[10px] uppercase font-black tracking-widest text-accent">Target User Identity</span>
+            </div>
+            {isCtxLoading && <Skeleton className="h-3 w-16" />}
+          </CardHeader>
+          <CardContent className="p-5">
+            {isCtxLoading ? (
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-48" />
+                </div>
+              </div>
+            ) : userCtx ? (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
+                    <AvatarImage src={userCtx.avatarUrl} />
+                    <AvatarFallback className="font-bold bg-accent/10 text-accent">
+                      {(userCtx.displayName || userCtx.name || '?').slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="space-y-0.5">
+                    <h3 className="font-black text-lg tracking-tight leading-none">{userCtx.displayName || userCtx.name}</h3>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground uppercase opacity-70">
+                        <Mail className="w-3 h-3" />
+                        {userCtx.email}
+                      </span>
+                      <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground uppercase opacity-70">
+                        <Hash className="w-3 h-3" />
+                        {userCtx.uid}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="hidden sm:block">
+                   <Badge variant="outline" className="border-accent/30 text-accent text-[8px] font-black uppercase px-2 py-0.5 tracking-tighter">Verified Context</Badge>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-destructive font-bold text-sm">
+                <ShieldOff className="w-4 h-4" />
+                User identity data could not be verified for this UID.
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Identity Section */}
       <Card className="border-muted/40 shadow-sm">
         <CardHeader className="bg-muted/5 border-b border-muted/10">
@@ -122,7 +203,15 @@ export default function NewCommunityArchitectPage() {
         <CardContent className="pt-6 space-y-5">
           <div className="space-y-2">
             <Label className="text-[10px] uppercase font-black tracking-widest text-muted-foreground/60">User ID (UID)</Label>
-            <Input placeholder="Firebase UID..." value={userId} onChange={(e) => setUserId(e.target.value)} className="rounded-xl font-mono text-sm" />
+            <Input 
+              placeholder="Firebase UID..." 
+              value={userId} 
+              onChange={(e) => setUserId(e.target.value)} 
+              disabled={!!prefilledUserId}
+              readOnly={!!prefilledUserId}
+              className={`rounded-xl font-mono text-sm ${prefilledUserId ? 'bg-muted/50 border-accent/20 cursor-not-allowed text-accent/70' : ''}`} 
+            />
+            {prefilledUserId && <p className="text-[9px] font-bold text-accent/60 italic">UID locked by shortcut flow</p>}
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">

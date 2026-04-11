@@ -36,7 +36,12 @@ import {
   PowerOff,
   RefreshCcw,
   AlertTriangle,
+  User,
+  Mail,
+  Hash,
 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import type { UserProfile } from '@/lib/types';
 import Link from 'next/link';
 
 const safeFormatDate = (timestamp: any): string => {
@@ -59,6 +64,8 @@ export default function EditCommunityArchitectPage() {
   const [assignment, setAssignment] = useState<CommunityArchitectAssignment | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [userCtx, setUserCtx] = useState<Partial<UserProfile> | null>(null);
+  const [isCtxLoading, setIsCtxLoading] = useState(false);
 
   // Editable form state
   const [countryCode, setCountryCode] = useState('');
@@ -117,6 +124,26 @@ export default function EditCommunityArchitectPage() {
 
     fetchAssignment();
   }, [assignmentId]);
+
+  useEffect(() => {
+    if (!assignment?.userId) return;
+
+    const fetchUserCtx = async () => {
+      setIsCtxLoading(true);
+      try {
+        const userDoc = await getDoc(doc(db, 'users', assignment.userId));
+        if (userDoc.exists()) {
+          setUserCtx({ uid: userDoc.id, ...userDoc.data() } as UserProfile);
+        }
+      } catch (err) {
+        console.error('Error fetching user context:', err);
+      } finally {
+        setIsCtxLoading(false);
+      }
+    };
+
+    fetchUserCtx();
+  }, [assignment?.userId]);
 
   const docRef = doc(db, 'communityArchitectAssignments', assignmentId);
 
@@ -273,11 +300,67 @@ export default function EditCommunityArchitectPage() {
           <p className="text-sm text-muted-foreground font-mono">{assignment.userId}</p>
         </div>
         <div className="flex items-center gap-2">
-          {assignment.isBlocked && <Badge variant="destructive" className="text-[9px] font-black uppercase tracking-widest">Blocked</Badge>}
-          {assignment.isActive && !assignment.isBlocked && <Badge className="text-[9px] font-black uppercase tracking-widest bg-emerald-600">Active</Badge>}
-          {!assignment.isActive && !assignment.isBlocked && <Badge variant="secondary" className="text-[9px] font-black uppercase tracking-widest">Inactive</Badge>}
+          {assignment.isBlocked && <Badge variant="destructive" className="text-[9px] font-black uppercase tracking-widest h-5">Blocked</Badge>}
+          {assignment.isActive && !assignment.isBlocked && <Badge className="text-[9px] font-black uppercase tracking-widest h-5 bg-emerald-600">Active</Badge>}
+          {!assignment.isActive && !assignment.isBlocked && <Badge variant="secondary" className="text-[9px] font-black uppercase tracking-widest h-5">Inactive</Badge>}
         </div>
       </div>
+
+      {/* User Context Shortcut (Persistent in Edit) */}
+      {(userCtx || isCtxLoading) && (
+        <Card className="border-muted/30 bg-muted/5 shadow-sm overflow-hidden">
+          <CardHeader className="py-3 px-5 border-b border-muted/10 flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+               <User className="w-3.5 h-3.5 text-muted-foreground/60" />
+               <span className="text-[10px] uppercase font-black tracking-widest text-muted-foreground/60">Assigned Profile Identity</span>
+            </div>
+            {isCtxLoading && <Skeleton className="h-3 w-16" />}
+          </CardHeader>
+          <CardContent className="p-5">
+            {isCtxLoading ? (
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-48" />
+                </div>
+              </div>
+            ) : userCtx ? (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-12 w-12 border border-muted/20 shadow-sm">
+                    <AvatarImage src={userCtx.avatarUrl} />
+                    <AvatarFallback className="font-bold bg-muted/20 text-foreground/70">
+                      {(userCtx.displayName || userCtx.name || '?').slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="space-y-0.5">
+                    <h3 className="font-black text-lg tracking-tight leading-none text-foreground/90">{userCtx.displayName || userCtx.name}</h3>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground uppercase opacity-70">
+                        <Mail className="w-3 h-3" />
+                        {userCtx.email}
+                      </span>
+                      <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground uppercase opacity-70">
+                        <Hash className="w-3 h-3" />
+                        {userCtx.uid}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="hidden sm:block">
+                   <Badge variant="outline" className="border-muted/30 text-muted-foreground text-[8px] font-black uppercase px-2 py-0.5 tracking-tighter">Verified Context</Badge>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-destructive font-bold text-sm">
+                <ShieldOff className="w-4 h-4" />
+                User identity data could not be verified for this UID.
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Quick Actions */}
       <Card className="border-muted/40 shadow-sm">

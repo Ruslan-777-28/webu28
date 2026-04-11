@@ -10,12 +10,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, User, Shield, UserX } from 'lucide-react';
+import { MoreHorizontal, User, Shield, UserX, Landmark } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { UserProfile, UserAccountStatus } from '@/lib/types';
-import { useState, useMemo } from 'react';
+import type { UserProfile, UserAccountStatus, CommunityArchitectAssignment } from '@/lib/types';
+import { useState, useMemo, useEffect } from 'react';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import {
     Select,
     SelectContent,
@@ -49,6 +51,17 @@ export function UsersTable({ users, isLoading }: { users: UserProfile[], isLoadi
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [accessFilter, setAccessFilter] = useState<string>('all');
+  const [assignments, setAssignments] = useState<CommunityArchitectAssignment[]>([]);
+
+  useEffect(() => {
+    const assignmentsRef = collection(db, 'communityArchitectAssignments');
+    const unsubscribe = onSnapshot(assignmentsRef, (snapshot) => {
+      setAssignments(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as CommunityArchitectAssignment)));
+    }, (error) => {
+      console.error('Error fetching assignments for table:', error);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const filteredUsers = useMemo(() => {
     return users.filter(user => {
@@ -176,11 +189,33 @@ export function UsersTable({ users, isLoading }: { users: UserProfile[], isLoadi
                   {user.createdAt?.toDate().toLocaleDateString() || 'N/A'}
                 </TableCell>
                 <TableCell className="text-right">
-                   <Link href={`/admin/users/${user.uid}`} passHref>
-                      <Button variant="outline" size="sm">
-                        Manage
-                      </Button>
-                    </Link>
+                   <div className="flex items-center justify-end gap-2">
+                     {(() => {
+                        const assignment = assignments.find(a => a.userId === user.uid);
+                        if (assignment) {
+                          return (
+                            <Link href={`/admin/community-architects/${assignment.id}`} passHref title="Edit Community Architect">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-accent hover:text-accent hover:bg-accent/10 border border-accent/20">
+                                <Landmark className="w-4 h-4" />
+                              </Button>
+                            </Link>
+                          );
+                        } else {
+                          return (
+                            <Link href={`/admin/community-architects/new?userId=${user.uid}`} passHref title="Assign Community Architect">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground hover:text-accent hover:bg-accent/10">
+                                <Landmark className="w-4 h-4 opacity-40 hover:opacity-100" />
+                              </Button>
+                            </Link>
+                          );
+                        }
+                     })()}
+                     <Link href={`/admin/users/${user.uid}`} passHref>
+                        <Button variant="outline" size="sm" className="rounded-lg font-bold uppercase text-[10px] tracking-widest h-8 px-3">
+                          Manage
+                        </Button>
+                      </Link>
+                   </div>
                 </TableCell>
               </TableRow>
             ))
