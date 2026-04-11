@@ -95,13 +95,14 @@ export async function POST(req: NextRequest) {
                      return NextResponse.json({ success: false, message: 'Invalid override payload.' }, { status: 400 });
                 }
                 
-                updateData['verification.manualOverride'] = {
-                    enabled: payload.enabled,
-                    trustLevel: payload.enabled ? (payload.trustLevel ?? 0) : null,
-                    reason: payload.enabled ? (payload.reason ?? '') : null,
-                    setBy: adminName,
-                    setAt: FieldValue.serverTimestamp()
-                };
+                // IMPORTANT: Each sub-field must be a separate dot-notation key.
+                // FieldValue.serverTimestamp() cannot be nested inside an object
+                // that is the value of a dot-notation path in update().
+                updateData['verification.manualOverride.enabled'] = payload.enabled;
+                updateData['verification.manualOverride.trustLevel'] = payload.enabled ? (payload.trustLevel ?? 0) : null;
+                updateData['verification.manualOverride.reason'] = payload.enabled ? (payload.reason ?? '') : null;
+                updateData['verification.manualOverride.setBy'] = adminName;
+                updateData['verification.manualOverride.setAt'] = FieldValue.serverTimestamp();
                 
                 // If enabling override, we also update the effective trustLevel and internal publicState
                 if (payload.enabled) {
