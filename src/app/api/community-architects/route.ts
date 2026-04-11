@@ -55,8 +55,7 @@ export async function GET(req: NextRequest) {
 
     let queryRef = adminDb
       .collection('communityArchitectAssignments')
-      .where('isActive', '==', true)
-      .where('isBlocked', '==', false);
+      .where('isActive', '==', true);
 
     if (userId) {
       queryRef = queryRef.where('userId', '==', userId);
@@ -64,7 +63,11 @@ export async function GET(req: NextRequest) {
 
     const snapshot = await queryRef.get();
 
-    const assignments = snapshot.docs.map(doc => sanitizeAssignment(doc.id, doc.data()));
+    // Filter by isBlocked properly (handling documents that might not have this field yet)
+    const assignments = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter((data: any) => data.isBlocked !== true)
+      .map((data: any) => sanitizeAssignment(data.id, data));
 
     // Enrich with user display data
     const userIds = [...new Set(assignments.map(a => a.userId as string))];

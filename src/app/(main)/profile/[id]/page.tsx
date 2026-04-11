@@ -24,6 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Link from 'next/link';
 import { calculateProfileCompletion } from '@/lib/utils/profile-completion';
 import { TrustStrip } from '@/components/profile/trust-strip';
+import { Badge } from '@/components/ui/badge';
 
 const LANGUAGE_MAP: Record<string, string> = {
     'uk-UA': 'Українська',
@@ -513,13 +514,15 @@ export default function PublicProfilePage() {
                             {/* Block A: Identity Card - Rectangular redesign */}
                             <Card className="shadow-md border-muted/40 bg-background/80 backdrop-blur-md overflow-hidden relative mt-1 md:mt-2 lg:mt-0 w-full flex flex-col h-full">
                                 <TrustStrip profile={profile} />
-                                {/* Community Architect Role Strip */}
                                 {architectAssignment && (
-                                    <Link href="/community-architects" className="block">
-                                        <div className="relative z-30 w-full px-3 py-1.5 bg-sidebar/95 backdrop-blur-sm flex items-center justify-center gap-2 cursor-pointer hover:bg-sidebar transition-colors">
-                                            <Landmark className="h-3 w-3 text-sidebar-foreground/60" />
-                                            <span className="text-[9px] font-black uppercase tracking-[0.15em] text-sidebar-foreground/80">
-                                                Community Architect — {architectAssignment.subcategoryName}, {architectAssignment.countryName}
+                                    <Link href="/community-architects" className="block relative z-30">
+                                        <div className="w-full px-3 py-2 bg-accent/5 border-b border-accent/10 flex items-center justify-center gap-2 cursor-pointer hover:bg-accent/10 transition-all group/strip">
+                                            <Landmark className="h-3 w-3 text-accent/60 group-hover/strip:text-accent" />
+                                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-accent/80 group-hover/strip:text-accent">
+                                                {architectAssignment.subcategoryName && architectAssignment.countryName 
+                                                    ? `Community Architect — ${architectAssignment.subcategoryName}, ${architectAssignment.countryName}`
+                                                    : 'Community Architect'
+                                                }
                                             </span>
                                         </div>
                                     </Link>
@@ -577,8 +580,14 @@ export default function PublicProfilePage() {
                                 <CardContent className="p-4 flex flex-col items-center text-center relative z-10 bg-background pt-4 gap-3">
                                     {/* Identity info */}
                                     <div className="w-full flex flex-col items-center gap-1 mt-1">
-                                        <h1 className="text-xl lg:text-2xl font-black leading-tight tracking-tight text-foreground/90 uppercase" title={profile.displayName || profile.name}>
+                                        <h1 className="text-xl lg:text-2xl font-black leading-tight tracking-tight text-foreground/90 uppercase flex items-center justify-center gap-2" title={profile.displayName || profile.name}>
                                             {profile.displayName || profile.name}
+                                            {architectAssignment && (
+                                                <Badge variant="outline" className="border-accent/40 bg-accent/10 text-accent text-[9px] font-black uppercase px-2 py-0.5 tracking-[0.05em] shrink-0 shadow-sm">
+                                                    <Landmark className="h-3 w-3 mr-1" />
+                                                    Architect
+                                                </Badge>
+                                            )}
                                         </h1>
                                         {profile.profileMetrics?.professional?.[selectedSubcategoryId] && (
                                             <span className="text-[10px] font-black text-accent uppercase tracking-[0.1em] opacity-80">
