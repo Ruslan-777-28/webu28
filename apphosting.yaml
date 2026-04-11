@@ -7,7 +7,5 @@ runConfig:
   maxInstances: 1
 
 env:
-  - variable: FIREBASE_PROJECT_ID
-  - variable: FIREBASE_CLIENT_EMAIL
   - variable: FIREBASE_PRIVATE_KEY
     secret: FIREBASE_PRIVATE_KEY # Reference to secret in Secret Manager
