@@ -118,10 +118,14 @@ export async function POST(req: NextRequest) {
                     updateData['verification.publicTrustState'] = states[level] || 'none';
                 }
                 
-                updateData['verification.updatedAt'] = FieldValue.serverTimestamp();
+                updateData['verification.verificationSyncedAt'] = FieldValue.serverTimestamp();
                 
                 logAction = 'updateTrustOverride';
-                logPayload = { ...payload };
+                logPayload = {
+                    enabled: payload.enabled,
+                    trustLevel: payload.enabled ? (payload.trustLevel ?? 0) : null,
+                    reason: payload.enabled ? (payload.reason ?? '') : null
+                };
                 break;
             }
 
@@ -134,16 +138,20 @@ export async function POST(req: NextRequest) {
 
         // 5. Create adminActions log entry
         const logRef = adminDb.collection('adminActions').doc();
-        await logRef.set({
+        const logEntry: Record<string, any> = {
             targetType: 'user',
             targetId: uid,
             action: logAction,
             payload: logPayload,
-            reason: payload.reason,
             createdAt: FieldValue.serverTimestamp(),
             createdBy: adminUid,
             createdByName: adminName,
-        });
+        };
+        // Only include reason if it's actually present in the payload
+        if (payload.reason !== undefined) {
+            logEntry.reason = payload.reason;
+        }
+        await logRef.set(logEntry);
 
         // 6. Return success
         return NextResponse.json({ success: true, message: `Successfully performed action '${logAction}' on user ${uid}.` });
