@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { collection, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useUser } from '@/hooks/use-auth';
@@ -48,7 +48,7 @@ export default function NewCommunityArchitectPage() {
   const [futureEditorialScopeEnabled, setFutureEditorialScopeEnabled] = useState(false);
   const [notesInternal, setNotesInternal] = useState('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!prefilledUserId) return;
     
     const fetchCtx = async () => {
@@ -118,7 +118,6 @@ export default function NewCommunityArchitectPage() {
     } catch (error: any) {
       console.error('Error creating assignment:', error);
       toast({ variant: 'destructive', title: 'Failed to create assignment', description: error.message });
-    } finally {
       setIsSaving(false);
     }
   };
