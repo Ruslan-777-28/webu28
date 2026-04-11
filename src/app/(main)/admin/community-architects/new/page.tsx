@@ -1,5 +1,5 @@
 'use client';
-
+import React, { useState } from 'react';
 import { collection, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useUser } from '@/hooks/use-auth';
@@ -12,7 +12,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Landmark, ArrowLeft, Save, User, Mail, Hash } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Landmark, ArrowLeft, Save, User, Mail, Hash, ShieldOff } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UserProfile } from '@/lib/types';

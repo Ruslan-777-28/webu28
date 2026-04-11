@@ -189,27 +189,27 @@ export function UsersTable({ users, isLoading }: { users: UserProfile[], isLoadi
                   {user.createdAt?.toDate().toLocaleDateString() || 'N/A'}
                 </TableCell>
                 <TableCell className="text-right">
-                   <div className="flex items-center justify-end gap-2">
-                     {(() => {
-                        const assignment = assignments.find(a => a.userId === user.uid);
-                        if (assignment) {
-                          return (
-                            <Link href={`/admin/community-architects/${assignment.id}`} passHref title="Edit Community Architect">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-accent hover:text-accent hover:bg-accent/10 border border-accent/20">
-                                <Landmark className="w-4 h-4" />
-                              </Button>
-                            </Link>
-                          );
-                        } else {
-                          return (
-                            <Link href={`/admin/community-architects/new?userId=${user.uid}`} passHref title="Assign Community Architect">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground hover:text-accent hover:bg-accent/10">
-                                <Landmark className="w-4 h-4 opacity-40 hover:opacity-100" />
-                              </Button>
-                            </Link>
-                          );
-                        }
-                     })()}
+                    <div className="flex items-center justify-end gap-2 group/actions">
+                      {(() => {
+                         const assignment = assignments.find(a => a.userId === user.uid);
+                         if (assignment) {
+                           return (
+                             <Link href={`/admin/community-architects/${assignment.id}`} passHref title="Edit Community Architect Assignment">
+                               <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg text-accent bg-accent/5 border-accent/40 hover:bg-accent/10 hover:border-accent transition-all">
+                                 <Landmark className="w-4 h-4" />
+                               </Button>
+                             </Link>
+                           );
+                         } else {
+                           return (
+                             <Link href={`/admin/community-architects/new?userId=${user.uid}`} passHref title="Assign Community Architect Role">
+                               <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground/60 border-muted-foreground/20 hover:text-accent hover:border-accent hover:bg-accent/5 transition-all">
+                                 <Landmark className="w-4 h-4" />
+                               </Button>
+                             </Link>
+                           );
+                         }
+                      })()}
                      <Link href={`/admin/users/${user.uid}`} passHref>
                         <Button variant="outline" size="sm" className="rounded-lg font-bold uppercase text-[10px] tracking-widest h-8 px-3">
                           Manage
