@@ -96,9 +96,17 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: true, data: enriched });
   } catch (error: any) {
-    console.error('API community-architects error:', error);
+    console.error('API /api/community-architects failure:', {
+      message: error.message,
+      stack: error.stack,
+      userId: req.nextUrl.searchParams.get('userId')
+    });
     return NextResponse.json(
-      { success: false, message: 'Failed to fetch community architects.', error: error.message },
+      { 
+        success: false, 
+        message: 'Failed to fetch community architects.', 
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal Server Error' 
+      },
       { status: 500 }
     );
   }

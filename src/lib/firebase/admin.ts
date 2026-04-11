@@ -35,16 +35,24 @@ function initAdmin(): admin.app.App {
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
   const privateKey = process.env.FIREBASE_PRIVATE_KEY;
 
-  // 1. Try explicit Service Account credentials if ALL are provided
-  if (projectId && clientEmail && privateKey) {
+  const isPlaceholderProject = projectId === 'your-project-id';
+  const isPlaceholderEmail = clientEmail === 'your-service-account-email';
+
+  // 1. Try explicit Service Account credentials if ALL are provided and REAL
+  if (projectId && !isPlaceholderProject && clientEmail && !isPlaceholderEmail && privateKey) {
     console.log('[Firebase Admin] Initializing using service account env (cert)');
-    return admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId,
-        clientEmail,
-        privateKey: privateKey.replace(/\\n/g, '\n'),
-      }),
-    });
+    try {
+      return admin.initializeApp({
+        credential: admin.credential.cert({
+          projectId,
+          clientEmail,
+          privateKey: privateKey.replace(/\\n/g, '\n'),
+        }),
+      });
+    } catch (e: any) {
+      console.error('[Firebase Admin] Cert initialization failed, falling back to ADC:', e.message);
+      // Fall through to ADC
+    }
   }
 
   // 2. Fallback to Application Default Credentials (ADC) for Google Cloud / App Hosting runtimes
