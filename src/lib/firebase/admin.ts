@@ -35,21 +35,23 @@ function initAdmin(): admin.app.App {
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
   const privateKey = process.env.FIREBASE_PRIVATE_KEY;
 
-  // We only throw if we are actually TRYING to use admin and it's missing.
-  // This will NOT throw at top-level import during build.
-  if (!projectId || !clientEmail || !privateKey) {
-    throw new Error(
-      `Firebase Admin Error: Missing required environment variables. ` +
-      `Check FIREBASE_PROJECT_ID/GCLOUD_PROJECT, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY.`
-    );
+  // 1. Try explicit Service Account credentials if ALL are provided
+  if (projectId && clientEmail && privateKey) {
+    console.log('[Firebase Admin] Initializing using service account env (cert)');
+    return admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId,
+        clientEmail,
+        privateKey: privateKey.replace(/\\n/g, '\n'),
+      }),
+    });
   }
 
+  // 2. Fallback to Application Default Credentials (ADC) for Google Cloud / App Hosting runtimes
+  console.log('[Firebase Admin] Initializing using Application Default Credentials (ADC)');
   return admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId,
-      clientEmail,
-      privateKey: privateKey.replace(/\\n/g, '\n'),
-    }),
+    credential: admin.credential.applicationDefault(),
+    projectId: projectId, // Pass projectId if we have it from other sources
   });
 }
 
