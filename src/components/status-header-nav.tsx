@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Trophy, History, Info, LayoutList, Award } from 'lucide-react';
 
-export function StatusHeaderNav() {
+export function StatusHeaderNav({ className }: { className?: string }) {
     const pathname = usePathname();
 
     const links = [
@@ -16,7 +16,7 @@ export function StatusHeaderNav() {
     ];
 
     return (
-        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-1 border-b border-muted/10 mb-10 w-full max-w-fit">
+        <div className={`flex items-center gap-1 overflow-x-auto no-scrollbar pb-1 ${className !== undefined ? className : 'border-b border-muted/10 mb-10 w-full max-w-fit'}`}>
             {links.map((link) => {
                 const Icon = link.icon;
                 const isActive = pathname === link.href;

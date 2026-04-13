@@ -15,26 +15,26 @@ import { AuthModal } from '@/components/auth-modal';
 import { HeroCircleMedia } from '@/components/hero-circle-media';
 import { Navigation } from '@/components/navigation';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { HomeStatusLink } from '@/components/home-status-link';
 
 export default function HomePage() {
   const pathname = usePathname();
   const { user, loading } = useUser();
 
-  const esotericWords = [
-    { word: 'Астрологія', color: 'text-sidebar-foreground/80', margin: 'ml-4' },
-    { word: 'Таро', color: 'text-sidebar-foreground/60', margin: 'ml-12' },
-    { word: 'Медитація', color: 'text-sidebar-foreground', margin: 'ml-2' },
-    { word: 'Психічні читання', color: 'text-sidebar-foreground/70', margin: 'ml-8' },
-    { word: 'Маніфестація', color: 'text-sidebar-foreground/80', margin: 'ml-5' },
-    { word: 'Нумерологія', color: 'text-sidebar-foreground/60', margin: 'ml-10' },
-    { word: 'Reiki', color: 'text-sidebar-foreground', margin: 'ml-3' },
-    { word: 'Тлумачення снів', color: 'text-sidebar-foreground/70', margin: 'ml-9' },
-    { word: 'Чакри / energy balance', color: 'text-sidebar-foreground/80', margin: 'ml-6' },
-    { word: 'Human Design', color: 'text-sidebar-foreground/60', margin: 'ml-1' },
-    { word: 'Feng Shui', color: 'text-sidebar-foreground', margin: 'ml-11' },
-    { word: 'Oracle cards', color: 'text-sidebar-foreground/70', margin: 'ml-7' },
-    { word: 'Хіромантія', color: 'text-sidebar-foreground/80', margin: 'ml-4' },
-    { word: 'Ритуали/ обряди', color: 'text-sidebar-foreground/60', margin: 'ml-12' },
+  const subcategories = [
+    { slug: 'tarot', label: 'tarot', align: 'justify-center pr-8', weight: 'large', color: 'text-sidebar-foreground/45', description: 'фахівці з таро, читачі карт, практики символічних розкладів, інтерпретатори життєвих ситуацій, стосунків, вибору шляху та внутрішніх станів через систему карт.' },
+    { slug: 'astrology', label: 'astrology', align: 'justify-start pl-2 md:pl-4', weight: 'large', color: 'text-sidebar-foreground/95', description: 'астрологи, консультанти з натальної карти, сумісності, транзитів, життєвих циклів, періодів змін, особистих схильностей і космічних впливів.' },
+    { slug: 'numerology', label: 'numerology', align: 'justify-end pr-4 md:pr-10', weight: 'large', color: 'text-sidebar-foreground/40', description: 'нумерологи, спеціалісти з числа долі, життєвого шляху, персональних циклів, аналізу дат народження, імен та числових кодів людини.' },
+    { slug: 'energy-practices', label: 'energy practices', align: 'justify-start pl-10 md:pl-16', weight: 'compact', color: 'text-sidebar-foreground/95', description: 'енергопрактики, майстри балансування стану, фахівці з чакральної гармонізації, відновлення ресурсу, тонкої чутливості, роботи з внутрішньою енергією та відчуттям потоку.' },
+    { slug: 'meditation', label: 'meditation / mindfulness', align: 'justify-center pl-6 md:pl-10', weight: 'compact', color: 'text-sidebar-foreground/50', description: 'практики медитації, усвідомленості, внутрішнього заземлення, ментального балансу, концентрації, емоційного розвантаження та уважної присутності в собі.' },
+    { slug: 'spiritual-coaching', label: 'spiritual coaching', align: 'justify-start pl-0 md:pl-2', weight: 'compact', color: 'text-sidebar-foreground/90', description: 'духовні наставники, провідники особистісного росту, спеціалісти з внутрішньої опори, сенсів, життєвого напрямку, самопізнання та м’якого особистого супроводу.' },
+    { slug: 'oracle-practices', label: 'oracle practices', align: 'justify-end pr-6 md:pr-12', weight: 'compact', color: 'text-sidebar-foreground/50', description: 'практики оракульних систем, інтуїтивні консультанти, провідники через символічні послання, оракульні колоди, образні системи та ритуальні способи отримання підказок.' },
+    { slug: 'dream-reading', label: 'dream reading', align: 'justify-center pr-2 md:pr-4', weight: 'compact', color: 'text-sidebar-foreground/90', description: 'фахівці з тлумачення снів, символіки підсвідомості, повторюваних сюжетів, внутрішніх сигналів, емоційних образів та прихованих сенсів сновидінь.' },
+    { slug: 'human-design', label: 'human design', align: 'justify-start pl-8 md:pl-14', weight: 'compact', color: 'text-sidebar-foreground/55', description: 'спеціалісти з Human Design, які допомагають зрозуміти тип, стратегію, авторитет, природні особливості людини, її спосіб прийняття рішень і взаємодії зі світом.' },
+    { slug: 'space-reading', label: 'space reading', align: 'justify-end pr-2 md:pr-8', weight: 'compact', color: 'text-sidebar-foreground/90', description: 'практики, що працюють із відчуттям простору, енергетикою місць, атмосферою дому чи середовища, сприйняттям просторових впливів та гармонізацією оточення.' },
+    { slug: 'mentors', label: 'mentors', align: 'justify-start pl-4 md:pl-8', weight: 'large', color: 'text-sidebar-foreground/50', description: 'наставники, досвідчені провідники, консультанти з особистого розвитку, підтримки, переосмислення досвіду, вибору напрямку та проходження складних життєвих етапів.' },
+    { slug: 'other', label: '...', align: 'justify-center', weight: 'large', color: 'text-sidebar-foreground/80', description: 'інші спеціалісти суміжних або нішевих напрямів, які не входять до основного списку: авторські методики, змішані практики, рідкісні системи та індивідуальні підходи.' },
   ];
 
   return (
@@ -102,13 +102,54 @@ export default function HomePage() {
                 </Popover>
             </div>
         </div>
-        <div className="flex-grow flex justify-center items-start pt-12 overflow-y-auto">
-            <div className="flex flex-col items-start gap-y-0 text-sidebar-foreground text-sm font-thin w-full px-12" style={{paddingTop: '10rem'}}>
-                {esotericWords.map(({word, color, margin}) => (
-                    <span key={word} className={cn(color, margin, 'tracking-[0.3em] font-light')}>{word}</span>
-                ))}
-                <span className={cn('text-sidebar-foreground/60', 'ml-12', 'tracking-[0.3em]')}>. . .</span>
+        <div className="flex-grow flex flex-col justify-center items-start pb-8 md:pb-12 overflow-y-auto w-full overflow-x-hidden">
+            <div className="flex flex-col items-stretch gap-y-3 w-full px-4 md:px-8">
+                <TooltipProvider delayDuration={150}>
+                    {subcategories.map(({ slug, label, description, weight, align, color }) => {
+                        
+                        // Stark typography hierarchy logic
+                        let typographyClasses = "";
+                        if (weight === 'large') {
+                            typographyClasses = `text-[14px] md:text-[15px] font-light tracking-[0.25em] ${color}`;
+                        } else {
+                            // compact
+                            typographyClasses = `text-[10.5px] md:text-[11.5px] font-light tracking-[0.1em] ${color}`;
+                        }
+
+                        // Special tweak for the "..." item to ensure it feels like a large icon
+                        if (slug === 'other') {
+                            typographyClasses = `text-[22px] md:text-[26px] font-normal tracking-[0.3em] ${color} pt-1`;
+                        }
+
+                        return (
+                            <Tooltip key={slug}>
+                                <TooltipTrigger asChild>
+                                    <button className={cn("text-left outline-none group w-full flex", align)}>
+                                        <span className={cn(
+                                            "transition-colors duration-700 ease-out",
+                                            "group-hover:text-white group-focus-visible:text-white",
+                                            typographyClasses
+                                        )}>
+                                            {label}
+                                        </span>
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent 
+                                    side="left" 
+                                    align="center"
+                                    sideOffset={20}
+                                    className="max-w-[260px] bg-sidebar/95 border border-white/10 px-4 py-3 shadow-xl backdrop-blur-md rounded-sm"
+                                >
+                                    <p className="text-xs font-light leading-[1.6] tracking-wide text-sidebar-foreground/95 text-left">
+                                        {description}
+                                    </p>
+                                </TooltipContent>
+                            </Tooltip>
+                        );
+                    })}
+                </TooltipProvider>
             </div>
+            <HomeStatusLink />
         </div>
 
       </div>

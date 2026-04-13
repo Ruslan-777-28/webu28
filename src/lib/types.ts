@@ -428,6 +428,14 @@ export type HomeHeroMediaSettings = {
   buttonLabel?: string;
   buttonLink?: string;
 
+  statusLinkImage?: {
+    imageUrl: string;
+    storagePath: string;
+    alt: string;
+    isEnabled: boolean;
+    targetUrl: string;
+  };
+
   updatedAt?: any; // Firestore Timestamp
   updatedBy?: string; // UID of admin
   version?: number;

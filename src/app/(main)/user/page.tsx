@@ -33,6 +33,7 @@ import { db } from '@/lib/firebase/client';
 import type { FaqItem } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PageHero } from '@/components/page-hero';
+import { FloatingStatusLink } from '@/components/floating-status-link';
 
 const whyNeedItItems = [
     {
@@ -447,6 +448,7 @@ export default function CommunityPage() {
                 </section>
             </main>
             <Footer />
+            <FloatingStatusLink docId="communityHeroMedia" />
         </>
     );
 }

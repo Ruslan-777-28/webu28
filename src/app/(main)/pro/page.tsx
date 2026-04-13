@@ -55,6 +55,7 @@ import Link from 'next/link';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { AuthModal } from '@/components/auth-modal';
 import { PageHero } from '@/components/page-hero';
+import { FloatingStatusLink } from '@/components/floating-status-link';
 
 const forYouItems = [
     'астролог',
@@ -704,6 +705,7 @@ export default function ProPage() {
       <DialogContent>
         <AuthModal setOpen={setAuthModalOpen} />
       </DialogContent>
+      <FloatingStatusLink docId="proHeroMedia" />
     </Dialog>
   );
 }

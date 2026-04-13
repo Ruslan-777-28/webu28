@@ -53,6 +53,7 @@ export type StatusAwardRecord = {
     note?: string;
     archiveVisible?: boolean; // Should this record be visible in historical archives?
     userAvatarUrl?: string; // Denormalized for display in tables
+    assignedAt: number; // Timestamp of the award
     isDemo: boolean;
 };
 

@@ -26,6 +26,7 @@ function HeroTabContent({ docId, title, description, showTextFields }: { docId: 
     const [mobileVideoFile, setMobileVideoFile] = useState<File | null>(null);
     const [posterFile, setPosterFile] = useState<File | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
+    const [statusImageFile, setStatusImageFile] = useState<File | null>(null);
 
     // Initial load
     useEffect(() => {
@@ -84,6 +85,27 @@ function HeroTabContent({ docId, title, description, showTextFields }: { docId: 
                 newSettings.imagePath = path;
             }
 
+            // Status Link Image logic
+            let currentStatusLinkImage = newSettings.statusLinkImage || {
+                imageUrl: '',
+                storagePath: '',
+                alt: 'Status',
+                isEnabled: false,
+                targetUrl: '/status'
+            };
+
+            if (statusImageFile) {
+                const { url, path } = await uploadFile(statusImageFile, 'status_link_image');
+                currentStatusLinkImage.imageUrl = url;
+                currentStatusLinkImage.storagePath = path;
+            }
+
+            // Force fallback values if empty
+            if (!currentStatusLinkImage.alt) currentStatusLinkImage.alt = 'Status';
+            if (!currentStatusLinkImage.targetUrl) currentStatusLinkImage.targetUrl = '/status';
+
+            newSettings.statusLinkImage = currentStatusLinkImage;
+
             newSettings.updatedAt = serverTimestamp();
 
             await setDoc(doc(db, 'siteSettings', docId), newSettings);
@@ -94,6 +116,7 @@ function HeroTabContent({ docId, title, description, showTextFields }: { docId: 
             setMobileVideoFile(null);
             setPosterFile(null);
             setImageFile(null);
+            setStatusImageFile(null);
 
             alert('Settings saved successfully!');
         } catch (error) {
@@ -221,6 +244,71 @@ function HeroTabContent({ docId, title, description, showTextFields }: { docId: 
                         </div>
                     </div>
                 )}
+
+                <div className="space-y-4 pt-4 border-t">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-medium">Status Link Image</h3>
+                        <div className="flex items-center space-x-2">
+                            <Switch 
+                                id={`status-enabled-${docId}`} 
+                                checked={settings.statusLinkImage?.isEnabled || false} 
+                                onCheckedChange={(c) => {
+                                    setSettings({
+                                        ...settings, 
+                                        statusLinkImage: {
+                                            ...(settings.statusLinkImage || { imageUrl: '', storagePath: '', alt: 'Status', targetUrl: '/status', isEnabled: false }),
+                                            isEnabled: c
+                                        }
+                                    });
+                                }} 
+                            />
+                            <Label htmlFor={`status-enabled-${docId}`}>Enable Status Marker</Label>
+                        </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                        <Label>Image Asset</Label>
+                        {settings.statusLinkImage?.imageUrl && !statusImageFile && (
+                            <img src={settings.statusLinkImage.imageUrl} alt="Status Link Preview" className="w-16 h-16 object-contain rounded-md mb-2 bg-black/5" />
+                        )}
+                        <Input type="file" accept="image/*" onChange={(e) => setStatusImageFile(e.target.files?.[0] || null)} />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label>Target URL</Label>
+                            <Input 
+                                value={settings.statusLinkImage?.targetUrl ?? '/status'} 
+                                onChange={(e) => {
+                                    setSettings({
+                                        ...settings,
+                                        statusLinkImage: {
+                                            ...(settings.statusLinkImage || { imageUrl: '', storagePath: '', alt: 'Status', targetUrl: '/status', isEnabled: false }),
+                                            targetUrl: e.target.value
+                                        }
+                                    });
+                                }} 
+                                placeholder="/status" 
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Alt Text</Label>
+                            <Input 
+                                value={settings.statusLinkImage?.alt ?? 'Status'} 
+                                onChange={(e) => {
+                                    setSettings({
+                                        ...settings,
+                                        statusLinkImage: {
+                                            ...(settings.statusLinkImage || { imageUrl: '', storagePath: '', alt: 'Status', targetUrl: '/status', isEnabled: false }),
+                                            alt: e.target.value
+                                        }
+                                    });
+                                }} 
+                                placeholder="Status" 
+                            />
+                        </div>
+                    </div>
+                </div>
 
             </CardContent>
             <CardFooter>
