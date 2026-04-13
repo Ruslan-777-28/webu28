@@ -257,7 +257,7 @@ export default function StatusPage() {
                             const isWinnerOrHolder = row.level === 'winner' || row.level === 'holder';
                             
                             return (
-                                <Card key={row.id} className="group relative overflow-hidden bg-muted/40 border border-muted shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.14)] hover:bg-muted/50 transition-all flex flex-col p-3.5 pb-4 h-full">
+                                <Card key={row.id} className="group relative overflow-hidden bg-muted/40 border border-muted shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] md:hover:scale-[1.25] z-0 hover:z-50 hover:bg-muted/50 transition-all duration-500 ease-out flex flex-col p-3.5 pb-4 h-full origin-center">
                                     
                                     {/* Archive ID (Refined Two-Row Technical Style) */}
                                     <div className="absolute top-3 right-3.5 text-right leading-[1.1]">
