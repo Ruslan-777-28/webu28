@@ -139,34 +139,34 @@ export default function ArchitectorsPage() {
                                 key={i} 
                                 className="relative bg-white hover:bg-slate-50 border-[0.5px] border-border/30 transition-all duration-500 ease-out p-0.5 sm:p-1 flex group cursor-pointer md:hover:scale-[3] md:hover:z-50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] origin-center overflow-visible"
                             >
-                                {/* Top-Left Anchored: Flag & Code */}
-                                <div className="absolute top-0 left-0 flex flex-col items-start opacity-80 group-hover:opacity-100 transition-opacity">
-                                    <span className={`fi fi-${country.code} text-[10px] sm:text-[14px] md:text-[16px] shadow-[0_1px_3px_rgba(0,0,0,0.1)] rounded-none sm:rounded-[1px]`} style={{ lineHeight: 1 }} />
-                                    <span className="text-[4px] sm:text-[5px] md:text-[6px] font-black text-muted-foreground/80 uppercase tracking-widest mt-0.5 ml-0.5 leading-none">
-                                        {country.code}
-                                    </span>
-                                </div>
-
-                                {/* Bottom-Right Anchored Block: Status, Avatar, Title */}
-                                <div className="absolute bottom-[2px] right-[2px] sm:bottom-1 sm:right-1 flex flex-col items-end opacity-80 group-hover:opacity-100 transition-opacity">
+                                {/* Left Anchored Block: Status, Avatar, Title */}
+                                <div className="absolute bottom-[2px] left-[2px] sm:bottom-1 sm:left-1 flex flex-col items-start opacity-80 group-hover:opacity-100 transition-opacity z-20">
                                     {/* Status Label (Hover Only) */}
-                                    <span className="text-[2px] sm:text-[3px] uppercase tracking-[0.2em] text-muted-foreground/60 font-bold leading-none mb-[1.5px] opacity-0 md:group-hover:opacity-100 transition-all duration-300 hidden md:block text-right w-full">
+                                    <span className="text-[2px] sm:text-[3px] uppercase tracking-[0.2em] text-muted-foreground/60 font-bold leading-none mb-[1.5px] opacity-0 md:group-hover:opacity-100 transition-all duration-300 hidden md:block text-left w-full pl-[0.5px]">
                                         {i % 4 === 0 ? 'претендент' : 'затверджено'}
                                     </span>
 
-                                    {/* Slightly wider horizontal rounded rectangle Avatar */}
-                                    <div className="w-6 h-5 sm:w-7 sm:h-6 md:w-8 md:h-7 border-[0.5px] border-border/50 shadow-sm bg-muted overflow-hidden rounded-[1px] md:rounded-[2px]">
+                                    {/* Horizontal rounded rectangle Avatar */}
+                                    <div className="w-6 h-5 sm:w-7 sm:h-6 md:w-8 md:h-7 border-[0.5px] border-border/50 shadow-sm bg-muted overflow-hidden rounded-[1px] md:rounded-[2px] shrink-0">
                                         <img src={avatarSrc} alt="Architect" className="w-full h-full object-cover" />
                                     </div>
 
                                     {/* Role Label (Hover Only) */}
-                                    <span className="text-[2.5px] sm:text-[3px] uppercase tracking-[0.2em] text-foreground/80 font-black leading-none mt-[1.5px] opacity-0 md:group-hover:opacity-100 transition-all duration-300 hidden md:block text-right w-full">
+                                    <span className="text-[2.5px] sm:text-[3px] uppercase tracking-[0.2em] text-foreground/80 font-black leading-none mt-[1.5px] opacity-0 md:group-hover:opacity-100 transition-all duration-300 hidden md:block text-left w-full pl-[0.5px]">
                                         куратор
                                     </span>
                                 </div>
 
-                                {/* Bottom-Left Anchored: 12 Architects Button (Preview State) */}
-                                <div className="absolute bottom-[2px] left-0 md:left-[2px] sm:bottom-1 sm:left-1 opacity-0 md:group-hover:opacity-100 pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-300 hidden md:flex items-end">
+                                {/* Right Anchored Block: Flag & Code */}
+                                <div className="absolute top-0 right-0 flex flex-col items-end opacity-80 group-hover:opacity-100 transition-opacity z-10">
+                                    <span className={`fi fi-${country.code} text-[10px] sm:text-[14px] md:text-[16px] shadow-[0_1px_3px_rgba(0,0,0,0.1)] rounded-none sm:rounded-[1px]`} style={{ lineHeight: 1 }} />
+                                    <span className="text-[4px] sm:text-[5px] md:text-[6px] font-black text-muted-foreground/80 uppercase tracking-widest mt-0.5 mr-0.5 leading-none">
+                                        {country.code}
+                                    </span>
+                                </div>
+
+                                {/* Right Anchored Block: Button (Preview State) */}
+                                <div className="absolute bottom-[2px] right-0 md:right-[2px] sm:bottom-1 sm:right-1 opacity-0 md:group-hover:opacity-100 pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-300 hidden md:flex items-end z-20">
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); setSelectedCountry(country); }}
                                         className="bg-accent/10 hover:bg-accent/20 border border-accent/20 text-accent text-[2.5px] sm:text-[3px] py-[1.5px] px-[3px] rounded-[1px] uppercase font-bold tracking-widest transition-colors cursor-pointer shadow-sm relative bottom-0"
