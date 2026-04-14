@@ -134,45 +134,82 @@ export default function ArchitectorsPage() {
                     >
                         {COUNTRIES_DATA.map((country, i) => {
                             const avatarSrc = `https://i.pravatar.cc/100?u=${country.code}-arch`;
+                            
+                            // Adaptive positioning logic
+                            const isLeftHalf = (i % 16) < 8;
+                            const isTopHalf = Math.floor(i / 16) < 6;
+
                             return (
                             <div 
                                 key={i} 
-                                className="relative bg-white hover:bg-slate-50 border-[0.5px] border-border/30 transition-all duration-500 ease-out p-0.5 sm:p-1 flex group cursor-pointer md:hover:scale-[3] md:hover:z-50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] origin-center overflow-visible"
+                                className="relative bg-white hover:bg-slate-50 border-[0.5px] border-border/30 transition-colors duration-300 ease-out p-1 flex group cursor-pointer z-10 hover:z-50 overflow-visible w-full h-full"
                             >
-                                {/* Left Anchored Block: Status, Avatar, Title */}
-                                <div className="absolute bottom-[2px] left-[2px] sm:bottom-1 sm:left-1 flex flex-col items-start opacity-80 group-hover:opacity-100 transition-opacity z-20">
-                                    {/* Status Label (Hover Only) */}
-                                    <span className="text-[2px] sm:text-[3px] uppercase tracking-[0.2em] text-muted-foreground/60 font-bold leading-none mb-[1.5px] opacity-0 md:group-hover:opacity-100 transition-all duration-300 hidden md:block text-left w-full pl-[0.5px]">
-                                        {i % 4 === 0 ? 'претендент' : 'затверджено'}
-                                    </span>
-
-                                    {/* Horizontal rounded rectangle Avatar */}
-                                    <div className="w-6 h-5 sm:w-7 sm:h-6 md:w-8 md:h-7 border-[0.5px] border-border/50 shadow-sm bg-muted overflow-hidden rounded-[1px] md:rounded-[2px] shrink-0">
+                                {/* ---- 1. SMALL STATE (Always in cell) ---- */}
+                                {/* Avatar Zone (Top-Left Anchored) */}
+                                <div className="absolute top-[3px] left-[3px] sm:top-[4px] sm:left-[4px] flex flex-col items-start opacity-80 group-hover:opacity-100 transition-opacity">
+                                    <div className="w-8 h-4 sm:w-10 sm:h-5 md:w-14 md:h-7 border-[0.5px] border-border/50 shadow-sm bg-muted overflow-hidden rounded-[1px] md:rounded-[2px] shrink-0">
                                         <img src={avatarSrc} alt="Architect" className="w-full h-full object-cover" />
                                     </div>
-
-                                    {/* Role Label (Hover Only) */}
-                                    <span className="text-[2.5px] sm:text-[3px] uppercase tracking-[0.2em] text-foreground/80 font-black leading-none mt-[1.5px] opacity-0 md:group-hover:opacity-100 transition-all duration-300 hidden md:block text-left w-full pl-[0.5px]">
-                                        куратор
-                                    </span>
                                 </div>
 
-                                {/* Right Anchored Block: Flag & Code */}
-                                <div className="absolute top-0 right-0 flex flex-col items-end opacity-80 group-hover:opacity-100 transition-opacity z-10">
-                                    <span className={`fi fi-${country.code} text-[10px] sm:text-[14px] md:text-[16px] shadow-[0_1px_3px_rgba(0,0,0,0.1)] rounded-none sm:rounded-[1px]`} style={{ lineHeight: 1 }} />
-                                    <span className="text-[4px] sm:text-[5px] md:text-[6px] font-black text-muted-foreground/80 uppercase tracking-widest mt-0.5 mr-0.5 leading-none">
+                                {/* Country Zone (Top-Right Anchored) */}
+                                <div className="absolute top-[3px] right-[3px] sm:top-[4px] sm:right-[4px] flex flex-col items-end opacity-80 group-hover:opacity-100 transition-opacity">
+                                    <span className={`fi fi-${country.code} text-[12px] sm:text-[14px] md:text-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.1)] rounded-none sm:rounded-[1px]`} style={{ lineHeight: 1 }} />
+                                    <span className="text-[5px] sm:text-[6px] md:text-[7px] font-black text-muted-foreground/80 uppercase tracking-widest mt-0.5 mr-0.5 leading-none">
                                         {country.code}
                                     </span>
                                 </div>
 
-                                {/* Right Anchored Block: Button (Preview State) */}
-                                <div className="absolute bottom-[2px] right-0 md:right-[2px] sm:bottom-1 sm:right-1 opacity-0 md:group-hover:opacity-100 pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-300 hidden md:flex items-end z-20">
-                                    <button 
-                                        onClick={(e) => { e.stopPropagation(); setSelectedCountry(country); }}
-                                        className="bg-accent/10 hover:bg-accent/20 border border-accent/20 text-accent text-[2.5px] sm:text-[3px] py-[1.5px] px-[3px] rounded-[1px] uppercase font-bold tracking-widest transition-colors cursor-pointer shadow-sm relative bottom-0"
-                                    >
-                                        12 архітекторів
-                                    </button>
+                                {/* ---- 2. ENLARGED / HOVER STATE (Floating Safe Preview Overlay) ---- */}
+                                <div className={`
+                                    absolute z-[100]
+                                    w-[200px] md:w-[260px]
+                                    h-[120px] md:h-[150px]
+                                    bg-white/95 backdrop-blur-md shadow-[0_20px_50px_rgba(0,0,0,0.25)] border border-border/40
+                                    rounded-xl
+                                    opacity-0 pointer-events-none
+                                    md:group-hover:opacity-100 md:group-hover:pointer-events-auto
+                                    transition-all duration-300 ease-out
+                                    flex justify-between items-stretch p-4 md:p-5
+                                    scale-95 md:group-hover:scale-100 origin-center
+                                    ${isLeftHalf ? 'md:left-[45%]' : 'md:right-[45%]'}
+                                    ${isTopHalf ? 'md:top-[25%]' : 'md:bottom-[25%]'}
+                                    hidden md:flex
+                                `}>
+                                    {/* Left Side: Persona */}
+                                    <div className="flex flex-col items-start justify-between h-full w-1/2 pr-2">
+                                        <div className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap overflow-hidden">
+                                            <span className="text-[9px] md:text-[10px] uppercase tracking-widest text-foreground font-black leading-none truncate">
+                                                NICK_A{(i+1).toString().padStart(2, '0')}
+                                            </span>
+                                            <span className="w-[1px] h-1.5 bg-border/60 shrink-0"></span>
+                                            <span className="text-[8px] md:text-[9px] uppercase tracking-widest text-muted-foreground/60 font-bold leading-none">
+                                                {i % 4 === 0 ? 'претендент' : 'затверджено'}
+                                            </span>
+                                        </div>
+                                        <div className="w-[60px] h-[45px] md:w-[80px] md:h-[60px] border-[0.5px] border-border/50 shadow-sm bg-muted overflow-hidden rounded-md shrink-0 my-2">
+                                            <img src={avatarSrc} alt="Architect" className="w-full h-full object-cover" />
+                                        </div>
+                                        <span className="text-[11px] md:text-[12px] uppercase tracking-widest text-foreground/90 font-black leading-none">
+                                            куратор
+                                        </span>
+                                    </div>
+
+                                    {/* Right Side: Action & Country */}
+                                    <div className="flex flex-col items-end justify-between h-full w-1/2">
+                                        <div className="flex flex-col items-end translate-y-1 md:translate-y-2">
+                                            <span className={`fi fi-${country.code} text-[28px] md:text-[36px] shadow-sm rounded-[2px]`} style={{ lineHeight: 1 }} />
+                                            <span className="text-[12px] md:text-[14px] font-black text-muted-foreground/80 uppercase tracking-widest mt-1.5 leading-none">
+                                                {country.code}
+                                            </span>
+                                        </div>
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); setSelectedCountry(country); }}
+                                            className="mt-auto translate-y-1.5 md:translate-y-2.5 bg-accent/10 hover:bg-accent/20 border border-accent/20 text-accent text-[9px] md:text-[10px] py-1.5 px-3 rounded uppercase font-bold tracking-widest transition-colors cursor-pointer shadow-sm whitespace-nowrap text-center"
+                                        >
+                                            12 архітекторів
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )})}
