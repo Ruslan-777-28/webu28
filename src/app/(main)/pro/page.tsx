@@ -52,7 +52,7 @@ import { db } from '@/lib/firebase/client';
 import type { FaqItem, ProHowUsersSeeYouBlock, ProKnowYourCustomerBlock, ProProfessionalItem, ProProfessionalsBlock } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { AuthModal } from '@/components/auth-modal';
 import { PageHero } from '@/components/page-hero';
 import { FloatingStatusLink } from '@/components/floating-status-link';
@@ -572,13 +572,20 @@ export default function ProPage() {
         {professionalsBlock && professionalsBlock.isActive && professionalItems.length > 0 && (
             <section className="py-20 bg-background">
               <div className="container mx-auto px-4">
-                <div className="text-center max-w-3xl mx-auto mb-16">
+                <div className="text-center max-w-5xl mx-auto mb-3">
                   <h2 className="text-3xl md:text-4xl font-bold mb-4">
                     {professionalsBlock.sectionTitle}
                   </h2>
-                  <p className="text-lg text-muted-foreground">
+                  <p className="text-lg text-muted-foreground w-full max-w-4xl mx-auto">
                     {professionalsBlock.sectionDescription}
                   </p>
+                </div>
+                
+                {/* Новий преміальний сірий заголовок над картками */}
+                <div className="text-center mb-5">
+                    <h3 className="text-xl md:text-2xl font-light uppercase tracking-[0.2em] text-muted-foreground/60">
+                        Архітектори / Куратори
+                    </h3>
                 </div>
                 {isLoading ? <Skeleton className="h-96 w-full"/> : (
                 <Carousel
@@ -611,11 +618,39 @@ export default function ProPage() {
                   <CarouselNext className="hidden sm:flex right-[-50px]" />
                 </Carousel>
                 )}
-                 {/* CTA #2 */}
-                <div className="text-center mt-16">
-                    <DialogTrigger asChild>
-                        <Button size="lg" variant="default">Приєднатися до професіоналів</Button>
-                    </DialogTrigger>
+                 {/* CTA #2: Замінено на 2 кнопки (форма + перехід) */}
+                <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-16 w-full max-w-4xl mx-auto px-4">
+                    
+                    {/* Кнопка 1: Виклик форми */}
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button size="lg" variant="default" className="w-full md:w-auto h-14 px-8 font-semibold tracking-wide shadow-md">
+                                Подати заявку на верифікацію куратор / архітектор
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[550px]">
+                            <DialogHeader>
+                                <DialogTitle className="text-2xl">Заявка на верифікацію</DialogTitle>
+                                <DialogDescription>
+                                    Форма знаходиться в розробці. Тут будуть детальні поля для заявки на статус.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="py-16 flex flex-col items-center justify-center text-muted-foreground border border-dashed border-border/60 rounded-lg bg-muted/30 my-4">
+                                <span className="text-sm font-medium tracking-wide uppercase">[ Form Shell Placeholder ]</span>
+                            </div>
+                            <div className="flex justify-end gap-3 mt-2">
+                                <Button variant="ghost" disabled>Скасувати</Button>
+                                <Button type="submit" disabled>Відправити заявку</Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+
+                    {/* Кнопка 2: Перехід на /architectors */}
+                    <Button size="lg" variant="secondary" className="w-full md:w-auto h-14 px-10 font-semibold tracking-wide border border-border/50 hover:bg-secondary/80" asChild>
+                        <Link href="/architectors">
+                            Куратори / архітектори платформи
+                        </Link>
+                    </Button>
                 </div>
               </div>
             </section>
