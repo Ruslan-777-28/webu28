@@ -349,7 +349,14 @@ export type ProKnowYourCustomerBlock = {
   cardMetaText: string;
   cardRatingValue: number;
   cardCompletedSessions: number;
+  cardReviewsCount?: number; // New field
   cardTags: string[];
+  reservedMinutes?: number; // New field
+  reservedReward?: number; // New field
+  rewardCurrencyLabel?: string; // New field
+  translationEnabled?: boolean; // New field
+  languagePair?: string; // New field
+  countryCode?: string; // New field
   updatedAt: any;
   updatedBy: string;
 };

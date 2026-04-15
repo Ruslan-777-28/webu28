@@ -51,6 +51,7 @@ export const recordSchema = z.object({
     profileSortOrder: z.number().int().optional(),
     tableSortOrder: z.number().int().optional(),
     note: z.string().optional(),
+    assignedAt: z.number().int(),
     isDemo: z.boolean().default(true),
 });
 

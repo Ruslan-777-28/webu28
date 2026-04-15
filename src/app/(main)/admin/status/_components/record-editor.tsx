@@ -40,6 +40,7 @@ export function RecordEditor() {
             level: 'winner',
             featuredOnProfile: true,
             archiveVisible: true,
+            assignedAt: Date.now(),
             isDemo: true
         }
     });
@@ -71,6 +72,7 @@ export function RecordEditor() {
             level: 'winner',
             featuredOnProfile: true,
             archiveVisible: true,
+            assignedAt: Date.now(),
             isDemo: true
         });
         setIsFormOpen(true);

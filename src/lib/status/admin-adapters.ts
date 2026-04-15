@@ -37,6 +37,7 @@ export const StatusAdminAdapters = {
         profileSortOrder: r.profileSortOrder ?? undefined,
         tableSortOrder: r.tableSortOrder ?? undefined,
         archiveVisible: r.archiveVisible ?? true,
+        assignedAt: r.assignedAt,
     }),
     fromForm: (v: RecordFormValues): StatusAwardRecord => ({
         ...v,
@@ -47,6 +48,7 @@ export const StatusAdminAdapters = {
         profileSortOrder: v.profileSortOrder,
         tableSortOrder: v.tableSortOrder,
         archiveVisible: v.archiveVisible,
+        assignedAt: v.assignedAt,
     }),
   },
 
