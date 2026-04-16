@@ -361,20 +361,63 @@ export type ProKnowYourCustomerBlock = {
   updatedBy: string;
 };
 
+export type ProInteractionType = 'text' | 'video' | 'file' | 'calendar';
+
+export type ProInteraction = {
+  type: ProInteractionType;
+  topText: string;
+  label: string;
+  subLabel: string;
+  isVisible: boolean;
+};
+
+export type ProPreviewModule = {
+  title: string;
+  subtitle: string;
+  hint: string;
+  isVisible: boolean;
+};
+
 export type ProHowUsersSeeYouBlock = {
   isActive: boolean;
   sectionTitle: string;
   sectionDescription: string;
-  imageUrl: string;
-  imageAlt: string;
-  cardPersonName: string;
-  cardHeadline: string;
-  cardLanguages: string;
-  cardStatusLabel: string;
-  cardDirections: string[];
-  cardButtonLabel: string;
+
+  // Zone 1: Identity (Left)
+  identity: {
+    avatarImageUrl: string;
+    displayName: string;
+    statusLabel: string;
+    headline: string;
+    languages: string;
+    metaLine: string;
+    countryFlag?: string;
+    countryCode?: string;
+  };
+
+  // Zone 2: Main (Center)
+  specializations: string[]; // Max 4
+  interactions: ProInteraction[]; // Fixed 3
+
+  // Zone 3: Previews (Right)
+  rightModules: {
+    publications: ProPreviewModule;
+    artifacts: ProPreviewModule;
+    biography: ProPreviewModule;
+  };
+
   updatedAt: any;
   updatedBy: string;
+
+  // Legacy fields (for backward compatibility during migration)
+  imageUrl?: string;
+  imageAlt?: string;
+  cardPersonName?: string;
+  cardHeadline?: string;
+  cardLanguages?: string;
+  cardStatusLabel?: string;
+  cardDirections?: string[];
+  cardButtonLabel?: string;
 };
 
 export type ProProfessionalsBlock = {

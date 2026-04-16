@@ -43,7 +43,7 @@ export default function ContentAdminPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {contentPages.map((page) => (
-                <Link key={page.href} href={page.href}>
+                <Link key={page.href} href={page.href} prefetch={false}>
                     <Card className="h-full hover:bg-muted/50 transition-colors">
                         <CardHeader className="flex-row items-center gap-4 space-y-0">
                              <div className="bg-background p-3 rounded-lg border">

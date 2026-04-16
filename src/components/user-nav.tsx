@@ -82,7 +82,7 @@ export function UserNav() {
             </DropdownMenuItem>
           </Link>
           {canAccessAdmin && (
-            <Link href="/admin">
+            <Link href="/admin" prefetch={false}>
               <DropdownMenuItem className="cursor-pointer">
                 Адмін панель
               </DropdownMenuItem>

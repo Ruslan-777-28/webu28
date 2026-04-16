@@ -30,6 +30,7 @@ import {
   Handshake,
   Layers,
   LifeBuoy,
+  MapPin,
   Megaphone,
   MessageSquare,
   Package,
@@ -43,10 +44,14 @@ import {
   Users,
   Video,
   Wallet,
+  User,
+  ChevronRight,
+  Paperclip,
   Phone,
   PhoneOff,
   History,
-  MessageCircle
+  MessageCircle,
+  Info
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import Footer from '@/components/layout/footer';
@@ -67,18 +72,18 @@ import { FloatingStatusLink } from '@/components/floating-status-link';
 const benefits = [
   {
     icon: Globe,
-    title: 'Вихід на глобальну сцену',
-    text: 'Працюйте з людьми з різних країн і відкривайте свої знання для ширшого світу, без мовних бар’єрів.',
+    title: 'Доступ до глобальної аудиторії',
+    text: 'Працюйте з людьми з різних країн і відкривайте свої знання для ширшого світу, без мовних бар’єрів 24/7 з любого куточка світу.',
   },
   {
     icon: Layers,
     title: 'Гнучкий формат роботи',
-    text: 'Обирайте той спосіб взаємодії, який підходить саме вам: консультації, події, повідомлення, цифрові продукти.',
+    text: 'Обирайте той спосіб взаємодії, який підходить саме вам: консультації, події, повідомлення, продаж цифрових товарів та авторського контенту.',
   },
   {
-    icon: CircleDollarSign,
-    title: 'Преміальний дохід',
-    text: 'Перетворюйте досвід, інтуїцію та експертність на реальну й зрозумілу цінність для клієнта.',
+    icon: Wallet,
+    title: 'Зручний вивід коштів',
+    text: 'Легко керуйте своїм балансом та виводьте кошти у зручний для вас спосіб. Керуйте зобов\'язаннями: хто винен вам і кому винні ви.',
   },
   {
     icon: Star,
@@ -105,23 +110,23 @@ const howItWorksSteps = [
   },
   {
     step: 2,
-    title: 'Оформіть свої пропозиції',
-    text: 'Вкажіть, які консультації, формати взаємодії або цифрові продукти ви хочете пропонувати.',
+    title: 'Вкажіть вартість',
+    text: 'Вкажіть: підкатегорію ніші, тип комунікації та цінову пропозицію. Опублікуйте.',
   },
   {
     step: 3,
-    title: 'Станьте видимими для аудиторії',
-    text: 'Ваш профіль, категорії, контент і присутність у платформі допомагають клієнтам знаходити вас за конкретним запитом.',
+    title: 'Додайте видимість',
+    text: 'Публікуйте контент: пости, товарні пропозиції в стрічці та в профілі. Взаємодія з іншими просуває акаунт.',
   },
   {
     step: 4,
-    title: 'Проводьте взаємодію у зручному форматі',
-    text: 'Відео, повідомлення, файли, події чи цифрові продукти — залежно від того, як ви хочете працювати.',
+    title: 'Прийняти пропозицію',
+    text: 'Обирай, з ким і як ти будеш взаємодіяти та яким типом комунікації.',
   },
   {
     step: 5,
     title: 'Монетизуйте свою цінність',
-    text: 'Отримуйте дохід завдяки змістовній взаємодії, де ваш досвід і знання стають реальною користю для іншої людини.',
+    text: 'Отримуйте та виводьте дохід, перетворюйте досвід та активність на вітрину компетентності.',
   },
 ];
 
@@ -241,12 +246,6 @@ const growthBenefits = [
   },
 ];
 
-const monetizationPaths = [
-  { icon: Video, title: 'Консультації', text: 'Персональна взаємодія з клієнтами у вибраному форматі.' },
-  { icon: Globe, title: 'Глобальний дохід', text: 'Доступ до міжнародної аудиторії підвищує попит і потенціал вашого чека.' },
-  { icon: Package, title: 'Цифрові продукти', text: 'Продаж авторських матеріалів і цифрового контенту.' },
-  { icon: Wallet, title: 'Зручний вивід коштів', text: 'Легко керуйте своїми заробітками та виводьте кошти у зручний для вас спосіб.' },
-];
 
 const mockArchitects = [
   {
@@ -400,9 +399,9 @@ export default function ProPage() {
                       <span>{cat}</span>
                     </div>
                   ))}
-                  <div className="flex items-start gap-2.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-foreground/30 mt-[0.55rem] shrink-0" />
-                    <span className="text-3xl font-bold text-foreground/30 leading-none">...</span>
+                  <div className="flex items-start gap-2.5 text-sm lg:text-[0.95rem] font-light tracking-wide text-foreground/90">
+                    <div className="w-1.5 h-1.5 rounded-full bg-foreground/30 mt-[0.45rem] shrink-0" />
+                    <span>other</span>
                   </div>
                 </div>
               </Card>
@@ -457,7 +456,8 @@ export default function ProPage() {
                 Інструменти для вашого успіху та росту
               </h2>
               <p className="text-lg text-muted-foreground">
-                Все, що потрібно, щоб оформити свою цінність, вийти на глобальну аудиторію та перетворити знання на системну практику й дохід.
+                Все, що потрібно, щоб оформити свою експертність, вийти на глобальну аудиторію та перетворити знання на системну практику й дохід в одній екосистемі.<br />
+                Безмежний потенціал для Твого апгрейду.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -521,10 +521,10 @@ export default function ProPage() {
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Формати роботи на платформі
+                Обирай, як саме тобі комфортно взаємодіяти з клієнтами та аудиторією
               </h2>
               <p className="text-lg text-muted-foreground">
-                Ви самі обираєте, як саме будувати взаємодію з клієнтами та аудиторією.
+                Типи комунікацій для тебе
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -814,27 +814,6 @@ export default function ProPage() {
           </section>
         )}
 
-        {/* 7. NEW BLOCK: Safety, Support & Fair Play */}
-        <section className="py-20 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {safetyAndSupportItems.map((item, index) => (
-                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow bg-card/50 border">
-                  <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
-                    <div className="bg-background p-2 rounded-lg border">
-                      <item.icon className="h-6 w-6 text-accent" />
-                    </div>
-                    <CardTitle className="text-lg">{item.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">{item.text}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* 8. SECTION: Visibility & Growth (Strengthened) */}
         <section className="py-20 bg-card">
           <div className="container mx-auto px-4">
@@ -861,6 +840,207 @@ export default function ProPage() {
             </div>
           </div>
         </section>
+
+
+        {/* 10. SECTION: Profile Mockup & Showcase */}
+        {profileBlock && profileBlock.isActive && (
+          <section className="py-24 bg-card/50 overflow-hidden">
+            <div className="container mx-auto px-4">
+              <div className="text-center max-w-3xl mx-auto mb-16">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">
+                  {profileBlock.sectionTitle}
+                </h2>
+                <div className="flex items-center justify-center gap-2">
+                  <p className="text-lg text-muted-foreground font-light">
+                    {profileBlock.sectionDescription}
+                  </p>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="text-muted-foreground/40 hover:text-accent transition-colors p-1" aria-label="Info">
+                        <Info className="h-4 w-4" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80 p-4 text-sm leading-relaxed bg-background/95 backdrop-blur-sm border-border/40 shadow-xl rounded-xl">
+                      <p className="text-foreground/90 font-medium">
+                        На цьому екрані у стиснутому демонстраційному форматі показано, як профіль експерта та його основний функціонал виглядатимуть для інших користувачів платформи. Повна версія профілю буде значно ширшою за наповненням і можливостями: після реєстрації вона стане доступною для повного перегляду та заповнення всіх полів на 100%.
+                      </p>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+
+              {/* Showcase Container */}
+              <div className="max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-10 items-stretch">
+                  
+                  {/* ZONE 1: Identity (Left - col-span-3) - Block A Card Surface */}
+                  <div className="md:col-span-3 h-full">
+                    <div className="h-full bg-background/80 border border-border/40 rounded-lg shadow-sm backdrop-blur-[1px] flex flex-col overflow-hidden">
+                      {/* Static Visual Status Row */}
+                      <div className="flex items-center gap-2 px-5 pt-5 pb-1 text-neutral-500">
+                        <ShieldCheck className="w-3.5 h-3.5 opacity-90" />
+                        <span className="text-[9px] font-bold uppercase tracking-[0.08em] whitespace-nowrap truncate">Community Architect · Taro / England</span>
+                      </div>
+
+                      {/* Static Visual Profile Completion Accent */}
+                      <div className="flex gap-1.5 w-full px-5 pt-2.5 pb-3">
+                        <div className="h-[2.5px] flex-1 bg-violet-600 rounded-full" />
+                        <div className="h-[2.5px] flex-1 bg-violet-600 rounded-full" />
+                        <div className="h-[2.5px] flex-1 bg-violet-600 rounded-full" />
+                        <div className="h-[2.5px] flex-1 bg-violet-600/20 rounded-full" />
+                      </div>
+
+                      <div className="relative group w-full border-y border-border/10">
+                        <div className="relative w-full aspect-[1.5/1] overflow-hidden bg-muted/20">
+                          <img 
+                            src={profileBlock.identity?.avatarImageUrl || profileBlock.imageUrl} 
+                            alt={profileBlock.identity?.displayName || profileBlock.cardPersonName} 
+                            className="object-cover h-full w-full transition-transform duration-700 group-hover:scale-[1.03]" 
+                          />
+                          
+                          {/* Ultra-Thin Minimal Status Bar */}
+                          {(profileBlock.identity?.statusLabel || profileBlock.cardStatusLabel || 'Online').toLowerCase().includes('online') && (
+                            <div className="absolute bottom-0 left-0 right-0 bg-emerald-900/95 h-[12px] flex items-center justify-center text-[5.5px] font-black text-white uppercase tracking-[1.35em] pl-[1.35em] select-none backdrop-blur-sm border-t border-white/5">
+                              ONLINE
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="p-6 pt-5 flex flex-col items-center md:items-start text-center md:text-left space-y-6 w-full">
+                        <div className="space-y-3 w-full">
+                          <div className="space-y-1">
+                            <h3 className="text-2xl font-bold tracking-tight text-foreground">
+                              {profileBlock.identity?.displayName || profileBlock.cardPersonName}
+                            </h3>
+                            {profileBlock.identity?.countryCode && (
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground/60 font-medium mt-1">
+                                <MapPin className="h-3 w-3 opacity-60" />
+                                <span className={`fi fi-${profileBlock.identity.countryCode.toLowerCase()} w-4 h-2.5 shadow-sm rounded-[1px] shrink-0`} />
+                                <span className="uppercase">{profileBlock.identity.countryCode}</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <p className="text-[0.85rem] italic text-foreground/70 leading-relaxed font-normal">
+                            {profileBlock.identity?.headline || profileBlock.cardHeadline}
+                          </p>
+                          
+                          <div className="space-y-2 pt-2 border-t border-border/40">
+                            <div className="flex items-center gap-2 text-[0.8rem] text-muted-foreground">
+                              <Globe className="h-3.5 w-3.5 opacity-60" />
+                              <span>{profileBlock.identity?.languages || profileBlock.cardLanguages}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-[0.8rem] text-muted-foreground">
+                              <Calendar className="h-3.5 w-3.5 opacity-60" />
+                              <span>{profileBlock.identity?.metaLine || 'В екосистемі з 2024'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ZONE 2: Main Showcase (Center - col-span-6) */}
+                  <div className="md:col-span-6 flex flex-col gap-6">
+                    {/* Specialization Row */}
+                    <Card className="bg-background border-border/40 shadow-sm overflow-hidden min-h-[140px] flex flex-col justify-center px-8">
+                       <div className="flex items-center gap-2 mb-4">
+                          <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+                          <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground/60">Ключові напрямки</span>
+                       </div>
+                       <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+                         {(profileBlock.specializations || profileBlock.cardDirections || []).map((spec, i) => (
+                           <span 
+                             key={i} 
+                             className={`text-[0.95rem] transition-colors duration-200 ${
+                               i === 0 
+                                 ? "text-foreground font-bold border-b-2 border-accent pb-0.5 tracking-tight" 
+                                 : "text-muted-foreground/60 font-medium"
+                             }`}
+                           >
+                             {spec}
+                           </span>
+                         ))}
+                       </div>
+                    </Card>
+
+                    {/* Interactions Strip */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 h-full">
+                      {(() => {
+                        const baseInteractions = [
+                          { type: 'text', topText: '', label: 'Чат сесія', subLabel: 'Отримайте відповідь', isVisible: true },
+                          { type: 'video', topText: '', label: 'Відео виклик', subLabel: 'Отримайте відповідь', isVisible: true },
+                          { type: 'file', topText: '', label: 'Аналіз файлу', subLabel: 'Отримайте відповідь', isVisible: true },
+                          { type: 'calendar', topText: '', label: 'Календар', subLabel: 'Оберіть зручний час', isVisible: true }
+                        ];
+                        
+                        const items = (profileBlock.interactions && profileBlock.interactions.length > 0)
+                          ? [
+                              ...profileBlock.interactions,
+                              ...baseInteractions.slice(profileBlock.interactions.length)
+                            ].map(i => ({ ...i, topText: i.topText || '' })) // Ensure topText exists
+                            .slice(0, 4)
+                          : baseInteractions;
+
+                        return items.map((int, i) => {
+                          if (!int.isVisible) return null;
+                          const Icon = int.type === 'video' ? Video : int.type === 'file' ? Paperclip : int.type === 'calendar' ? Calendar : MessageSquare;
+                          return (
+                            <Card key={i} className="bg-background border-border/40 shadow-sm hover:shadow-md transition-all group cursor-pointer h-full">
+                              <CardContent className="p-5 flex flex-col items-center text-center justify-center h-full">
+                                {int.topText && (
+                                  <div className="text-[10px] uppercase tracking-[0.15em] font-bold text-muted-foreground/60 mb-3 truncate w-full">
+                                    {int.topText}
+                                  </div>
+                                )}
+                                <div className="bg-muted/30 p-2.5 rounded-xl mb-4 group-hover:bg-accent/10 group-hover:text-accent transition-colors">
+                                  <Icon className="h-5 w-5 opacity-60 group-hover:opacity-100" />
+                                </div>
+                                <h4 className="text-sm font-bold text-foreground mb-1">{int.label}</h4>
+                                <p className="text-[10px] text-muted-foreground leading-tight uppercase tracking-wider">{int.subLabel}</p>
+                              </CardContent>
+                            </Card>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* ZONE 3: Mini Modules (Right - col-span-3) */}
+                  <div className="md:col-span-3 flex flex-col gap-4">
+                    {[
+                      { key: 'publications', icon: BookOpen, data: profileBlock.rightModules?.publications },
+                      { key: 'artifacts', icon: Package, data: profileBlock.rightModules?.artifacts },
+                      { key: 'biography', icon: User, data: profileBlock.rightModules?.biography }
+                    ].map((mod, i) => {
+                      if (mod.data && !mod.data.isVisible) return null;
+                      const Icon = mod.icon;
+                      return (
+                        <Card key={mod.key} className="bg-background/80 backdrop-blur-sm border-border/40 shadow-sm hover:border-accent/30 transition-colors group cursor-pointer flex-1 min-h-[100px] flex flex-col justify-center">
+                          <CardContent className="p-4 flex items-center gap-4">
+                            <div className="bg-accent/5 p-2 rounded-[8px] border border-accent/10 border-none">
+                              <Icon className="h-5 w-5 text-accent opacity-70" />
+                            </div>
+                            <div className="min-w-0">
+                              <h5 className="text-[0.85rem] font-bold text-foreground truncate">{mod.data?.title || (mod.key === 'publications' ? 'Публікації' : mod.key === 'artifacts' ? 'Артефакти' : 'Біографія')}</h5>
+                              <p className="text-[0.7rem] text-muted-foreground truncate">{mod.data?.subtitle || 'Переглянути деталі'}</p>
+                              <div className="flex items-center gap-1 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span className="text-[9px] uppercase tracking-widest font-bold text-accent">{mod.data?.hint || 'Відкрити'}</span>
+                                <ChevronRight className="h-2.5 w-2.5 text-accent" />
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
 
         {/* 9. SECTION “Чому це більше, ніж робота через соцмережі...” (Strengthened) */}
@@ -897,61 +1077,7 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* 10. SECTION: Profile Mockup & Personal Brand */}
-        {profileBlock && profileBlock.isActive && (
-          <section className="py-20 bg-card">
-            <div className="container mx-auto px-4">
-              <div className="text-center max-w-3xl mx-auto mb-16">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  {profileBlock.sectionTitle}
-                </h2>
-                <p className="text-lg text-muted-foreground">
-                  {profileBlock.sectionDescription}
-                </p>
-              </div>
 
-              <div className="max-w-2xl mx-auto bg-background p-6 sm:p-8 rounded-xl shadow-lg border border-border">
-                <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6">
-                  <div className="flex-shrink-0">
-                    <Avatar className="h-24 w-24 border-4 border-background shadow-md">
-                      <AvatarImage src={profileBlock.imageUrl} alt={profileBlock.imageAlt} />
-                      <AvatarFallback>{profileBlock.cardPersonName?.slice(0, 2)}</AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <div className="flex-grow">
-                    <h3 className="text-2xl font-bold text-foreground">{profileBlock.cardPersonName}</h3>
-                    <p className="text-muted-foreground mt-1">{profileBlock.cardHeadline}</p>
-                    <div className="flex items-center justify-center sm:justify-start gap-4 mt-3 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1.5">
-                        <Globe className="h-4 w-4" />
-                        {profileBlock.cardLanguages}
-                      </span>
-                      <span className="text-border">|</span>
-                      {profileBlock.cardStatusLabel && (
-                        <div className="flex items-center gap-2">
-                          <span className="relative flex h-2.5 w-2.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
-                          </span>
-                          <span>{profileBlock.cardStatusLabel}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-6">
-                  <h4 className="font-semibold text-foreground mb-3">Напрямки:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {profileBlock.cardDirections.map(dir => <Badge key={dir} variant="outline">{dir}</Badge>)}
-                  </div>
-                </div>
-                <div className="mt-8 border-t border-border pt-6">
-                  <Button className="w-full" size="lg">{profileBlock.cardButtonLabel}</Button>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* 11. Professionals Showcase */}
         {professionalsBlock && professionalsBlock.isActive && (
@@ -1086,30 +1212,22 @@ export default function ProPage() {
           </section>
         )}
 
-        {/* 12. SECTION “Монетизація” (Strengthened) */}
-        <section className="py-20 bg-card">
+
+
+        {/* 7. NEW BLOCK: Safety, Support & Fair Play */}
+        <section className="py-20 bg-background">
           <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Кілька шляхів монетизації в одній екосистемі
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Доступ до глобальної аудиторії підвищує попит, а гнучкі інструменти дозволяють легко перетворювати свою цінність на дохід.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {monetizationPaths.map((path, index) => (
-                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow bg-background">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      <div className="bg-card p-2 rounded-lg border">
-                        <path.icon className="h-6 w-6 text-accent" />
-                      </div>
-                      {path.title}
-                    </CardTitle>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {safetyAndSupportItems.map((item, index) => (
+                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow bg-card/50 border">
+                  <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
+                    <div className="bg-background p-2 rounded-lg border">
+                      <item.icon className="h-6 w-6 text-accent" />
+                    </div>
+                    <CardTitle className="text-lg">{item.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground">{path.text}</p>
+                    <p className="text-muted-foreground">{item.text}</p>
                   </CardContent>
                 </Card>
               ))}

@@ -65,7 +65,7 @@ export function AdminNav() {
     <>
       <SidebarHeader>
         <div className="flex items-center justify-between">
-          <Link href="/admin" className="font-bold text-lg text-sidebar-primary">
+          <Link href="/admin" className="font-bold text-lg text-sidebar-primary" prefetch={false}>
             LECTOR Admin
           </Link>
           {isMobile && <SidebarTrigger />}
@@ -86,7 +86,7 @@ export function AdminNav() {
           <SidebarSeparator />
           {visibleNavItems.map((item) => (
             <SidebarMenuItem key={item.href}>
-              <Link href={item.href} legacyBehavior passHref>
+            <Link href={item.href} legacyBehavior passHref prefetch={false}>
                 <SidebarMenuButton
                   asChild
                   isActive={pathname.startsWith(item.href)}
