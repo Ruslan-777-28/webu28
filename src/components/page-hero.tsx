@@ -80,6 +80,7 @@ export function PageHero({
   const subheadline = settings?.subheadline || fallbackSubheadline;
   const buttonLabel = settings?.buttonLabel || fallbackButtonLabel;
   const buttonLink = settings?.buttonLink || fallbackButtonLink || '#';
+  const secondaryTextBlock = settings?.secondaryTextBlock;
 
   const isPro = pageId === 'pro';
 
@@ -88,8 +89,8 @@ export function PageHero({
       
       {/* 1. Pro-specific FULL WIDTH HEADLINE (above the video) */}
       {isPro && headline && (
-        <div className="relative z-10 w-full px-6 pt-12 pb-4 md:px-12 md:pt-16 max-w-7xl">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight">
+        <div className="relative z-10 w-full px-8 pt-6 pb-2 md:pl-20 md:pr-12 md:pt-8 max-w-7xl">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-5xl font-semibold tracking-tighter text-foreground/70 uppercase">
             {headline}
           </h1>
         </div>
@@ -100,7 +101,7 @@ export function PageHero({
         
         {/* Left: Media Area (Wide 21:9 desktop, aspect-video mobile) */}
         {showMedia && (
-          <div className={`relative w-full flex-shrink-0 bg-muted/20 ${isPro ? 'md:w-[50%]' : 'md:w-[55%]'}`}>
+          <div className={`relative w-full flex-shrink-0 bg-muted/20 ${isPro ? 'md:w-[50%] filter contrast-[1.05] brightness-[0.98]' : 'md:w-[55%]'}`}>
             {finalRenderType === 'video' && settings ? (
               <>
                 {/* Desktop Video */}
@@ -146,9 +147,9 @@ export function PageHero({
         )}
 
         {/* Right: Text Content Area */}
-        <div className={`relative flex flex-col justify-center px-6 py-8 md:px-12 z-10 flex-grow w-full ${isPro ? 'md:w-[50%] md:py-8' : 'md:w-[45%] md:py-16'}`}>
-            {(headline || subheadline) && (
-              <div className="max-w-2xl text-left">
+        <div className={`relative flex flex-col justify-center px-6 py-2 md:px-12 z-10 flex-grow w-full ${isPro ? 'md:w-[50%] md:py-2 -mt-4 md:-mt-8' : 'md:w-[45%] md:py-16'}`}>
+            {(headline || subheadline || secondaryTextBlock) && (
+              <div className="max-w-xl text-left">
                 {/* Only render headline inside the box if NOT Pro */}
                 {!isPro && headline && (
                   <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
@@ -156,14 +157,25 @@ export function PageHero({
                   </h1>
                 )}
                 
+                {isPro && (
+                  <div className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-foreground font-semibold mb-3">
+                    Наша роль
+                  </div>
+                )}
+
                 {subheadline && (
-                  <p className={`text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed ${isPro ? 'md:text-2xl mt-0 md:mt-4 max-w-xl' : ''}`}>
+                  <p className={`leading-relaxed font-light ${isPro ? 'text-[15px] md:text-[1.05rem] text-muted-foreground/90 mb-4' : 'text-base md:text-lg text-muted-foreground mb-10'}`}>
                     {subheadline}
                   </p>
                 )}
                 
                 {buttonLabel && (
-                  <Button size="lg" asChild className="w-full sm:w-auto">
+                  <Button 
+                    variant={isPro ? "outline" : "default"}
+                    size={isPro ? "default" : "lg"}
+                    asChild 
+                    className={`font-medium ${isPro ? 'w-full h-10 border-foreground/10 text-foreground/80 hover:bg-foreground/[0.03] hover:border-foreground/20 hover:text-foreground transition-all duration-300 underline decoration-1 decoration-foreground/20 underline-offset-[5px] hover:decoration-foreground/40 mt-4 mb-8' : 'w-full sm:w-auto mb-8'}`}
+                  >
                     {buttonLink.startsWith('http') ? (
                       <a href={buttonLink} target="_blank" rel="noopener noreferrer">
                         {buttonLabel}
@@ -174,6 +186,18 @@ export function PageHero({
                       </Link>
                     )}
                   </Button>
+                )}
+
+                {isPro && secondaryTextBlock && (
+                  <div className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-foreground font-semibold mb-3">
+                    Ваші можливості
+                  </div>
+                )}
+
+                {secondaryTextBlock && isPro && (
+                  <p className="text-[14px] md:text-[1rem] text-muted-foreground/60 leading-relaxed font-light">
+                    {secondaryTextBlock}
+                  </p>
                 )}
               </div>
             )}

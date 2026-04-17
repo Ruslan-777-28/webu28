@@ -477,6 +477,7 @@ export type HomeHeroMediaSettings = {
   subheadline?: string;
   buttonLabel?: string;
   buttonLink?: string;
+  secondaryTextBlock?: string;
 
   statusLinkImage?: {
     imageUrl: string;

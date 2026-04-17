@@ -13,7 +13,7 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { HomeHeroMediaSettings } from '@/lib/types';
 
-function HeroTabContent({ docId, title, description, showTextFields }: { docId: string, title: string, description: string, showTextFields: boolean }) {
+function HeroTabContent({ docId, title, description, showTextFields, showSecondaryTextBlock }: { docId: string, title: string, description: string, showTextFields: boolean, showSecondaryTextBlock?: boolean }) {
     const [settings, setSettings] = useState<HomeHeroMediaSettings>({
         enabled: true,
         mediaType: 'video',
@@ -242,6 +242,16 @@ function HeroTabContent({ docId, title, description, showTextFields }: { docId: 
                                 />
                             </div>
                         </div>
+                        {showSecondaryTextBlock && (
+                            <div className="space-y-2 mt-4">
+                                <Label>Secondary Text Block / Post-CTA Text</Label>
+                                <Input 
+                                    value={settings.secondaryTextBlock || ''} 
+                                    onChange={(e) => setSettings({...settings, secondaryTextBlock: e.target.value})} 
+                                    placeholder="Text block below the CTA button" 
+                                />
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -350,6 +360,7 @@ export default function HeroAdminPage() {
                         title="Pro / Expert Hero" 
                         description="Manage the 21:9 hero with dynamic text blocks for the For Expert page."
                         showTextFields={true}
+                        showSecondaryTextBlock={true}
                     />
                 </TabsContent>
                 
