@@ -2,6 +2,7 @@ import { onDocumentCreated, FirestoreEvent, QueryDocumentSnapshot } from "fireba
 import * as admin from "firebase-admin";
 import * as nodemailer from "nodemailer";
 import { defineSecret } from "firebase-functions/params";
+import * as logger from "firebase-functions/logger";
 
 // Secrets for SMTP authentication
 const TITAN_USER = defineSecret("TITAN_SMTP_USER");
@@ -21,7 +22,7 @@ export const onContactSubmissionCreated = onDocumentCreated({
 }, async (event: FirestoreEvent<QueryDocumentSnapshot | undefined, { submissionId: string }>) => {
   const snapshot = event.data;
   if (!snapshot) {
-    console.log("No data associated with the event");
+    logger.error("No data associated with the event");
     return;
   }
 
@@ -29,18 +30,28 @@ export const onContactSubmissionCreated = onDocumentCreated({
   const submissionId = event.params.submissionId;
 
   if (!data) {
-    console.log(`Document ${submissionId} exists but has no data`);
+    logger.warn(`Document ${submissionId} exists but has no data`);
     return;
   }
 
-  console.log(`Processing submission ${submissionId} of type: ${data.type}`);
+  logger.info(`[Trigger Started] Processing submission ${submissionId} of type: ${data.type}`);
+
+  // 1. Mark as processing in Firestore immediately
+  try {
+    await snapshot.ref.update({
+      emailDeliveryStatus: "processing",
+      emailProcessedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (err) {
+    logger.error(`Failed to update status to processing for ${submissionId}`, err);
+  }
 
   try {
-    // 1. Fetch Routing Settings from Firestore
+    // 2. Fetch Routing Settings from Firestore
     const settingsDoc = await admin.firestore().doc("siteSettings/contact").get();
     const settings = settingsDoc.exists ? settingsDoc.data() : {};
 
-    // 2. Determine Destination Email
+    // 3. Determine Destination Email
     let destEmail = "hello@lector.life"; // Default Fallback
     const type = data.type || "general";
 
@@ -54,9 +65,9 @@ export const onContactSubmissionCreated = onDocumentCreated({
       destEmail = settings?.generalEmail || "hello@lector.life";
     }
 
-    console.log(`Routing submission to: ${destEmail}`);
+    logger.info(`[Routing] Submission ${submissionId} -> ${destEmail}`);
 
-    // 3. Setup Nodemailer Transport
+    // 4. Setup Nodemailer Transport
     // Titan SMTP settings: smtp.titan.email, port 465 (SSL)
     const transporter = nodemailer.createTransport({
       host: "smtp.titan.email",
@@ -68,7 +79,7 @@ export const onContactSubmissionCreated = onDocumentCreated({
       },
     });
 
-    // 4. Construct Email Body (Clean & Readable HTML)
+    // 5. Construct Email Body (Clean & Readable HTML)
     const htmlBody = `
       <div style="font-family: sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px; border-radius: 8px;">
         <h2 style="color: #6d28d9; margin-top: 0; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px;">
@@ -111,8 +122,9 @@ export const onContactSubmissionCreated = onDocumentCreated({
       </div>
     `;
 
-    // 5. Send Email
+    // 6. Send Email
     // Note: support@lector.life is used as sender (primary account) to ensure SMTP reliability.
+    logger.info(`[SMTP] Delivering email for ${submissionId} to ${destEmail}...`);
     await transporter.sendMail({
       from: `"LECTOR System" <support@lector.life>`,
       to: destEmail,
@@ -121,17 +133,29 @@ export const onContactSubmissionCreated = onDocumentCreated({
       html: htmlBody,
     });
 
-    console.log(`Successfully forwarded submission ${submissionId} to ${destEmail}`);
-
-    // Mark as processed
+    // 7. Mark as successful
     await snapshot.ref.update({
       emailForwarded: true,
+      emailDeliveryStatus: "sent",
       forwardedAt: admin.firestore.FieldValue.serverTimestamp(),
       forwardedTo: destEmail
     });
 
-  } catch (error) {
-    console.error(`Error processing submission ${submissionId}:`, error);
+    logger.info(`[Success] Function completed for submission ${submissionId}`);
+
+  } catch (error: any) {
+    logger.error(`[Fatal Error] Processing submission ${submissionId} failed:`, error);
+    
+    // 8. CRITICAL: Always write failure status to Firestore for visibility
+    try {
+      await snapshot.ref.update({
+        emailForwarded: false,
+        emailDeliveryStatus: "failed",
+        emailError: error.message || String(error)
+      });
+    } catch (updateErr) {
+      logger.error("Failed to write error status back to Firestore", updateErr);
+    }
   }
 });
 
