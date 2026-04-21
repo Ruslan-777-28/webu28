@@ -239,6 +239,13 @@ service cloud.firestore {
       allow create, update, delete: if isSignedIn() && request.auth.token.admin == true;
     }
 
+    // ---------- Contact Submissions ----------
+    match /contactSubmissions/{submissionId} {
+      allow create: if true;
+      allow read: if isSignedIn() && request.auth.token.admin == true;
+      allow update, delete: if isSignedIn() && request.auth.token.admin == true;
+    }
+
     // ---------- Default deny ----------
     match /{document=**} {
       allow read, write: if false;

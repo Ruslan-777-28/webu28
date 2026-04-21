@@ -101,7 +101,8 @@ export function PageHero({
 
         {/* Left: Media Area (Wide 21:9 desktop, aspect-video mobile) */}
         {showMedia && (
-          <div className={`relative w-full flex-shrink-0 bg-muted/20 ${isPro ? 'md:w-[50%] filter contrast-[1.05] brightness-[0.98]' : 'md:w-[55%]'}`}>
+          <div className={`relative w-full flex-shrink-0 bg-muted/20 ${isPro ? 'md:w-[50%] filter contrast-[1.05] brightness-[0.98]' : 'md:w-[58%]'}`}>
+            <div className={`w-full h-full ${!isPro ? 'py-10 md:py-20 lg:py-24 pl-4 pr-0 flex items-center justify-start -translate-x-[12%] -translate-y-[4%]' : ''}`}>
             {finalRenderType === 'video' && settings ? (
               <>
                 {/* Desktop Video */}
@@ -134,20 +135,28 @@ export function PageHero({
                 className="w-full h-full object-cover md:aspect-[21/9] aspect-video"
               />
             ) : null}
+            </div>
 
-            {/* Seamless Fade Overlays */}
-            {/* Desktop: fade right edge to blend into background */}
-            <div className="hidden md:block absolute inset-y-0 right-[-1px] w-32 bg-gradient-to-l from-background to-transparent pointer-events-none" />
-            <div className="hidden md:block absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background via-background/80 to-transparent pointer-events-none" />
+            {/* Desktop: seamless fades (Enhanced Atmospheric Layers) */}
+            <div className="hidden md:block absolute inset-y-0 right-[-1px] w-48 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+            <div className="hidden md:block absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background via-background/60 to-transparent pointer-events-none" />
+            <div className="hidden md:block absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-background via-background/90 to-transparent pointer-events-none" />
+            
+            <div className="hidden md:block absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-background to-transparent pointer-events-none" />
+            <div className="hidden md:block absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background via-background/50 to-transparent pointer-events-none" />
+            
+            <div className="hidden md:block absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+            <div className="hidden md:block absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background via-background/50 to-transparent pointer-events-none" />
 
-            {/* Mobile: fade bottom edge to blend into text */}
-            <div className="block md:hidden absolute inset-x-0 bottom-[-1px] h-24 bg-gradient-to-t from-background to-transparent pointer-events-none" />
-            <div className="block md:hidden absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none" />
+            {/* Mobile: seamless fades */}
+            <div className="block md:hidden absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background to-transparent pointer-events-none" />
+            <div className="block md:hidden absolute inset-x-0 bottom-[-1px] h-40 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+            <div className="block md:hidden absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none" />
           </div>
         )}
 
         {/* Right: Text Content Area */}
-        <div className={`relative flex flex-col justify-center px-6 py-2 md:px-12 z-10 flex-grow w-full ${isPro ? 'md:w-[50%] md:py-2 -mt-4 md:-mt-8' : 'md:w-[45%] md:py-16'}`}>
+        <div className={`relative flex flex-col justify-center px-6 py-2 md:px-12 z-10 flex-grow w-full ${isPro ? 'md:w-[50%] md:py-2 -mt-4 md:-mt-8' : 'md:w-[42%] md:py-16'}`}>
           {(headline || subheadline || secondaryTextBlock) && (
             <div className="max-w-xl text-left">
               {/* Only render headline inside the box if NOT Pro */}
