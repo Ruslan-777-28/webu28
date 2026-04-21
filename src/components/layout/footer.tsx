@@ -55,7 +55,7 @@ export default function Footer() {
     fetchFooter();
   }, []);
 
-  const informationLinks = [
+  const informationLinksPlatform = [
     { href: '/info/community-rules', label: 'Правила спільноти' },
     { href: '/status', label: 'Статус' },
     { href: '/status/nominations', label: 'Вітрина номінацій' },
@@ -63,6 +63,10 @@ export default function Footer() {
     { href: '/status/legend', label: 'Умовні позначки' },
     { href: '/status/hall-of-fame', label: 'Hall of Fame' },
     { href: '/status/archive', label: 'Архів статусів' },
+  ];
+
+  const informationLinksLegal = [
+    { href: '/roadmap', label: 'Roadmap' },
     { href: '/referral-sprint-program', label: 'Referral Sprint Program' },
     { href: '/architectors', label: 'architectors' },
     { href: '/community-architects', label: 'Community Architects' },
@@ -79,19 +83,26 @@ export default function Footer() {
     <footer className="bg-sidebar text-sidebar-foreground">
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
-          {/* Left Column */}
-          <div className="md:col-span-5 space-y-4">
-            <h3 className="text-2xl font-bold text-accent">LECTOR</h3>
-            <p className="text-sm max-w-xs text-sidebar-foreground/70">
-              Глобальний простір знань, взаємодії та живої цінності.
-            </p>
+          {/* Brand Column */}
+          <div className="md:col-span-4 space-y-4 flex flex-col">
+            <div className="space-y-4">
+              <h3 className="text-2xl font-bold text-accent">LECTOR</h3>
+              <p className="text-sm max-w-xs text-sidebar-foreground/70">
+                Глобальний простір знань, взаємодії та живої цінності.
+              </p>
+            </div>
+            <div className="pt-6 mt-auto">
+              <Link href="/manifest" className="text-xs uppercase tracking-[0.2em] font-medium text-sidebar-foreground/50 hover:text-accent transition-colors w-max">
+                manifest
+              </Link>
+            </div>
           </div>
 
-          {/* Center Column */}
-          <div className="md:col-span-4 space-y-4">
+          {/* Info Column 1 */}
+          <div className="md:col-span-3 space-y-4">
             <h4 className="font-semibold tracking-wider uppercase text-sidebar-foreground/80">Інформація</h4>
             <ul className="space-y-2">
-              {informationLinks.map((link) => (
+              {informationLinksPlatform.map((link) => (
                 <li key={link.label}>
                   <Link href={link.href} className="text-sm text-sidebar-foreground/70 hover:text-accent transition-colors">
                       {link.label}
@@ -101,8 +112,22 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Right Column */}
+          {/* Info Column 2 */}
           <div className="md:col-span-3 space-y-4">
+            <h4 className="font-semibold tracking-wider uppercase text-sidebar-foreground/80">Ресурси</h4>
+            <ul className="space-y-2">
+              {informationLinksLegal.map((link) => (
+                <li key={link.label}>
+                  <Link href={link.href} className="text-sm text-sidebar-foreground/70 hover:text-accent transition-colors">
+                      {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Socials Column */}
+          <div className="md:col-span-2 space-y-4">
              <h4 className="font-semibold tracking-wider uppercase text-sidebar-foreground/80">Спільнота</h4>
              <div className="flex space-x-4">
                  {isLoading ? (
@@ -123,8 +148,8 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-border/20 pt-8 flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-xs text-sidebar-foreground/50">
+        <div className="mt-4 md:-mt-1 flex flex-col sm:flex-row justify-start sm:items-end">
+          <p className="text-[11px] sm:text-xs text-sidebar-foreground/50">
             © 2026 LECTOR. All rights reserved.
           </p>
         </div>

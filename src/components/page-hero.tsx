@@ -56,7 +56,7 @@ export function PageHero({
 
   // Use values from Firestore or fallbacks
   const isEnabled = settings?.enabled !== false; // Active by default if not strictly disabled
-  
+
   // Resilient media type detection
   let effectiveMediaType = settings?.mediaType;
   if (!effectiveMediaType && settings) {
@@ -67,15 +67,15 @@ export function PageHero({
   // Final check for media presence (including fallbacks)
   const hasVideo = !!(settings?.desktopVideoUrl || settings?.mobileVideoUrl);
   const hasImage = !!settings?.imageUrl;
-  
+
   // Decide what to actually render based on priority and availability
-  const finalRenderType = (effectiveMediaType === 'video' && hasVideo) ? 'video' : 
-                         (effectiveMediaType === 'image' && hasImage) ? 'image' : 
-                         hasVideo ? 'video' : 
-                         hasImage ? 'image' : null;
+  const finalRenderType = (effectiveMediaType === 'video' && hasVideo) ? 'video' :
+    (effectiveMediaType === 'image' && hasImage) ? 'image' :
+      hasVideo ? 'video' :
+        hasImage ? 'image' : null;
 
   const showMedia = isEnabled && !!finalRenderType;
-  
+
   const headline = settings?.headline || fallbackHeadline;
   const subheadline = settings?.subheadline || fallbackSubheadline;
   const buttonLabel = settings?.buttonLabel || fallbackButtonLabel;
@@ -86,7 +86,7 @@ export function PageHero({
 
   return (
     <section className="relative w-full bg-background overflow-hidden border-b border-border/50">
-      
+
       {/* 1. Pro-specific FULL WIDTH HEADLINE (above the video) */}
       {isPro && headline && (
         <div className="relative z-10 w-full px-8 pt-6 pb-2 md:pl-20 md:pr-12 md:pt-8 max-w-7xl">
@@ -98,7 +98,7 @@ export function PageHero({
 
       {/* 2. Main Flex Container */}
       <div className={`flex flex-col md:flex-row items-stretch w-full ${isPro ? 'min-h-[350px] md:min-h-[400px]' : 'min-h-[400px] md:min-h-[500px]'}`}>
-        
+
         {/* Left: Media Area (Wide 21:9 desktop, aspect-video mobile) */}
         {showMedia && (
           <div className={`relative w-full flex-shrink-0 bg-muted/20 ${isPro ? 'md:w-[50%] filter contrast-[1.05] brightness-[0.98]' : 'md:w-[55%]'}`}>
@@ -139,7 +139,7 @@ export function PageHero({
             {/* Desktop: fade right edge to blend into background */}
             <div className="hidden md:block absolute inset-y-0 right-[-1px] w-32 bg-gradient-to-l from-background to-transparent pointer-events-none" />
             <div className="hidden md:block absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background via-background/80 to-transparent pointer-events-none" />
-            
+
             {/* Mobile: fade bottom edge to blend into text */}
             <div className="block md:hidden absolute inset-x-0 bottom-[-1px] h-24 bg-gradient-to-t from-background to-transparent pointer-events-none" />
             <div className="block md:hidden absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none" />
@@ -148,59 +148,59 @@ export function PageHero({
 
         {/* Right: Text Content Area */}
         <div className={`relative flex flex-col justify-center px-6 py-2 md:px-12 z-10 flex-grow w-full ${isPro ? 'md:w-[50%] md:py-2 -mt-4 md:-mt-8' : 'md:w-[45%] md:py-16'}`}>
-            {(headline || subheadline || secondaryTextBlock) && (
-              <div className="max-w-xl text-left">
-                {/* Only render headline inside the box if NOT Pro */}
-                {!isPro && headline && (
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-                    {headline}
-                  </h1>
-                )}
-                
-                {isPro && (
-                  <div className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-foreground font-semibold mb-3">
-                    Наша роль
-                  </div>
-                )}
+          {(headline || subheadline || secondaryTextBlock) && (
+            <div className="max-w-xl text-left">
+              {/* Only render headline inside the box if NOT Pro */}
+              {!isPro && headline && (
+                <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-5xl font-semibold tracking-tighter text-foreground/70 uppercase text-balance leading-tight mb-6">
+                  {headline}
+                </h1>
+              )}
 
-                {subheadline && (
-                  <p className={`leading-relaxed font-light ${isPro ? 'text-[15px] md:text-[1.05rem] text-muted-foreground/90 mb-4' : 'text-base md:text-lg text-muted-foreground mb-10'}`}>
-                    {subheadline}
-                  </p>
-                )}
-                
-                {buttonLabel && (
-                  <Button 
-                    variant={isPro ? "outline" : "default"}
-                    size={isPro ? "default" : "lg"}
-                    asChild 
-                    className={`font-medium ${isPro ? 'w-full h-10 border-foreground/10 text-foreground/80 hover:bg-foreground/[0.03] hover:border-foreground/20 hover:text-foreground transition-all duration-300 underline decoration-1 decoration-foreground/20 underline-offset-[5px] hover:decoration-foreground/40 mt-4 mb-8' : 'w-full sm:w-auto mb-8'}`}
-                  >
-                    {buttonLink.startsWith('http') ? (
-                      <a href={buttonLink} target="_blank" rel="noopener noreferrer">
-                        {buttonLabel}
-                      </a>
-                    ) : (
-                      <Link href={buttonLink}>
-                        {buttonLabel}
-                      </Link>
-                    )}
-                  </Button>
-                )}
+              {isPro && (
+                <div className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-foreground font-semibold mb-3">
+                  Наша роль
+                </div>
+              )}
 
-                {isPro && secondaryTextBlock && (
-                  <div className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-foreground font-semibold mb-3">
-                    Ваші можливості
-                  </div>
-                )}
+              {subheadline && (
+                <p className={`leading-relaxed font-light ${isPro ? 'text-[15px] md:text-[1.05rem] text-muted-foreground/90 mb-4' : 'text-base md:text-lg text-muted-foreground mb-10'}`}>
+                  {subheadline}
+                </p>
+              )}
 
-                {secondaryTextBlock && isPro && (
-                  <p className="text-[14px] md:text-[1rem] text-muted-foreground/60 leading-relaxed font-light">
-                    {secondaryTextBlock}
-                  </p>
-                )}
-              </div>
-            )}
+              {buttonLabel && (
+                <Button
+                  variant="outline"
+                  size="default"
+                  asChild
+                  className="font-medium w-full h-10 border-foreground/10 text-foreground/80 hover:bg-foreground/[0.03] hover:border-foreground/20 hover:text-foreground transition-all duration-300 underline decoration-1 decoration-foreground/20 underline-offset-[5px] hover:decoration-foreground/40 mt-4 mb-8"
+                >
+                  {buttonLink.startsWith('http') ? (
+                    <a href={buttonLink} target="_blank" rel="noopener noreferrer">
+                      {buttonLabel}
+                    </a>
+                  ) : (
+                    <Link href={buttonLink}>
+                      {buttonLabel}
+                    </Link>
+                  )}
+                </Button>
+              )}
+
+              {isPro && secondaryTextBlock && (
+                <div className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-foreground font-semibold mb-3">
+                  Ваші можливості
+                </div>
+              )}
+
+              {secondaryTextBlock && isPro && (
+                <p className="text-[14px] md:text-[1rem] text-muted-foreground/60 leading-relaxed font-light">
+                  {secondaryTextBlock}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </section>
