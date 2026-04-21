@@ -27,6 +27,8 @@ const settingsSchema = z.object({
   contactIntro: optionalStringSchema,
   partnershipsIntro: optionalStringSchema,
   architectsIntro: optionalStringSchema,
+  supportEmail: requiredEmailSchema,
+  supportIntro: optionalStringSchema,
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -48,6 +50,8 @@ export default function ContactSettingsPage() {
             contactIntro: '',
             partnershipsIntro: '',
             architectsIntro: '',
+            supportEmail: '',
+            supportIntro: '',
         },
     });
 
@@ -208,6 +212,34 @@ export default function ContactSettingsPage() {
                                         <FormLabel>Architects Apply Intro Text</FormLabel>
                                         <FormControl>
                                             <Textarea placeholder="Офіційна процедура верифікації експертів..." className="resize-y" rows={3} {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <div className="space-y-6 pt-4 border-t">
+                            <h3 className="text-lg font-medium text-foreground">/support (Support & Technical Issues)</h3>
+                            <FormField
+                                control={form.control}
+                                name="supportEmail"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Support Email</FormLabel>
+                                        <FormControl><Input placeholder="support@lector.com" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="supportIntro"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Support Intro Text</FormLabel>
+                                        <FormControl>
+                                            <Textarea placeholder="Питання підтримки та технічні нюанси..." className="resize-y" rows={3} {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

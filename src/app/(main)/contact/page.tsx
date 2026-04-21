@@ -6,12 +6,13 @@ import { PageCloseButton } from '@/components/page-close-button';
 import { doc, getDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowRight, Handshake, Building2 } from 'lucide-react';
+import { ArrowRight, Handshake, Building2, LifeBuoy } from 'lucide-react';
 import Link from 'next/link';
 
 interface ContactSettings {
   contactIntro?: string;
   generalEmail?: string;
+  supportEmail?: string;
   showDirectEmails?: boolean;
 }
 
@@ -212,6 +213,24 @@ export default function ContactHubPage() {
                 </p>
                 <div className="flex items-center text-foreground text-sm font-bold uppercase tracking-widest">
                   Подати заявку <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+             </Link>
+
+             <Link 
+               href="/support" 
+               className="group block bg-card border border-border/30 rounded-2xl p-6 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300"
+             >
+                <div className="w-12 h-12 bg-accent/5 rounded-xl mb-6 flex items-center justify-center text-accent group-hover:scale-110 transition-transform duration-300">
+                   <LifeBuoy className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold tracking-tight text-foreground mb-3">
+                  Підтримка та технічні питання
+                </h3>
+                <p className="text-muted-foreground/80 font-light mb-6 text-sm md:text-base">
+                  Виникли труднощі або технічні помилки? Наша команда допоможе вирішити будь-яке питання в роботі платформи.
+                </p>
+                <div className="flex items-center text-accent text-sm font-bold uppercase tracking-widest">
+                  Написати у підтримку <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </div>
              </Link>
           </div>
