@@ -1,0 +1,9 @@
+# Build artifacts
+lib/
+# Dependencies
+node_modules/
+# Logs
+*.log
+# Local env
+.env.*.local
+.env.local
