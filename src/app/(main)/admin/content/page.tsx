@@ -2,7 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, HelpCircle, Users, Link as LinkIcon, Edit3 } from 'lucide-react';
+import { FileText, HelpCircle, Users, Link as LinkIcon, Edit3, Mail } from 'lucide-react';
 import Link from 'next/link';
 
 const contentPages = [
@@ -29,6 +29,12 @@ const contentPages = [
         description: "Manage social media links in the website footer.",
         href: "/admin/content/footer",
         icon: LinkIcon,
+    },
+    {
+        title: "Contact Hub Settings",
+        description: "Manage destination emails and intro texts for all contact forms.",
+        href: "/admin/content/contact",
+        icon: Mail,
     },
 ];
 

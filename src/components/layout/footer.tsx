@@ -70,7 +70,7 @@ export default function Footer() {
     { href: '/referral-sprint-program', label: 'Referral Sprint Program' },
     { href: '/architectors', label: 'architectors' },
     { href: '/community-architects', label: 'Community Architects' },
-    { href: '/info/contact', label: 'Контакти' },
+    { href: '/contact', label: 'Контакти' },
     { href: '/info/privacy-policy', label: 'Privacy Policy' },
     { href: '/info/terms-of-use', label: 'Terms of Use' },
   ];
