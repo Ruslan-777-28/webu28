@@ -39,6 +39,8 @@ import type { FaqItem } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PageHero } from '@/components/page-hero';
 import { FloatingStatusLink } from '@/components/floating-status-link';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { AuthModal } from '@/components/auth-modal';
 
 const whyNeedItItems = [
     {
@@ -112,6 +114,7 @@ const useCases = [
 export default function CommunityPage() {
     const [faqItems, setFaqItems] = useState<FaqItem[]>([]);
     const [isLoadingFaq, setIsLoadingFaq] = useState(true);
+    const [isAuthModalOpen, setAuthModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchFaq = async () => {
@@ -137,7 +140,7 @@ export default function CommunityPage() {
     }, []);
 
     return (
-        <>
+        <Dialog open={isAuthModalOpen} onOpenChange={setAuthModalOpen}>
             <main className="flex flex-col w-full min-h-screen bg-background text-foreground">
                 <Navigation />
 
@@ -148,6 +151,7 @@ export default function CommunityPage() {
                     fallbackSubheadline="LECTOR — це безпечний простір, де ви можете отримати персональну консультацію, новий погляд на ситуацію та живу взаємодію з перевіреними експертами, практиками й провідниками з усього світу."
                     fallbackButtonLabel="Зареєструватися"
                     fallbackButtonLink="/"
+                    onButtonClick={() => setAuthModalOpen(true)}
                 />
 
                 {/* 10. SECTION “Для яких ситуацій...” (Moved up) */}
@@ -273,7 +277,7 @@ export default function CommunityPage() {
                 {/* 6. CTA #1 */}
                 <section className="pb-20 bg-background">
                     <div className="container mx-auto px-4 text-center">
-                        <Button size="lg">Створити акаунт і почати</Button>
+                        <Button size="lg" onClick={() => setAuthModalOpen(true)}>Створити акаунт і почати</Button>
                     </div>
                 </section>
                 
@@ -449,7 +453,7 @@ export default function CommunityPage() {
                 {/* 9. CTA #2 */}
                 <section className="pb-20 bg-card">
                     <div className="container mx-auto px-4 text-center">
-                        <Button variant="outline" size="lg">Відкрити доступ до платформи</Button>
+                        <Button variant="outline" size="lg" onClick={() => setAuthModalOpen(true)}>Відкрити доступ до платформи</Button>
                     </div>
                 </section>
 
@@ -516,12 +520,15 @@ export default function CommunityPage() {
                         <p className="max-w-xl mx-auto text-lg text-muted-foreground mb-8">
                         Відкрийте доступ до експертів, живих відповідей і простору, де знання стають особистою цінністю.
                         </p>
-                        <Button size="lg">Створити акаунт</Button>
+                        <Button size="lg" onClick={() => setAuthModalOpen(true)}>Створити акаунт</Button>
                     </div>
                 </section>
             </main>
             <Footer />
+            <DialogContent>
+                <AuthModal setOpen={setAuthModalOpen} />
+            </DialogContent>
             <FloatingStatusLink docId="communityHeroMedia" />
-        </>
+        </Dialog>
     );
 }

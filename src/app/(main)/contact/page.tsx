@@ -8,6 +8,7 @@ import { db } from '@/lib/firebase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight, Handshake, Building2, LifeBuoy } from 'lucide-react';
 import Link from 'next/link';
+import { UnifiedContactForm } from '@/components/unified-contact-form';
 
 interface ContactSettings {
   contactIntro?: string;
@@ -19,17 +20,6 @@ interface ContactSettings {
 export default function ContactHubPage() {
   const [settings, setSettings] = useState<ContactSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Form State
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -46,36 +36,6 @@ export default function ContactHubPage() {
     };
     fetchSettings();
   }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) {
-      setErrorMsg('Будь ласка, заповніть всі обов\'язкові поля');
-      return;
-    }
-
-    setIsSubmitting(true);
-    setErrorMsg('');
-
-    try {
-      await addDoc(collection(db, 'contactSubmissions'), {
-        type: 'general',
-        ...formData,
-        createdAt: serverTimestamp(),
-        status: 'new'
-      });
-      setIsSuccess(true);
-    } catch (err) {
-      console.error(err);
-      setErrorMsg('Виникла помилка. Спробуйте пізніше.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -107,68 +67,15 @@ export default function ContactHubPage() {
               )}
             </div>
 
-            <div className="bg-card border border-border/30 rounded-2xl p-6 md:p-10 shadow-sm relative overflow-hidden">
-              {isSuccess ? (
-                <div className="absolute inset-0 bg-background/95 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500">
-                   <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-6">
-                      <div className="w-6 h-6 rounded-full bg-accent animate-pulse" />
-                   </div>
-                   <h3 className="text-2xl font-bold tracking-tighter mb-4 text-foreground">Ваше звернення отримано. Дякуємо.</h3>
-                   <p className="text-muted-foreground/80 font-light max-w-md mx-auto leading-relaxed">
-                      Команда LECTOR опрацює його та повернеться з відповіддю у відповідному форматі.
-                   </p>
-                </div>
-              ) : null}
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Ім'я *</label>
-                      <input 
-                        type="text" name="name" value={formData.name} onChange={handleChange} required
-                        className="w-full bg-background border border-border/50 rounded-lg px-4 py-3 placeholder-muted-foreground/30 focus:outline-none focus:border-accent/50 transition-colors"
-                        placeholder="Ваше ім'я"
-                      />
-                   </div>
-                   <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Email *</label>
-                      <input 
-                        type="email" name="email" value={formData.email} onChange={handleChange} required
-                        className="w-full bg-background border border-border/50 rounded-lg px-4 py-3 placeholder-muted-foreground/30 focus:outline-none focus:border-accent/50 transition-colors"
-                        placeholder="your@email.com"
-                      />
-                   </div>
-                </div>
-                <div className="space-y-2">
-                   <label className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Тема</label>
-                   <input 
-                     type="text" name="subject" value={formData.subject} onChange={handleChange}
-                     className="w-full bg-background border border-border/50 rounded-lg px-4 py-3 placeholder-muted-foreground/30 focus:outline-none focus:border-accent/50 transition-colors"
-                     placeholder="Коротко про суть питання"
-                   />
-                </div>
-                <div className="space-y-2">
-                   <label className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Повідомлення *</label>
-                   <textarea 
-                     name="message" value={formData.message} onChange={handleChange} required rows={5}
-                     className="w-full bg-background border border-border/50 rounded-lg px-4 py-3 placeholder-muted-foreground/30 focus:outline-none focus:border-accent/50 transition-colors resize-none"
-                     placeholder="Деталі вашого звернення..."
-                   ></textarea>
-                </div>
-                
-                {errorMsg && <div className="text-sm text-destructive">{errorMsg}</div>}
-
-                <button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="w-full bg-foreground text-background font-bold py-4 rounded-lg uppercase tracking-widest text-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
-                >
-                  {isSubmitting ? 'Надсилання...' : 'Надіслати звернення'}
-                </button>
-              </form>
+            <div className="bg-card border border-border/30 rounded-2xl shadow-sm relative overflow-hidden">
+              <UnifiedContactForm 
+                variant="general"
+                hideHeader
+                className="p-2 md:p-4"
+              />
 
               {!isLoading && settings?.showDirectEmails && settings?.generalEmail && (
-                 <div className="mt-8 pt-6 border-t border-border/30 text-center">
+                 <div className="pb-10 pt-2 text-center">
                     <p className="text-sm text-muted-foreground/60 mb-2">Або напишіть нам напряму:</p>
                     <a href={`mailto:${settings.generalEmail}`} className="text-foreground tracking-wide font-medium hover:text-accent transition-colors">
                       {settings.generalEmail}

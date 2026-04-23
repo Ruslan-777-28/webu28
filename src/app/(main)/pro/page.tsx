@@ -41,6 +41,7 @@ import {
   ShieldCheck,
   Star,
   TrendingUp,
+  Trophy,
   Users,
   Video,
   Wallet,
@@ -66,6 +67,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, Dialog
 import { AuthModal } from '@/components/auth-modal';
 import { PageHero } from '@/components/page-hero';
 import { FloatingStatusLink } from '@/components/floating-status-link';
+import { ArchitectApplyModal } from '@/components/architect-apply-modal';
 
 
 
@@ -91,9 +93,9 @@ const benefits = [
     text: 'Створюйте потужний профіль, формуйте довіру й вибудовуйте власну репутаційну вагу в платформі.',
   },
   {
-    icon: Repeat,
-    title: 'Один акаунт — дві ролі',
-    text: 'Ваш профіль дає можливість бути і професіоналом, і замовником, досліджуючи платформу з обох боків.',
+    icon: Trophy,
+    title: 'Визнання',
+    text: 'Отримуйте статуси, сезонні відзнаки та репутаційне визнання, що підкреслюють вашу компетентність.',
   },
   {
     icon: Megaphone,
@@ -232,7 +234,7 @@ const growthBenefits = [
   {
     icon: Award,
     title: 'Репутація, яка працює на вас',
-    text: 'Ваш шлях у платформі формує репутаційну вагу, що підсилює довіру і вибір на вашу користь.',
+    text: 'Ваш шлях у платформі формує репутаційну вагу, що підсилює довіру і вибір на вашу користь. Статуси та сезонні відзнаки.',
   },
   {
     icon: ChevronsUp,
@@ -310,6 +312,7 @@ export default function ProPage() {
   const [faqItems, setFaqItems] = useState<FaqItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
+  const [isArchitectModalOpen, setArchitectModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -374,6 +377,7 @@ export default function ProPage() {
           fallbackSubheadline="Створюйте власні пропозиції, консультуйте клієнтів з усього світу та перетворюйте досвід, інтуїцію й експертність на преміальний дохід у зручному для вас форматі."
           fallbackButtonLabel="Приєднатися до професіоналів"
           fallbackButtonLink="/"
+          onButtonClick={() => setAuthModalOpen(true)}
         />
 
         {/* 2. SECTION “Це для вас, якщо Ви...” */}
@@ -1178,28 +1182,19 @@ export default function ProPage() {
               <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-16 w-full max-w-4xl mx-auto px-4">
 
                 {/* Кнопка 1: Виклик форми */}
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button size="lg" variant="default" className="w-full md:w-auto h-14 px-8 font-semibold tracking-wide shadow-md">
-                      Подати заявку на верифікацію куратор / архітектор
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[550px]">
-                    <DialogHeader>
-                      <DialogTitle className="text-2xl">Заявка на верифікацію</DialogTitle>
-                      <DialogDescription>
-                        Форма знаходиться в розробці. Тут будуть детальні поля для заявки на статус.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="py-16 flex flex-col items-center justify-center text-muted-foreground border border-dashed border-border/60 rounded-lg bg-muted/30 my-4">
-                      <span className="text-sm font-medium tracking-wide uppercase">[ Form Shell Placeholder ]</span>
-                    </div>
-                    <div className="flex justify-end gap-3 mt-2">
-                      <Button variant="ghost" disabled>Скасувати</Button>
-                      <Button type="submit" disabled>Відправити заявку</Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                <Button 
+                  size="lg" 
+                  variant="default" 
+                  className="w-full md:w-auto h-14 px-8 font-semibold tracking-wide shadow-md"
+                  onClick={() => setArchitectModalOpen(true)}
+                >
+                  Подати заявку на верифікацію куратор / архітектор
+                </Button>
+
+                <ArchitectApplyModal 
+                  open={isArchitectModalOpen} 
+                  onOpenChange={setArchitectModalOpen} 
+                />
 
                 {/* Кнопка 2: Перехід на /architectors */}
                 <Button size="lg" variant="secondary" className="w-full md:w-auto h-14 px-10 font-semibold tracking-wide border border-border/50 hover:bg-secondary/80" asChild>
@@ -1278,9 +1273,9 @@ export default function ProPage() {
             <p className="max-w-xl mx-auto text-lg text-muted-foreground mb-8">
               Дайте їм професійний простір, глобальну аудиторію та гідний формат монетизації.
             </p>
-            <DialogTrigger asChild>
-              <Button size="lg">Приєднатися до професіоналів</Button>
-            </DialogTrigger>
+            <Button size="lg" onClick={() => setAuthModalOpen(true)}>
+              Приєднатися до професіоналів
+            </Button>
           </div>
         </section>
       </main>

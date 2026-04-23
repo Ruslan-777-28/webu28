@@ -154,19 +154,37 @@ export const onContactSubmissionCreated = onDocumentCreated({
 });
 
 function renderAdditionalFields(data: any): string {
-  const fields: string[] = [];
-  if (data.company) fields.push(`<tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Organization:</strong></td><td>${data.company}</td></tr>`);
-  if (data.partnershipType) fields.push(`<tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Partnership Type:</strong></td><td>${data.partnershipType}</td></tr>`);
-  if (data.country) fields.push(`<tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Country:</strong></td><td>${data.country}</td></tr>`);
-  if (data.category) fields.push(`<tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Category:</strong></td><td>${data.category} / ${data.subcategory || ''}</td></tr>`);
-  if (data.profileLink) fields.push(`<tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Profile:</strong></td><td><a href="${data.profileLink}">${data.profileLink}</a></td></tr>`);
-  if (data.whyStatus) fields.push(`<tr><td style="padding: 20px 0 10px 0;"><strong>Why Status:</strong></td><td>${data.whyStatus}</td></tr>`);
+  const skipKeys = ['name', 'email', 'subject', 'message', 'createdAt', 'status', 'type', 'id'];
+  
+  const fields = Object.entries(data)
+    .filter(([key, value]) => {
+      return !skipKeys.includes(key) && 
+             value !== undefined && 
+             value !== null && 
+             value !== '' &&
+             typeof value !== 'object'; // Skip timestamps or complex objects
+    })
+    .map(([key, value]) => {
+      const label = key
+        .replace(/([A-Z])/g, ' $1') // Space before capitals
+        .replace(/^./, str => str.toUpperCase()); // Capitalize first letter
+      
+      return `
+        <tr>
+          <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; width: 150px; font-size: 13px; color: #6b7280;"><strong>${label}:</strong></td>
+          <td style="padding: 10px; border-bottom: 1px solid #f3f4f6; font-size: 14px; color: #111827;">${value}</td>
+        </tr>
+      `;
+    });
   
   if (fields.length === 0) return '';
+  
   return `
-    <div style="margin-top: 25px;">
-      <h3 style="font-size: 14px; text-transform: uppercase; color: #9ca3af; margin-bottom: 10px;">Additional Information:</h3>
-      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+    <div style="margin-top: 30px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+      <div style="background: #f9fafb; padding: 10px 15px; border-bottom: 1px solid #e5e7eb;">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: #9ca3af; margin: 0; letter-spacing: 0.05em;">Additional Information</h3>
+      </div>
+      <table style="width: 100%; border-collapse: collapse;">
         ${fields.join('')}
       </table>
     </div>

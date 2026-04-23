@@ -13,6 +13,7 @@ interface PageHeroProps {
   fallbackSubheadline?: string;
   fallbackButtonLabel?: string;
   fallbackButtonLink?: string;
+  onButtonClick?: () => void;
 }
 
 export function PageHero({
@@ -21,6 +22,7 @@ export function PageHero({
   fallbackSubheadline,
   fallbackButtonLabel,
   fallbackButtonLink,
+  onButtonClick,
 }: PageHeroProps) {
   const [settings, setSettings] = useState<HomeHeroMediaSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -182,10 +184,13 @@ export function PageHero({
                 <Button
                   variant="outline"
                   size="default"
-                  asChild
+                  asChild={!onButtonClick}
                   className="font-medium w-full h-10 border-foreground/10 text-foreground/80 hover:bg-foreground/[0.03] hover:border-foreground/20 hover:text-foreground transition-all duration-300 underline decoration-1 decoration-foreground/20 underline-offset-[5px] hover:decoration-foreground/40 mt-4 mb-8"
+                  onClick={onButtonClick}
                 >
-                  {buttonLink.startsWith('http') ? (
+                  {onButtonClick ? (
+                    buttonLabel
+                  ) : buttonLink.startsWith('http') ? (
                     <a href={buttonLink} target="_blank" rel="noopener noreferrer">
                       {buttonLabel}
                     </a>
