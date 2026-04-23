@@ -4,21 +4,19 @@ import * as nodemailer from "nodemailer";
 import { defineSecret } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 
-// Secrets for SMTP authentication
-const TITAN_USER = defineSecret("TITAN_SMTP_USER");
-const TITAN_PASS = defineSecret("TITAN_SMTP_PASS");
+// Secrets for SMTP authentication (Google Workspace)
+const SMTP_USER = defineSecret("SMTP_USER");
+const SMTP_PASS = defineSecret("SMTP_PASS");
 
 admin.initializeApp();
 
 /**
  * Triggered when a new document is created in the 'contactSubmissions' collection.
- * It determines the submission type, pulls the correct destination email from site settings,
- * and sends an email notification via Titan SMTP.
  */
 export const onContactSubmissionCreated = onDocumentCreated({
   document: "contactSubmissions/{submissionId}",
-  secrets: [TITAN_USER, TITAN_PASS],
-  region: "us-central1", // Matching firestore location from firebase.json
+  secrets: [SMTP_USER, SMTP_PASS],
+  region: "us-central1",
 }, async (event: FirestoreEvent<QueryDocumentSnapshot | undefined, { submissionId: string }>) => {
   const snapshot = event.data;
   if (!snapshot) {
@@ -36,7 +34,6 @@ export const onContactSubmissionCreated = onDocumentCreated({
 
   logger.info(`[Trigger Started] Processing submission ${submissionId} of type: ${data.type}`);
 
-  // 1. Mark as processing in Firestore immediately
   try {
     await snapshot.ref.update({
       emailDeliveryStatus: "processing",
@@ -47,39 +44,39 @@ export const onContactSubmissionCreated = onDocumentCreated({
   }
 
   try {
-    // 2. Fetch Routing Settings from Firestore
     const settingsDoc = await admin.firestore().doc("siteSettings/contact").get();
     const settings = settingsDoc.exists ? settingsDoc.data() : {};
 
-    // 3. Determine Destination Email
-    let destEmail = "hello@lector.life"; // Default Fallback
+    let destEmail = "hello@lector.global";
     const type = data.type || "general";
 
     if (type === "partnership") {
-      destEmail = settings?.partnershipsEmail || "partnerships@lector.life";
+      destEmail = settings?.partnershipsEmail || "partnerships@lector.global";
     } else if (type === "architect_application") {
-      destEmail = settings?.architectsEmail || "architects@lector.life";
+      destEmail = settings?.architectsEmail || "architects@lector.global";
     } else if (type === "support") {
-      destEmail = settings?.supportEmail || "support@lector.life";
+      destEmail = settings?.supportEmail || "support@lector.global";
     } else {
-      destEmail = settings?.generalEmail || "hello@lector.life";
+      destEmail = settings?.generalEmail || "hello@lector.global";
     }
 
-    logger.info(`[Routing] Submission ${submissionId} -> ${destEmail}`);
+    // SMTP Configuration (Gmail / Google Workspace)
+    const smtpHost = "smtp.gmail.com";
+    const smtpPort = 465;
+    const smtpUser = SMTP_USER.value();
 
-    // 4. Setup Nodemailer Transport
-    // Titan SMTP settings: smtp.titan.email, port 465 (SSL)
+    logger.info(`[SMTP] Host: ${smtpHost}:${smtpPort}, User: ${smtpUser}`);
+
     const transporter = nodemailer.createTransport({
-      host: "smtp.titan.email",
-      port: 465,
+      host: smtpHost,
+      port: smtpPort,
       secure: true,
       auth: {
-        user: TITAN_USER.value(),
-        pass: TITAN_PASS.value(),
+        user: smtpUser,
+        pass: SMTP_PASS.value(),
       },
     });
 
-    // 5. Construct Email Body (Clean & Readable HTML)
     const htmlBody = `
       <div style="font-family: sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px; border-radius: 8px;">
         <h2 style="color: #6d28d9; margin-top: 0; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px;">
@@ -122,18 +119,16 @@ export const onContactSubmissionCreated = onDocumentCreated({
       </div>
     `;
 
-    // 6. Send Email
-    // Note: support@lector.life is used as sender (primary account) to ensure SMTP reliability.
-    logger.info(`[SMTP] Delivering email for ${submissionId} to ${destEmail}...`);
+    logger.info(`[SMTP] Attempting delivery for ${submissionId}...`);
+    
     await transporter.sendMail({
-      from: `"LECTOR System" <support@lector.life>`,
+      from: `"LECTOR Support" <support@lector.global>`,
       to: destEmail,
       replyTo: data.email,
       subject: `[${type.toUpperCase()}] ${data.subject || 'New Submission'} - ${data.name}`,
       html: htmlBody,
     });
 
-    // 7. Mark as successful
     await snapshot.ref.update({
       emailForwarded: true,
       emailDeliveryStatus: "sent",
@@ -146,7 +141,6 @@ export const onContactSubmissionCreated = onDocumentCreated({
   } catch (error: any) {
     logger.error(`[Fatal Error] Processing submission ${submissionId} failed:`, error);
     
-    // 8. CRITICAL: Always write failure status to Firestore for visibility
     try {
       await snapshot.ref.update({
         emailForwarded: false,
@@ -159,24 +153,16 @@ export const onContactSubmissionCreated = onDocumentCreated({
   }
 });
 
-/**
- * Helper to render dynamic fields based on submission type
- */
 function renderAdditionalFields(data: any): string {
   const fields: string[] = [];
-
-  // Partnerships specific
   if (data.company) fields.push(`<tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Organization:</strong></td><td>${data.company}</td></tr>`);
   if (data.partnershipType) fields.push(`<tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Partnership Type:</strong></td><td>${data.partnershipType}</td></tr>`);
-
-  // Architects specific
   if (data.country) fields.push(`<tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Country:</strong></td><td>${data.country}</td></tr>`);
   if (data.category) fields.push(`<tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Category:</strong></td><td>${data.category} / ${data.subcategory || ''}</td></tr>`);
   if (data.profileLink) fields.push(`<tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Profile:</strong></td><td><a href="${data.profileLink}">${data.profileLink}</a></td></tr>`);
   if (data.whyStatus) fields.push(`<tr><td style="padding: 20px 0 10px 0;"><strong>Why Status:</strong></td><td>${data.whyStatus}</td></tr>`);
   
   if (fields.length === 0) return '';
-
   return `
     <div style="margin-top: 25px;">
       <h3 style="font-size: 14px; text-transform: uppercase; color: #9ca3af; margin-bottom: 10px;">Additional Information:</h3>

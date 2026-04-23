@@ -86,8 +86,8 @@ const howItWorksSteps = [
     { step: 1, title: 'Створіть акаунт', text: 'Зареєструйтесь, щоб відкрити доступ до повної взаємодії всередині платформи.' },
     { step: 2, title: 'Оберіть напрям або експерта', text: 'Досліджуйте категорії, профілі та матеріали, щоб знайти того, хто відповідає вашому запиту.' },
     { step: 3, title: 'Ознайомтесь із профілем і форматом роботи', text: 'Перегляньте подачу, зміст, стиль і доступні способи взаємодії.' },
-    { step: 4, title: 'Розпочніть взаємодію', text: 'Оберіть той формат спілкування, який підходить саме вам.' },
-    { step: 5, title: 'Отримайте персональну цінність', text: 'Від живої розмови до матеріалів і нових інсайтів — усе будується навколо вашого реального запиту.' },
+    { step: 4, title: 'Розпочніть взаємодію', text: 'Оберіть той формат спілкування, який підходить саме вам. Натисніть виклик.' },
+    { step: 5, title: 'Отримайте персональну цінність', text: 'Оцініть результат, компетентність реалізації запиту.' },
 ];
 
 const interactionFormats = [
@@ -151,7 +151,7 @@ export default function CommunityPage() {
                 />
 
                 {/* 10. SECTION “Для яких ситуацій...” (Moved up) */}
-                <section className="py-20 bg-background">
+                <section className="pt-32 pb-20 bg-background">
                     <div className="container mx-auto px-4">
                         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
                             Коли платформа може бути особливо корисною
@@ -227,7 +227,7 @@ export default function CommunityPage() {
                                     
                                     {/* Text Block (Restored size and spacing) */}
                                     <div className="flex flex-col space-y-2 px-1">
-                                        <h3 className="text-lg font-bold text-foreground tracking-tight leading-snug">
+                                        <h3 className="text-lg font-bold text-foreground tracking-tight leading-snug md:min-h-[5rem] flex items-start justify-center">
                                             {item.title}
                                         </h3>
                                         <p className="text-muted-foreground text-[0.9rem] leading-relaxed font-light px-2">

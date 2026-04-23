@@ -85,7 +85,7 @@ export function PageHero({
   const isPro = pageId === 'pro';
 
   return (
-    <section className="relative w-full bg-background overflow-hidden border-b border-border/50">
+    <section className={`relative w-full bg-background overflow-x-hidden ${isPro ? 'border-b border-border/50' : 'md:-mb-16'}`}>
 
       {/* 1. Pro-specific FULL WIDTH HEADLINE (above the video) */}
       {isPro && headline && (
@@ -97,66 +97,66 @@ export function PageHero({
       )}
 
       {/* 2. Main Flex Container */}
-      <div className={`flex flex-col md:flex-row items-stretch w-full ${isPro ? 'min-h-[350px] md:min-h-[400px]' : 'min-h-[400px] md:min-h-[500px]'}`}>
+      <div className={`flex flex-col md:flex-row items-stretch w-full ${isPro ? 'min-h-[350px] md:min-h-[400px]' : 'min-h-[500px] md:min-h-[650px]'}`}>
 
         {/* Left: Media Area (Wide 21:9 desktop, aspect-video mobile) */}
         {showMedia && (
-          <div className={`relative w-full flex-shrink-0 bg-muted/20 ${isPro ? 'md:w-[50%] filter contrast-[1.05] brightness-[0.98]' : 'md:w-[58%]'}`}>
-            <div className={`w-full h-full ${!isPro ? 'py-10 md:py-20 lg:py-24 pl-4 pr-0 flex items-center justify-start -translate-x-[12%] -translate-y-[4%]' : ''}`}>
-            {finalRenderType === 'video' && settings ? (
-              <>
-                {/* Desktop Video */}
-                {settings.desktopVideoUrl && (
+          <div className={`relative w-full flex-shrink-0 bg-muted/20 ${isPro ? 'md:w-[50%] filter contrast-[1.05] brightness-[0.98]' : 'md:w-[72%]'}`}>
+            <div className={`w-full h-full ${!isPro ? 'pt-6 pb-0 md:pt-12 md:pb-0 lg:pt-16 lg:pb-0 pl-4 pr-0 flex items-center justify-start -translate-x-[17%] -translate-y-[13%] scale-[0.8]' : ''}`}>
+              {finalRenderType === 'video' && settings ? (
+                <>
+                  {/* Desktop Video */}
+                  {settings.desktopVideoUrl && (
+                    <video
+                      src={settings.desktopVideoUrl}
+                      poster={settings.posterUrl}
+                      className="hidden md:block w-full h-full object-cover aspect-[21/9]"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    />
+                  )}
+                  {/* Mobile Video (fallback to desktop if mobile not provided) */}
                   <video
-                    src={settings.desktopVideoUrl}
+                    src={settings.mobileVideoUrl || settings.desktopVideoUrl}
                     poster={settings.posterUrl}
-                    className="hidden md:block w-full h-full object-cover aspect-[21/9]"
+                    className="block md:hidden w-full h-full object-cover aspect-video"
                     autoPlay
                     muted
                     loop
                     playsInline
                   />
-                )}
-                {/* Mobile Video (fallback to desktop if mobile not provided) */}
-                <video
-                  src={settings.mobileVideoUrl || settings.desktopVideoUrl}
-                  poster={settings.posterUrl}
-                  className="block md:hidden w-full h-full object-cover aspect-video"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
+                </>
+              ) : (finalRenderType === 'image' && settings?.imageUrl) ? (
+                <img
+                  src={settings.imageUrl}
+                  alt="Hero Media"
+                  className="w-full h-full object-cover md:aspect-[21/9] aspect-video"
                 />
-              </>
-            ) : (finalRenderType === 'image' && settings?.imageUrl) ? (
-              <img
-                src={settings.imageUrl}
-                alt="Hero Media"
-                className="w-full h-full object-cover md:aspect-[21/9] aspect-video"
-              />
-            ) : null}
+              ) : null}
             </div>
 
             {/* Desktop: seamless fades (Enhanced Atmospheric Layers) */}
-            <div className="hidden md:block absolute inset-y-0 right-[-1px] w-48 bg-gradient-to-l from-background to-transparent pointer-events-none" />
-            <div className="hidden md:block absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background via-background/60 to-transparent pointer-events-none" />
-            <div className="hidden md:block absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-background via-background/90 to-transparent pointer-events-none" />
-            
+            <div className="hidden md:block absolute inset-y-0 right-[-1px] w-64 bg-gradient-to-l from-background to-transparent pointer-events-none backdrop-blur-[4px]" />
+            <div className="hidden md:block absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background via-background/60 to-transparent pointer-events-none backdrop-blur-[2px]" />
+            <div className="hidden md:block absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background via-background/90 to-transparent pointer-events-none" />
+
             <div className="hidden md:block absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-background to-transparent pointer-events-none" />
             <div className="hidden md:block absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background via-background/50 to-transparent pointer-events-none" />
-            
-            <div className="hidden md:block absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-background to-transparent pointer-events-none" />
-            <div className="hidden md:block absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background via-background/50 to-transparent pointer-events-none" />
+
+            <div className="hidden md:block absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent pointer-events-none backdrop-blur-[1px]" />
+            <div className="hidden md:block absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background via-background/50 to-transparent pointer-events-none backdrop-blur-[0.5px]" />
 
             {/* Mobile: seamless fades */}
             <div className="block md:hidden absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background to-transparent pointer-events-none" />
-            <div className="block md:hidden absolute inset-x-0 bottom-[-1px] h-40 bg-gradient-to-t from-background to-transparent pointer-events-none" />
-            <div className="block md:hidden absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none" />
+            <div className="block md:hidden absolute inset-x-0 bottom-[-1px] h-20 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+            <div className="block md:hidden absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none" />
           </div>
         )}
 
         {/* Right: Text Content Area */}
-        <div className={`relative flex flex-col justify-center px-6 py-2 md:px-12 z-10 flex-grow w-full ${isPro ? 'md:w-[50%] md:py-2 -mt-4 md:-mt-8' : 'md:w-[42%] md:py-16'}`}>
+        <div className={`relative flex flex-col justify-center px-6 py-2 md:px-12 z-10 flex-grow w-full ${isPro ? 'md:w-[50%] md:py-2 -mt-4 md:-mt-8' : 'md:w-[28%] md:py-10 md:pl-0 md:pr-12 md:-ml-40'}`}>
           {(headline || subheadline || secondaryTextBlock) && (
             <div className="max-w-xl text-left">
               {/* Only render headline inside the box if NOT Pro */}
