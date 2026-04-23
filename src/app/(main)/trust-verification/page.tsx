@@ -131,6 +131,11 @@ export default function TrustVerificationPage() {
     }
   ];
 
+  const ecosystemLinks = [
+    { href: '/rewards', label: 'Система балів', desc: 'Динаміка активності' },
+    { href: '/status', label: 'Status Hub', desc: 'Визнання та ролі' },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Navigation />
@@ -186,8 +191,8 @@ export default function TrustVerificationPage() {
           <div className="text-sm space-y-1.5 pt-0.5">
             <p className="font-black uppercase tracking-wider text-[11px]">Про систему рівнів</p>
             <p className="text-muted-foreground leading-relaxed font-medium">
-              Ваш рівень довіри оновлюється автоматично на основі активності та верифікації контактів. 
-              Ми розділяємо статус довіри (надійність) та статус онлайн (доступність). Високий рівень довіри відкриває доступ до преміальних функцій платформи.
+              Ваш рівень довіри оновлюється автоматично на основі активності та верифікації. 
+              У системі LECTOR довіра працює у зв'язці з <Link href="/rewards" className="text-primary hover:underline">балами</Link> (активність) та <Link href="/status" className="text-primary hover:underline">статусом</Link> (визнання), формуючи вашу повну репутацію.
             </p>
           </div>
         </div>
@@ -288,7 +293,7 @@ export default function TrustVerificationPage() {
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] opacity-40">
             Система верифікації працює у автоматичному режимі. Всі дані захищені протоколами LECTOR.
           </p>
-          <div className="flex justify-center gap-6">
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-4">
             <Link 
               href="/" 
               className="text-xs font-black text-primary uppercase tracking-widest hover:underline"
@@ -301,6 +306,16 @@ export default function TrustVerificationPage() {
             >
               Мій профіль
             </Link>
+            {ecosystemLinks.map(link => (
+              <Link 
+                key={link.href}
+                href={link.href}
+                className="text-xs font-black text-muted-foreground hover:text-primary uppercase tracking-widest transition-colors flex items-center gap-2"
+              >
+                <div className="w-1 h-1 rounded-full bg-muted-foreground/30" />
+                {link.label}
+              </Link>
+            ))}
           </div>
         </footer>
       </main>

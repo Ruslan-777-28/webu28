@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useMemo } from 'react';
 import { doc, onSnapshot, collection, query, where, addDoc, deleteDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
@@ -25,6 +25,7 @@ import Link from 'next/link';
 import { calculateProfileCompletion } from '@/lib/utils/profile-completion';
 import { TrustStrip } from '@/components/profile/trust-strip';
 import { Badge } from '@/components/ui/badge';
+import { WelcomeIntentSection } from '@/components/welcome-intent-section';
 
 const LANGUAGE_MAP: Record<string, string> = {
     'uk-UA': 'Українська',
@@ -329,6 +330,7 @@ function CircularProgress({ percentage, size = 48 }: { percentage: number, size?
 export default function PublicProfilePage() {
     const params = useParams();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const profileId = params?.id as string;
     const { user: currentUser } = useUser();
     const { toast } = useToast();
@@ -440,6 +442,13 @@ export default function PublicProfilePage() {
             unsubProducts();
         };
     }, [profileId]);
+
+    // Handle auto-edit mode from welcome flow
+    useEffect(() => {
+        if (searchParams.get('edit') === 'true' && currentUser?.uid === profileId) {
+            setEditModalOpen(true);
+        }
+    }, [searchParams, currentUser, profileId]);
     
     const isOwnProfile = currentUser?.uid === profileId;
 
@@ -502,6 +511,9 @@ export default function PublicProfilePage() {
             <div className="relative z-10 flex flex-col min-h-screen">
                 <Navigation />
                 <main className="flex-grow pt-3 md:pt-4 pb-12 relative lg:pt-8 w-full">
+                    <div className="container max-w-[1400px] mx-auto px-3 md:px-4">
+                        <WelcomeIntentSection />
+                    </div>
                     <div className="container max-w-[1400px] mx-auto px-3 md:px-4 space-y-4 lg:space-y-0 lg:grid lg:grid-cols-[3fr_6.5fr_2.5fr] lg:gap-4 lg:items-stretch items-start relative z-10 w-full mb-10">
                         <div className="absolute top-[-36px] right-2 md:top-[-44px] md:right-4 lg:top-[-60px] lg:right-4 z-50">
                             <Button variant="ghost" size="icon" className="h-8 w-8 md:h-9 md:w-9 rounded-full bg-background/50 backdrop-blur hover:bg-background/80 shadow-sm border border-muted/30" onClick={handleClose}>

@@ -223,6 +223,22 @@ export function CreatePostModal({ setOpen }: { setOpen: (open: boolean) => void 
 
     try {
       await setDoc(docRef, newPostPayload);
+      
+      // Award points for the first post
+      try {
+        const idToken = await user.getIdToken();
+        fetch('/api/points/award', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+          },
+          body: JSON.stringify({ kind: 'first_post_bonus' })
+        }).catch(err => console.warn("Points award failed:", err));
+      } catch (err) {
+        console.warn("Auth token for points failed:", err);
+      }
+
       toast({
         title: "Матеріал надіслано!",
         description: "Ваш пост було надіслано на розгляд і скоро з'явиться у вашому профілі.",

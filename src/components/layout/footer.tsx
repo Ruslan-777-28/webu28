@@ -58,6 +58,7 @@ export default function Footer() {
   const informationLinksPlatform = [
     { href: '/info/community-rules', label: 'Правила спільноти' },
     { href: '/status', label: 'Статус' },
+    { href: '/rewards', label: 'Система балів' },
     { href: '/status/nominations', label: 'Вітрина номінацій' },
     { href: '/trust-verification', label: 'Довіра і верифікація' },
     { href: '/status/legend', label: 'Умовні позначки' },

@@ -6,6 +6,7 @@ import { Info } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { WelcomeIntentSection } from '@/components/welcome-intent-section';
 
 // 192 Countries list mapped to ISO alpha-2 codes
 const COUNTRIES_DATA = [
@@ -85,6 +86,10 @@ export default function ArchitectorsPage() {
                 Using it here but keeping the overall header zone as compact as possible.
             */}
             <Navigation subtitle="Matrix Wall" />
+            
+            <div className="container max-w-[1400px] mx-auto px-1.5 pt-4">
+                <WelcomeIntentSection />
+            </div>
 
             <main className="flex-grow flex flex-col px-1.5 pb-1.5 min-h-0">
                 <div className="pt-2 pb-4 flex justify-center items-center">

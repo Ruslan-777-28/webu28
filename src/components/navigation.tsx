@@ -21,7 +21,7 @@ interface NavigationProps {
 export function Navigation({ hideBalance = false, subtitle }: NavigationProps) {
   const pathname = usePathname();
   const isAchievementsPage = pathname?.endsWith('/achievements');
-  const { user, loading } = useUser();
+  const { user, profile, loading } = useUser();
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
 
   const navLinks = [
@@ -137,10 +137,10 @@ export function Navigation({ hideBalance = false, subtitle }: NavigationProps) {
           <div className="flex items-center gap-2">
               <Link 
                 href="/referral-sprint-program"
-                className="text-xl md:text-2xl font-extralight tracking-tighter text-muted-foreground/60 font-mono hover:text-primary transition-colors cursor-pointer"
+                className="text-xl md:text-2xl font-extralight tracking-tighter text-muted-foreground/50 font-mono tabular-nums whitespace-nowrap hover:text-primary transition-colors cursor-pointer"
                 title="Referral Sprint Program"
               >
-                  000 000.00
+                  {(profile?.bonusBalance ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ')}
               </Link>
               <Popover>
                   <PopoverTrigger asChild>

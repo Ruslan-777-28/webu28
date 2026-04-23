@@ -32,6 +32,7 @@ import { Progress } from "./ui/progress";
 import { ImageIcon, Upload, X } from "lucide-react";
 import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useUser } from "@/hooks/use-auth";
 
 const profileSchema = z.object({
   name: z.string().min(2, { message: "Ім'я має містити щонайменше 2 символи." }),
@@ -45,6 +46,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, setOpen: (open: boolean) => void }) {
   const { toast } = useToast();
+  const { user } = useUser();
   
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [coverUploadProgress, setCoverUploadProgress] = useState(0);
@@ -157,6 +159,24 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
         title: "Профіль оновлено!",
         description: "Ваші зміни було успішно збережено.",
       });
+
+      // Check for points milestones
+      if (user) {
+        try {
+          const idToken = await user.getIdToken();
+          fetch('/api/points/award', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({ kind: 'check_milestones' })
+          }).catch(err => console.warn("Milestone check failed:", err));
+        } catch (err) {
+          console.warn("Auth token for milestones failed:", err);
+        }
+      }
+
       setOpen(false);
     } catch (error: any) {
       console.error("Profile update error:", error);

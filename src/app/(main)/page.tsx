@@ -20,7 +20,7 @@ import { HomeStatusLink } from '@/components/home-status-link';
 
 export default function HomePage() {
   const pathname = usePathname();
-  const { user, loading } = useUser();
+  const { user, profile, loading } = useUser();
 
   const subcategories = [
     { slug: 'tarot', label: 'tarot', align: 'justify-center pr-8', weight: 'large', color: 'text-sidebar-foreground/45', description: 'фахівці з таро, читачі карт, практики символічних розкладів, інтерпретатори життєвих ситуацій, стосунків, вибору шляху та внутрішніх станів через систему карт.' },
@@ -78,10 +78,10 @@ export default function HomePage() {
             <div className="flex items-center gap-2">
                 <Link 
                     href="/referral-sprint-program"
-                    className="text-xl md:text-2xl font-thin tracking-tighter text-sidebar-foreground/50 font-mono hover:text-sidebar-foreground transition-colors cursor-pointer"
+                    className="text-xl md:text-2xl font-extralight tracking-tighter text-sidebar-foreground/50 font-mono tabular-nums whitespace-nowrap hover:text-sidebar-foreground transition-colors cursor-pointer"
                     title="Referral Sprint Program"
                 >
-                    000 000.00
+                    {(profile?.bonusBalance ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ')}
                 </Link>
                 <Popover>
                     <PopoverTrigger asChild>

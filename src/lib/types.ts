@@ -321,6 +321,8 @@ export type UserProfile = {
 
   // --- Trust & Verification Fields ---
   verification?: UserVerification;
+
+  usageIntent?: string;
 };
 
 export type AdminActionLog = {

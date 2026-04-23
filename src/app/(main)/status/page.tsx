@@ -15,6 +15,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { BlogSettings, Subcategory } from '@/lib/types';
 import { FormattedStatusTableRow, StatusAwardLevel } from '@/lib/status/types';
 import { Button } from '@/components/ui/button';
+import { WelcomeIntentSection } from '@/components/welcome-intent-section';
+import { StatusSystemMap } from '@/components/status-system-map';
 
 const iconMap: Record<string, React.ElementType> = {
     Mic, Shield, MessageCircle, Repeat, TrendingUp, Crown, Star,
@@ -187,16 +189,22 @@ export default function StatusPage() {
             </div>
             
             <main className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-16 mt-[32px] md:mt-[40px]">
+                <WelcomeIntentSection />
                 {/* Header Section */}
                 <div className="flex flex-col gap-10 mb-8">
                     <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
                         <div className="space-y-5 max-w-2xl">
                             <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-foreground leading-none">
-                                Статус
+                                Статус у LECTOR
                             </h1>
-                            <p className="text-sm md:text-base text-muted-foreground/80 font-medium leading-relaxed">
-                                Зафіксований зріз статусів і відзнак платформи за вибраний період. Офіційний реєстр видатних досягнень та професійного визнання.
-                            </p>
+                            <div className="space-y-3">
+                                <p className="text-sm md:text-lg text-muted-foreground font-bold leading-relaxed">
+                                    Статус у LECTOR — це не одна позначка, а система розвитку присутності, довіри та визнання в екосистемі платформи.
+                                </p>
+                                <p className="text-xs md:text-sm text-muted-foreground/70 font-medium leading-relaxed">
+                                    У цій системі поєднуються рівні наповнення профілю, рівні довіри, особливі ролі та публічні відзнаки.
+                                </p>
+                            </div>
                         </div>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
                             {/* Dynamic Snapshot Marker */}
@@ -216,6 +224,9 @@ export default function StatusPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Status System Map - Reinforcement Layer */}
+                <StatusSystemMap />
 
                 <div className="sticky top-[72px] md:top-[88px] z-40 bg-background/95 backdrop-blur-md pt-4 pb-2 mb-8 -mx-4 px-4 md:-mx-6 md:px-6 border-b border-muted/10">
                     <StatusHeaderNav className="w-full max-w-fit mb-4" />
