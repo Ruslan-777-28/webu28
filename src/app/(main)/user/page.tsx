@@ -41,6 +41,7 @@ import { PageHero } from '@/components/page-hero';
 import { FloatingStatusLink } from '@/components/floating-status-link';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { AuthModal } from '@/components/auth-modal';
+import { ReviewCarousel } from '@/components/review-carousel';
 
 const whyNeedItItems = [
     {
@@ -313,9 +314,9 @@ export default function CommunityPage() {
                 </section>
 
                 {/* NEW EXPERTS BLOCK */}
-                <section className="py-24 bg-card overflow-hidden">
+                <section className="py-8 bg-card overflow-hidden">
                     <div className="container mx-auto px-4">
-                        <div className="mb-12 lg:mb-16 max-w-3xl mx-auto text-center">
+                        <div className="mb-2 lg:mb-4 max-w-3xl mx-auto text-center">
                             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-5 tracking-tight">
                                 <span className="block mb-2">Знайдіть свого експерта.</span>
                                 <span className="block text-2xl md:text-3xl text-muted-foreground font-medium">Обирайте особистість, а не сторінку.</span>
@@ -324,127 +325,7 @@ export default function CommunityPage() {
                                 На платформі ви знаходите не випадковий контент, а людей, чий підхід, стиль і спосіб взаємодії можуть по-справжньому відгукнутися саме вам. Це допомагає обирати з більшою довірою і ясністю.
                             </p>
                         </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-                            
-                            {/* Card 1 */}
-                            <div className="bg-background/80 border border-border/40 rounded-xl shadow-sm overflow-hidden group hover:shadow-xl hover:border-border/60 transition-all duration-500 hover:-translate-y-1">
-                                <div className="flex flex-row h-full">
-                                    <div className="w-28 sm:w-32 shrink-0 border-r border-border/10 bg-muted/20 relative">
-                                        <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded bg-background/90 backdrop-blur-sm border border-border/40 shadow-sm z-10">
-                                            <ShieldCheck className="w-2.5 h-2.5 text-emerald-500 opacity-90" />
-                                            <span className="text-[7.5px] font-bold uppercase tracking-[0.08em] text-foreground/80">Verified</span>
-                                        </div>
-                                        <img src="https://i.pravatar.cc/400?u=archstr1" alt="Alina Zoryana" className="object-cover w-full h-full absolute inset-0 transition-transform duration-700 group-hover:scale-[1.03]" />
-                                    </div>
-                                    
-                                    <div className="p-4 sm:p-5 flex flex-col flex-grow min-w-0">
-                                        <div className="space-y-1 w-full">
-                                            <h3 className="text-base sm:text-lg font-bold tracking-tight text-foreground truncate">
-                                                Alina Zoryana
-                                            </h3>
-                                            <p className="text-[8px] sm:text-[9px] uppercase tracking-[0.15em] font-bold text-accent truncate">
-                                                Таролог, Астролог
-                                            </p>
-                                        </div>
-                                        
-                                        <p className="text-[0.8rem] sm:text-[0.85rem] text-muted-foreground mt-2 line-clamp-2 leading-snug flex-grow">
-                                            Допомагаю знаходити відповіді через Таро та астрологію. Працюю з темами стосунків, внутрішніх змін і життєвих циклів.
-                                        </p>
-
-                                        <div className="mt-3 sm:mt-4 pt-3 border-t border-border/20 flex items-center justify-between">
-                                            <div className="flex items-center gap-1 font-bold text-xs sm:text-sm text-foreground">
-                                                <Star className="w-3.5 h-3.5 text-accent fill-accent" />
-                                                4.9
-                                            </div>
-                                            <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-medium text-muted-foreground uppercase tracking-wider bg-muted/30 px-2 py-1 rounded-md border border-border/30">
-                                                <History className="w-3 h-3 opacity-70" />
-                                                120+ сесій
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Card 2 */}
-                            <div className="bg-background/80 border border-border/40 rounded-xl shadow-sm overflow-hidden group hover:shadow-xl hover:border-border/60 transition-all duration-500 hover:-translate-y-1">
-                                <div className="flex flex-row h-full">
-                                    <div className="w-28 sm:w-32 shrink-0 border-r border-border/10 bg-muted/20 relative">
-                                        <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded bg-background/90 backdrop-blur-sm border border-border/40 shadow-sm z-10">
-                                            <ShieldCheck className="w-2.5 h-2.5 text-emerald-500 opacity-90" />
-                                            <span className="text-[7.5px] font-bold uppercase tracking-[0.08em] text-foreground/80">Expert</span>
-                                        </div>
-                                        <img src="https://i.pravatar.cc/400?u=archstr2" alt="Ірина Вогник" className="object-cover w-full h-full absolute inset-0 transition-transform duration-700 group-hover:scale-[1.03]" />
-                                    </div>
-                                    
-                                    <div className="p-4 sm:p-5 flex flex-col flex-grow min-w-0">
-                                        <div className="space-y-1 w-full">
-                                            <h3 className="text-base sm:text-lg font-bold tracking-tight text-foreground truncate">
-                                                Ірина Вогник
-                                            </h3>
-                                            <p className="text-[8px] sm:text-[9px] uppercase tracking-[0.15em] font-bold text-accent truncate">
-                                                Нумеролог
-                                            </p>
-                                        </div>
-                                        
-                                        <p className="text-[0.8rem] sm:text-[0.85rem] text-muted-foreground mt-2 line-clamp-2 leading-snug flex-grow">
-                                            Допомагаю побачити сильні сторони, внутрішні сценарії та напрям розвитку через аналіз чисел і персональні розбори.
-                                        </p>
-
-                                        <div className="mt-3 sm:mt-4 pt-3 border-t border-border/20 flex items-center justify-between">
-                                            <div className="flex items-center gap-1 font-bold text-xs sm:text-sm text-foreground">
-                                                <Star className="w-3.5 h-3.5 text-accent fill-accent" />
-                                                4.8
-                                            </div>
-                                            <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-medium text-muted-foreground uppercase tracking-wider bg-muted/30 px-2 py-1 rounded-md border border-border/30">
-                                                <History className="w-3 h-3 opacity-70" />
-                                                90+ сесій
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Card 3 */}
-                            <div className="bg-background/80 border border-border/40 rounded-xl shadow-sm overflow-hidden group hover:shadow-xl hover:border-border/60 transition-all duration-500 hover:-translate-y-1 md:col-span-2 lg:col-span-1 max-w-xl mx-auto w-full lg:max-w-none">
-                                <div className="flex flex-row h-full">
-                                    <div className="w-28 sm:w-32 shrink-0 border-r border-border/10 bg-muted/20 relative">
-                                        <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded bg-background/90 backdrop-blur-sm border border-border/40 shadow-sm z-10">
-                                            <ShieldCheck className="w-2.5 h-2.5 text-emerald-500 opacity-90" />
-                                            <span className="text-[7.5px] font-bold uppercase tracking-[0.08em] text-foreground/80">Guided</span>
-                                        </div>
-                                        <img src="https://i.pravatar.cc/400?u=archstr3" alt="Максим Сидоренко" className="object-cover w-full h-full absolute inset-0 transition-transform duration-700 group-hover:scale-[1.03]" />
-                                    </div>
-                                    
-                                    <div className="p-4 sm:p-5 flex flex-col flex-grow min-w-0">
-                                        <div className="space-y-1 w-full">
-                                            <h3 className="text-base sm:text-lg font-bold tracking-tight text-foreground truncate">
-                                                Максим Сидоренко
-                                            </h3>
-                                            <p className="text-[8px] sm:text-[9px] uppercase tracking-[0.15em] font-bold text-accent truncate">
-                                                Енергопрактик
-                                            </p>
-                                        </div>
-                                        
-                                        <p className="text-[0.8rem] sm:text-[0.85rem] text-muted-foreground mt-2 line-clamp-2 leading-snug flex-grow">
-                                            Працюю з відновленням внутрішнього балансу, стану і ясності через практики, живу присутність та індивідуальну взаємодію.
-                                        </p>
-
-                                        <div className="mt-3 sm:mt-4 pt-3 border-t border-border/20 flex items-center justify-between">
-                                            <div className="flex items-center gap-1 font-bold text-xs sm:text-sm text-foreground">
-                                                <Star className="w-3.5 h-3.5 text-accent fill-accent" />
-                                                4.9
-                                            </div>
-                                            <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-medium text-muted-foreground uppercase tracking-wider bg-muted/30 px-2 py-1 rounded-md border border-border/30">
-                                                <History className="w-3 h-3 opacity-70" />
-                                                140+ сесій
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                        </div>
+                        <ReviewCarousel />
                     </div>
                 </section>
 
