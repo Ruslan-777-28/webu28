@@ -47,8 +47,23 @@ export function ReviewCarousel() {
 
     const current = slides[currentIndex];
 
-    const next = () => setCurrentIndex((prev) => (prev + 1) % slides.length);
-    const prev = () => setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
+    const next = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            (e.currentTarget as HTMLElement).blur();
+        }
+        setCurrentIndex((prev) => (prev + 1) % slides.length);
+    };
+
+    const prev = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            (e.currentTarget as HTMLElement).blur();
+        }
+        setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
+    };
 
     const getCommIcon = (type: string) => {
         const t = type.toLowerCase();
@@ -59,17 +74,29 @@ export function ReviewCarousel() {
     };
 
     return (
-        <div className="relative max-w-3xl mx-auto py-2 px-4 lg:px-6">
+        <div className="relative max-w-3xl mx-auto pt-0 pb-2 px-4 lg:px-6">
             {/* Carousel Controls - Arrows */}
             {slides.length > 1 && (
                 <>
                     <div className="absolute top-1/2 -left-4 md:-left-16 -translate-y-1/2 z-20">
-                        <Button variant="ghost" size="icon" onClick={prev} className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-background/80 hover:bg-background shadow-md border border-border/20 backdrop-blur-sm">
+                        <Button 
+                            type="button"
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={prev} 
+                            className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-background/80 hover:bg-background shadow-md border border-border/20 backdrop-blur-sm"
+                        >
                             <ChevronLeft className="w-6 h-6" />
                         </Button>
                     </div>
                     <div className="absolute top-1/2 -right-4 md:-right-16 -translate-y-1/2 z-20">
-                        <Button variant="ghost" size="icon" onClick={next} className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-background/80 hover:bg-background shadow-md border border-border/20 backdrop-blur-sm">
+                        <Button 
+                            type="button"
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={next} 
+                            className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-background/80 hover:bg-background shadow-md border border-border/20 backdrop-blur-sm"
+                        >
                             <ChevronRight className="w-6 h-6" />
                         </Button>
                     </div>
@@ -137,12 +164,12 @@ export function ReviewCarousel() {
                         <div className="relative z-10 space-y-3 max-w-md w-full mx-auto">
                             {/* Service Info Bar */}
                             <div className="flex flex-col items-center mb-1">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                    <Megaphone className="w-3.5 h-3.5 text-accent/60" />
+                                <div className="flex items-center gap-3 mb-0.5">
+                                    <Megaphone className="w-4 h-4 text-accent/60" />
                                     <span className="text-[11px] font-black uppercase tracking-[0.2em] text-accent">{current.testimonial.title}</span>
-                                    <div className="flex items-center gap-0.5 ml-2">
+                                    <div className="flex items-center">
                                         {[...Array(5)].map((_, i) => (
-                                            <Star key={i} className="w-2.5 h-2.5 text-muted-foreground/30" />
+                                            <Star key={i} className="w-3 h-3 text-muted-foreground/30" />
                                         ))}
                                     </div>
                                 </div>
@@ -255,7 +282,13 @@ export function ReviewCarousel() {
                     {slides.map((_, i) => (
                         <button
                             key={i}
-                            onClick={() => setCurrentIndex(i)}
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                (e.currentTarget as HTMLElement).blur();
+                                setCurrentIndex(i);
+                            }}
                             className={cn(
                                 "h-1.5 transition-all duration-500 rounded-full",
                                 currentIndex === i ? "w-8 bg-accent" : "w-1.5 bg-muted-foreground/20 hover:bg-muted-foreground/40"

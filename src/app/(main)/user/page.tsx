@@ -21,7 +21,6 @@ import {
   File,
   Search,
   BookOpen,
-  PenSquare,
   Handshake,
   Calendar,
   Video,
@@ -142,270 +141,270 @@ export default function CommunityPage() {
 
     return (
         <Dialog open={isAuthModalOpen} onOpenChange={setAuthModalOpen}>
-            <main className="flex flex-col w-full min-h-screen bg-background text-foreground">
-                <Navigation />
+            <div className="h-screen overflow-y-auto md:snap-y md:snap-proximity scroll-smooth">
+                <main className="flex flex-col w-full bg-background text-foreground">
+                    <Navigation />
 
-                {/* 1. HERO SECTION */}
-                <PageHero 
-                    pageId="community"
-                    fallbackHeadline="Знайдіть ясність у змістовній розмові"
-                    fallbackSubheadline="LECTOR — це безпечний простір, де ви можете отримати персональну консультацію, новий погляд на ситуацію та живу взаємодію з перевіреними експертами, практиками й провідниками з усього світу."
-                    fallbackButtonLabel="Зареєструватися"
-                    fallbackButtonLink="/"
-                    onButtonClick={() => setAuthModalOpen(true)}
-                />
-
-                {/* 10. SECTION “Для яких ситуацій...” (Moved up) */}
-                <section className="pt-32 pb-20 bg-background">
-                    <div className="container mx-auto px-4">
-                        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-                            Коли платформа може бути особливо корисною
-                        </h2>
-                        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {useCases.map((item, index) => (
-                            <Card key={index} className="bg-card/70 shadow-sm hover:shadow-md transition-shadow">
-                                <CardContent className="p-4 flex items-center gap-3">
-                                <CheckCircle className="h-5 w-5 text-accent flex-shrink-0" />
-                                <span className="font-medium text-sm">{item}</span>
-                                </CardContent>
-                            </Card>
-                            ))}
-                        </div>
+                    {/* 1. HERO SECTION */}
+                    <div className="md:snap-start md:scroll-mt-24">
+                        <PageHero 
+                            pageId="community"
+                            fallbackHeadline="Знайдіть ясність у змістовній розмові"
+                            fallbackSubheadline="LECTOR — це безпечний простір, де ви можете отримати персональну консультацію, новий погляд на ситуацію та живу взаємодію з перевіреними експертами, практиками й провідниками з усього світу."
+                            fallbackButtonLabel="Зареєструватися"
+                            fallbackButtonLink="/"
+                            onButtonClick={() => setAuthModalOpen(true)}
+                        />
                     </div>
-                </section>
 
-
-                {/* 8. SECTION “Чому це краще...” (Moved up) */}
-                <section className="pt-20 pb-10 bg-card">
-                    <div className="container mx-auto px-4">
-                        <div className="grid lg:grid-cols-2 gap-12 items-center">
-                            <div>
-                            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                                Більше, ніж нескінченний пошук у соцмережах
+                    {/* 10. SECTION “Для яких ситуацій...” */}
+                    <section className="pt-32 pb-20 bg-background md:snap-start md:scroll-mt-24">
+                        <div className="container mx-auto px-4">
+                            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+                                Коли платформа може бути особливо корисною
                             </h2>
-                            <p className="text-lg text-muted-foreground mb-8">
-                                Ми створили LECTOR, щоб ви могли перейти від споживання контенту до сфокусованої, змістовної взаємодії.
-                            </p>
-                            <p className="text-md">
-                            Замість розрізнених сторінок, випадкових порад і хаосу в месенджерах ви отримуєте єдиний, надійний простір, де легко знайти експерта, обрати зручний формат і отримати реальну цінність. Це допомагає рухатися до відповідей спокійніше, точніше і з більшою довірою до процесу.
-                            </p>
-                            </div>
-                            <div className="bg-background p-8 rounded-lg shadow-sm border space-y-4">
-                                <div className="flex items-start gap-3">
-                                    <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
-                                    <p className="text-md font-medium">Профілі, категорії й контент зібрані в одному місці.</p>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
-                                    <p className="text-md font-medium">Легше знайти людину, яка резонує з вашим запитом.</p>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
-                                    <p className="text-md font-medium">Менше інформаційного шуму, більше реального сенсу.</p>
-                                </div>
-                                 <div className="flex items-start gap-3">
-                                    <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
-                                    <p className="text-md font-medium">Зручна, безпечна та цілісна взаємодія.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 5. SECTION “Як це працює” */}
-                <section className="pt-10 pb-20 bg-card overflow-hidden">
-                    <div className="container mx-auto px-4 text-center">
-                        <h2 className="text-3xl md:text-4xl font-bold mb-16 tracking-tight">
-                            Як це працює
-                        </h2>
-                        <div className="relative max-w-5xl mx-auto">
-                            {/* Horizontal connecting line (Desktop only) - Bisection height adjusted for h-12 circles */}
-                            <div className="absolute top-6 left-[10%] right-[10%] hidden md:block h-[1px] bg-border/40 z-0" />
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-5 gap-10 md:gap-4 relative z-10">
-                                {howItWorksSteps.map((item) => (
-                                <div key={item.step} className="flex flex-col items-center">
-                                    {/* Circle Marker (Corrective scale-up to h-12) */}
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background border border-border/40 shadow-sm mb-6 transition-colors hover:border-accent/40 duration-300">
-                                        <span className="text-base font-medium text-foreground/70">{item.step}</span>
-                                    </div>
-                                    
-                                    {/* Text Block (Restored size and spacing) */}
-                                    <div className="flex flex-col space-y-2 px-1">
-                                        <h3 className="text-lg font-bold text-foreground tracking-tight leading-snug md:min-h-[5rem] flex items-start justify-center">
-                                            {item.title}
-                                        </h3>
-                                        <p className="text-muted-foreground text-[0.9rem] leading-relaxed font-light px-2">
-                                            {item.text}
-                                        </p>
-                                    </div>
-                                </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 4. SECTION “Що ви отримуєте після реєстрації” */}
-                <section className="py-20 bg-background">
-                    <div className="container mx-auto px-4">
-                        <div className="text-center max-w-3xl mx-auto mb-12">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                                Що відкриває для вас реєстрація
-                            </h2>
-                            <p className="text-lg text-muted-foreground">
-                               Це не просто формальність, а вхід у повну екосистему для персональної взаємодії та росту.
-                            </p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {registrationBenefits.map((item, index) => (
-                            <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow">
-                                <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
-                                    <div className="bg-background p-2 rounded-lg">
-                                        <item.icon className="h-6 w-6 text-accent" />
-                                    </div>
-                                    <CardTitle className="text-lg">{item.title}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-muted-foreground">{item.text}</p>
-                                </CardContent>
-                            </Card>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-                
-                {/* 6. CTA #1 */}
-                <section className="pb-20 bg-background">
-                    <div className="container mx-auto px-4 text-center">
-                        <Button size="lg" onClick={() => setAuthModalOpen(true)}>Створити акаунт і почати</Button>
-                    </div>
-                </section>
-                
-                {/* 7. SECTION “Формати взаємодії” */}
-                <section className="py-20 bg-card">
-                    <div className="container mx-auto px-4">
-                        <div className="text-center max-w-3xl mx-auto mb-12">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                                Формати, у яких ви можете взаємодіяти
-                            </h2>
-                            <p className="text-lg text-muted-foreground">
-                                Платформа дає свободу обирати той формат, у якому вам комфортно отримувати відповіді та підтримку.
-                            </p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {interactionFormats.map((format, index) => (
-                            <div key={index} className="relative">
-                                <Card className="shadow-sm hover:shadow-lg transition-all bg-card/50 flex flex-col h-full">
-                                    <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
-                                        <div className="bg-background p-2 rounded-lg border">
-                                            <format.icon className="h-6 w-6 text-accent" />
-                                        </div>
-                                        <CardTitle className="text-lg">{format.title}</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="flex flex-col flex-grow justify-start">
-                                        <p className="text-muted-foreground">{format.text}</p>
+                            <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {useCases.map((item, index) => (
+                                <Card key={index} className="bg-card/70 shadow-sm hover:shadow-md transition-shadow">
+                                    <CardContent className="p-4 flex items-center gap-3">
+                                    <CheckCircle className="h-5 w-5 text-accent flex-shrink-0" />
+                                    <span className="font-medium text-sm">{item}</span>
                                     </CardContent>
                                 </Card>
-                            </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* NEW EXPERTS BLOCK */}
-                <section className="py-8 bg-card overflow-hidden">
-                    <div className="container mx-auto px-4">
-                        <div className="mb-2 lg:mb-4 max-w-3xl mx-auto text-center">
-                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-5 tracking-tight">
-                                <span className="block mb-2">Знайдіть свого експерта.</span>
-                                <span className="block text-2xl md:text-3xl text-muted-foreground font-medium">Обирайте особистість, а не сторінку.</span>
-                            </h2>
-                            <p className="text-lg text-muted-foreground font-light leading-relaxed">
-                                На платформі ви знаходите не випадковий контент, а людей, чий підхід, стиль і спосіб взаємодії можуть по-справжньому відгукнутися саме вам. Це допомагає обирати з більшою довірою і ясністю.
-                            </p>
-                        </div>
-                        <ReviewCarousel />
-                    </div>
-                </section>
-
-
-
-                {/* 9. CTA #2 */}
-                <section className="pb-20 bg-card">
-                    <div className="container mx-auto px-4 text-center">
-                        <Button variant="outline" size="lg" onClick={() => setAuthModalOpen(true)}>Відкрити доступ до платформи</Button>
-                    </div>
-                </section>
-
-                {/* 3. SECTION “Чому людям це потрібно” */}
-                <section className="py-20 bg-background">
-                    <div className="container mx-auto px-4">
-                        <div className="text-center max-w-3xl mx-auto mb-12">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                                Коли потрібна не випадкова думка, а справжня ясність
-                            </h2>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {whyNeedItItems.map((item, index) => (
-                            <Card key={index} className="text-center border-none shadow-none">
-                                <CardContent className="p-6">
-                                <div className="inline-flex items-center justify-center bg-card rounded-full p-3 mb-4">
-                                    <item.icon className="h-8 w-8 text-accent" />
-                                </div>
-                                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                                <p className="text-muted-foreground">{item.text}</p>
-                                </CardContent>
-                            </Card>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-
-                {/* 11. FAQ SECTION */}
-                <section className="py-20 bg-card">
-                    <div className="container mx-auto px-4 max-w-3xl">
-                        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-                            Поширені запитання
-                        </h2>
-                        {isLoadingFaq ? (
-                            <div className="space-y-4">
-                                <Skeleton className="h-16 w-full" />
-                                <Skeleton className="h-16 w-full" />
-                                <Skeleton className="h-16 w-full" />
-                            </div>
-                        ) : (
-                            <Accordion type="single" collapsible className="w-full">
-                                {faqItems.map((faq) => (
-                                <AccordionItem key={faq.id} value={`item-${faq.id}`}>
-                                    <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline">
-                                    {faq.question}
-                                    </AccordionTrigger>
-                                    <AccordionContent className="text-base text-muted-foreground">
-                                    {faq.answer}
-                                    </AccordionContent>
-                                </AccordionItem>
                                 ))}
-                            </Accordion>
-                        )}
-                    </div>
-                </section>
+                            </div>
+                        </div>
+                    </section>
 
-                {/* 12. FINAL CTA SECTION */}
-                <section className="py-20 md:py-28 bg-background">
-                    <div className="container mx-auto px-4 text-center">
-                        <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                        Зареєструйтесь, щоб перейти від пошуку до справжньої взаємодії
-                        </h2>
-                        <p className="max-w-xl mx-auto text-lg text-muted-foreground mb-8">
-                        Відкрийте доступ до експертів, живих відповідей і простору, де знання стають особистою цінністю.
-                        </p>
-                        <Button size="lg" onClick={() => setAuthModalOpen(true)}>Створити акаунт</Button>
-                    </div>
-                </section>
-            </main>
-            <Footer />
+
+                    {/* 8. SECTION “Чому це краще...” */}
+                    <section className="pt-20 pb-10 bg-card">
+                        <div className="container mx-auto px-4">
+                            <div className="grid lg:grid-cols-2 gap-12 items-center">
+                                <div>
+                                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                                    Більше, ніж нескінченний пошук у соцмережах
+                                </h2>
+                                <p className="text-lg text-muted-foreground mb-8">
+                                    Ми створили LECTOR, щоб ви могли перейти від споживання контенту до сфокусованої, змістовної взаємодії.
+                                </p>
+                                <p className="text-md">
+                                Замість розрізнених сторінок, випадкових порад і хаосу в месенджерах ви отримуєте єдиний, надійний простір, де легко знайти експерта, обрати зручний формат і отримати реальну цінність. Це допомагає рухатися до відповідей спокійніше, точніше і з більшою довірою до процесу.
+                                </p>
+                                </div>
+                                <div className="bg-background p-8 rounded-lg shadow-sm border space-y-4">
+                                    <div className="flex items-start gap-3">
+                                        <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
+                                        <p className="text-md font-medium">Профілі, категорії й контент зібрані в одному місці.</p>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
+                                        <p className="text-md font-medium">Легше знайти людину, яка резонує з вашим запитом.</p>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
+                                        <p className="text-md font-medium">Менше інформаційного шуму, більше реального сенсу.</p>
+                                    </div>
+                                     <div className="flex items-start gap-3">
+                                        <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
+                                        <p className="text-md font-medium">Зручна, безпечна та цілісна взаємодія.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* NEW EXPERTS BLOCK */}
+                    <section className="pt-4 pb-24 bg-card overflow-hidden md:snap-start md:scroll-mt-24">
+                        <div className="container mx-auto px-4">
+                            <div className="mb-1 lg:mb-2 max-w-4xl mx-auto text-center">
+                                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 tracking-tight">
+                                    <span className="block mb-1">Знайдіть свого експерта.</span>
+                                    <span className="block text-2xl md:text-3xl text-muted-foreground font-medium">Обирайте особистість, а не сторінку.</span>
+                                </h2>
+                                <p className="text-lg text-muted-foreground font-light leading-relaxed">
+                                    На платформі ви знаходите не випадковий контент, а людей, чий підхід, стиль і спосіб взаємодії можуть по-справжньому відгукнутися саме вам. Це допомагає обирати з більшою довірою і ясністю.
+                                </p>
+                            </div>
+                            <ReviewCarousel />
+                        </div>
+                    </section>
+
+                    {/* 4. SECTION “Що ви отримуєте після реєстрації” */}
+                    <section className="py-20 bg-background md:snap-start md:scroll-mt-24">
+                        <div className="container mx-auto px-4">
+                            <div className="text-center max-w-3xl mx-auto mb-12">
+                                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                                    Що відкриває для вас реєстрація
+                                </h2>
+                                <p className="text-lg text-muted-foreground">
+                                   Це не просто формальність, а вхід у повну екосистему для персональної взаємодії та росту.
+                                </p>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {registrationBenefits.map((item, index) => (
+                                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow">
+                                    <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
+                                        <div className="bg-background p-2 rounded-lg">
+                                            <item.icon className="h-6 w-6 text-accent" />
+                                        </div>
+                                        <CardTitle className="text-lg">{item.title}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-muted-foreground">{item.text}</p>
+                                    </CardContent>
+                                </Card>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* 5. SECTION “Як це працює” */}
+                    <section className="pt-10 pb-20 bg-card overflow-hidden md:snap-start md:scroll-mt-24">
+                        <div className="container mx-auto px-4 text-center">
+                            <h2 className="text-3xl md:text-4xl font-bold mb-16 tracking-tight">
+                                Як це працює
+                            </h2>
+                            <div className="relative max-w-5xl mx-auto">
+                                {/* Horizontal connecting line (Desktop only) */}
+                                <div className="absolute top-6 left-[10%] right-[10%] hidden md:block h-[1px] bg-border/40 z-0" />
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-5 gap-10 md:gap-4 relative z-10">
+                                    {howItWorksSteps.map((item) => (
+                                    <div key={item.step} className="flex flex-col items-center">
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background border border-border/40 shadow-sm mb-6 transition-colors hover:border-accent/40 duration-300">
+                                            <span className="text-base font-medium text-foreground/70">{item.step}</span>
+                                        </div>
+                                        
+                                        <div className="flex flex-col space-y-2 px-1">
+                                            <h3 className="text-lg font-bold text-foreground tracking-tight leading-snug md:min-h-[5rem] flex items-start justify-center">
+                                                {item.title}
+                                            </h3>
+                                            <p className="text-muted-foreground text-[0.9rem] leading-relaxed font-light px-2">
+                                                {item.text}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    {/* 6. CTA #1 */}
+                    <section className="pb-20 bg-background">
+                        <div className="container mx-auto px-4 text-center">
+                            <Button size="lg" onClick={() => setAuthModalOpen(true)}>Створити акаунт і почати</Button>
+                        </div>
+                    </section>
+                    
+                    {/* 7. SECTION “Формати взаємодії” */}
+                    <section className="py-20 bg-card">
+                        <div className="container mx-auto px-4">
+                            <div className="text-center max-w-3xl mx-auto mb-12">
+                                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                                    Формати, у яких ви можете взаємодіяти
+                                </h2>
+                                <p className="text-lg text-muted-foreground">
+                                    Платформа дає свободу обирати той формат, у якому вам комфортно отримувати відповіді та підтримку.
+                                </p>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {interactionFormats.map((format, index) => (
+                                <div key={index} className="relative">
+                                    <Card className="shadow-sm hover:shadow-lg transition-all bg-card/50 flex flex-col h-full">
+                                        <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
+                                            <div className="bg-background p-2 rounded-lg border">
+                                                <format.icon className="h-6 w-6 text-accent" />
+                                            </div>
+                                            <CardTitle className="text-lg">{format.title}</CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="flex flex-col flex-grow justify-start">
+                                            <p className="text-muted-foreground">{format.text}</p>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* 9. CTA #2 */}
+                    <section className="pb-20 bg-card">
+                        <div className="container mx-auto px-4 text-center">
+                            <Button variant="outline" size="lg" onClick={() => setAuthModalOpen(true)}>Відкрити доступ до платформи</Button>
+                        </div>
+                    </section>
+
+                    {/* 3. SECTION “Чому людям це потрібно” */}
+                    <section className="py-20 bg-background">
+                        <div className="container mx-auto px-4">
+                            <div className="text-center max-w-3xl mx-auto mb-12">
+                                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                                    Коли потрібна не випадкова думка, а справжня ясність
+                                </h2>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {whyNeedItItems.map((item, index) => (
+                                <Card key={index} className="text-center border-none shadow-none">
+                                    <CardContent className="p-6">
+                                    <div className="inline-flex items-center justify-center bg-card rounded-full p-3 mb-4">
+                                        <item.icon className="h-8 w-8 text-accent" />
+                                    </div>
+                                    <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                                    <p className="text-muted-foreground">{item.text}</p>
+                                    </CardContent>
+                                </Card>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+
+                    {/* 11. FAQ SECTION */}
+                    <section className="py-20 bg-card md:snap-start md:scroll-mt-24">
+                        <div className="container mx-auto px-4 max-w-3xl">
+                            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+                                Поширені запитання
+                            </h2>
+                            {isLoadingFaq ? (
+                                <div className="space-y-4">
+                                    <Skeleton className="h-16 w-full" />
+                                    <Skeleton className="h-16 w-full" />
+                                    <Skeleton className="h-16 w-full" />
+                                </div>
+                            ) : (
+                                <Accordion type="single" collapsible className="w-full">
+                                    {faqItems.map((faq) => (
+                                    <AccordionItem key={faq.id} value={`item-${faq.id}`}>
+                                        <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline">
+                                        {faq.question}
+                                        </AccordionTrigger>
+                                        <AccordionContent className="text-base text-muted-foreground">
+                                        {faq.answer}
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                    ))}
+                                </Accordion>
+                            )}
+                        </div>
+                    </section>
+
+                    {/* 12. FINAL CTA SECTION */}
+                    <section className="py-20 md:py-28 bg-background md:snap-start md:scroll-mt-24">
+                        <div className="container mx-auto px-4 text-center">
+                            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                            Зареєструйтесь, щоб перейти від пошуку до справжньої взаємодії
+                            </h2>
+                            <p className="max-w-xl mx-auto text-lg text-muted-foreground mb-8">
+                            Відкрийте доступ до експертів, живих відповідей і простору, де знання стають особистою цінністю.
+                            </p>
+                            <Button size="lg" onClick={() => setAuthModalOpen(true)}>Створити акаунт</Button>
+                        </div>
+                    </section>
+                </main>
+                <Footer />
+            </div>
             <DialogContent>
                 <AuthModal setOpen={setAuthModalOpen} />
             </DialogContent>
