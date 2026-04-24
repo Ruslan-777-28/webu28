@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/use-auth';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,7 +15,7 @@ import Link from 'next/link';
  * Shows a premium welcome banner after first login/signup based on usageIntent.
  * Triggered by ?welcome=true URL parameter.
  */
-export function WelcomeIntentSection() {
+function WelcomeIntentSectionContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { profile, user, loading } = useUser();
@@ -174,3 +174,12 @@ export function WelcomeIntentSection() {
         </div>
     );
 }
+
+export function WelcomeIntentSection() {
+    return (
+        <Suspense fallback={null}>
+            <WelcomeIntentSectionContent />
+        </Suspense>
+    );
+}
+
