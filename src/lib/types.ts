@@ -649,3 +649,56 @@ export type CouncilMember = {
   termEndAt: any; // Firestore Timestamp
   updatedAt: any; // Firestore Timestamp
 };
+
+// --- User Testimonials CMS Types ---
+
+export type UserTestimonialSlide = {
+  id: string;
+  isActive: boolean;
+  order: number;
+
+  expert: {
+    avatarUrl: string;
+    name: string;
+    roleLabel: string;
+    verifiedLabel: string;
+    countryCode: string;
+    countryName: string;
+    city?: string;
+    languages: string[];
+    ratingLabel: string;
+    rating: number;
+    sessionsLabel: string;
+  };
+
+  customer: {
+    avatarUrl: string;
+    name: string;
+    roleLabel: string;
+    countryCode: string;
+    countryName?: string;
+    city?: string;
+    languages: string[];
+    ratingLabel: string;
+    rating: number;
+    sessionsLabel: string;
+  };
+
+  testimonial: {
+    title: string;
+    offerIdLabel: string;
+    communicationType: string;
+    categoryLabel: string;
+    firstText: string;
+    firstRating: number;
+    secondText: string;
+    secondRating: number;
+    communicationDateLabel: string;
+  };
+};
+
+export type UserTestimonialsSettings = {
+  updatedAt: any;
+  updatedBy: string;
+  slides: UserTestimonialSlide[];
+};

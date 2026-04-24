@@ -2,7 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, HelpCircle, Users, Link as LinkIcon, Edit3, Mail } from 'lucide-react';
+import { FileText, HelpCircle, Users, Link as LinkIcon, Edit3, Mail, Megaphone } from 'lucide-react';
 import Link from 'next/link';
 
 const contentPages = [
@@ -35,6 +35,12 @@ const contentPages = [
         description: "Manage destination emails and intro texts for all contact forms.",
         href: "/admin/content/contact",
         icon: Mail,
+    },
+    {
+        title: "User Page Testimonials",
+        description: "Manage testimonial carousel cards on the /user page.",
+        href: "/admin/content/user-testimonials",
+        icon: Megaphone
     },
 ];
 
