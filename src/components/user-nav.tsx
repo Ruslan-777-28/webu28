@@ -22,6 +22,7 @@ import Link from "next/link";
 import { Skeleton } from "./ui/skeleton";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useFriends } from "@/hooks/use-friends";
+import { useNotifications } from "@/hooks/use-notifications";
 import { useShares } from "@/hooks/use-shares";
 
 export function UserNav() {
@@ -29,7 +30,10 @@ export function UserNav() {
   const { userFavorites: favoriteUsers } = useFavorites(undefined, 'user');
   const { userFavorites: favoritePosts } = useFavorites(undefined, 'post');
   const { friends } = useFriends();
-  const { unreadCount } = useShares();
+  const { unreadCount: shareUnreadCount } = useShares();
+  const { unreadCount: notifUnreadCount } = useNotifications();
+
+  const totalUnread = shareUnreadCount + notifUnreadCount;
 
   const handleSignOut = async () => {
     await signOut(auth);
@@ -48,14 +52,17 @@ export function UserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10">
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full group">
+          <Avatar className="h-10 w-10 border border-transparent group-hover:border-primary/20 transition-all">
             <AvatarImage src={profile.avatarUrl || ''} alt={profile.name || 'user avatar'} />
             <AvatarFallback>{profile.name?.charAt(0) || user.email?.charAt(0)}</AvatarFallback>
           </Avatar>
+          {totalUnread > 0 && (
+            <span className="absolute top-0 right-0 h-3 w-3 rounded-full bg-primary ring-2 ring-background animate-pulse" />
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-64" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{profile.name}</p>
@@ -66,6 +73,19 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+          <Link href="/notifications">
+            <DropdownMenuItem className="cursor-pointer flex justify-between items-center group font-bold">
+              <span className="flex items-center">
+                Сповіщення
+              </span>
+              {totalUnread > 0 && (
+                <span className="bg-primary text-primary-foreground text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm shadow-primary/40 group-hover:bg-primary/90 transition-colors">
+                  {totalUnread}
+                </span>
+              )}
+            </DropdownMenuItem>
+          </Link>
+          <DropdownMenuSeparator />
           <Link href={`/profile/${user.uid}`}>
             <DropdownMenuItem className="cursor-pointer">
               Профіль
@@ -92,9 +112,9 @@ export function UserNav() {
           <Link href="/my-shared-items">
             <DropdownMenuItem className="cursor-pointer flex justify-between items-center group">
               <span>Мені поділилися</span>
-              {unreadCount > 0 && (
-                <span className="bg-primary text-primary-foreground text-[9px] font-black px-1.5 py-0.5 rounded-full animate-pulse shadow-sm shadow-primary/40 group-hover:bg-primary/90 transition-colors">
-                  {unreadCount}
+              {shareUnreadCount > 0 && (
+                <span className="bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  {shareUnreadCount}
                 </span>
               )}
             </DropdownMenuItem>

@@ -2,6 +2,7 @@ import { initializeApp, getApps, getApp, FirebaseApp, FirebaseOptions } from 'fi
 import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
+import { getFunctions, Functions } from 'firebase/functions';
 
 const isBrowser = typeof window !== 'undefined';
 
@@ -12,6 +13,7 @@ let app: FirebaseApp | null = null;
 let auth: Auth;
 let db: Firestore;
 let storage: FirebaseStorage;
+let functions: Functions;
 
 /**
  * Early Synchronous Initialization for the Browser.
@@ -32,6 +34,7 @@ if (isBrowser) {
       auth = getAuth(app);
       db = getFirestore(app);
       storage = getStorage(app);
+      functions = getFunctions(app);
     }
   } catch (error) {
     console.error('Firebase Client Early Initialization Error:', error);
@@ -50,10 +53,12 @@ if (!app) {
   db = isBrowser ? {} : ({} as Firestore);
   // @ts-ignore
   storage = isBrowser ? {} : ({} as FirebaseStorage);
+  // @ts-ignore
+  functions = isBrowser ? {} : ({} as Functions);
 }
 
 // Re-export as constants
-export { app, auth, db, storage };
+export { app, auth, db, storage, functions };
 
 /**
  * Helper to ensure initialization (used for dynamic updates if needed)
@@ -68,6 +73,8 @@ export function setFirebaseConfig(config: FirebaseOptions) {
     db = getFirestore(app);
     // @ts-ignore
     storage = getStorage(app);
+    // @ts-ignore
+    functions = getFunctions(app);
   } catch (e) {
     console.error('Manual Firebase re-init failed', e);
   }

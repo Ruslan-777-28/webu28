@@ -114,19 +114,25 @@ export async function POST(req: NextRequest) {
                 createdAt: FieldValue.serverTimestamp(),
             });
 
-            // 4. Create notification for referrer using corrected shared contract
-            const notificationRef = adminDb.collection('notifications').doc();
+            // 4. Create notification for referrer using deterministic ID
+            const notificationRef = adminDb.collection('notifications').doc(`referral_signup_${referredUid}`);
             transaction.set(notificationRef, {
                 uid: referrerUid,
-                channel: 'user',
-                kind: 'referral_signup_bonus',
-                title: 'Новий бонус!',
-                body: `Ваш промокод використано! Нараховано +3 бонусних кредити.`,
+                channel: 'system',
+                kind: 'referral_signup',
+                title: 'Ваш промокод використано',
+                body: 'Новий користувач зареєструвався з вашим Sprint-кодом. Вам нараховано +3 бонуси. Перегляньте його профіль — можливо, ви знайомі або захочете додати його в друзі.',
                 readAt: null,
                 createdAt: FieldValue.serverTimestamp(),
                 data: {
                     referredUid: referredUid,
-                    kind: 'signup'
+                    referredDisplayName: referredUserData?.displayName || referredUserData?.name || 'Новий користувач',
+                    referredAvatarUrl: referredUserData?.avatarUrl || null,
+                    bonusAmount: 3,
+                    source: 'referral_program',
+                    siteRoute: `/profile/${referredUid}`,
+                    appRoute: `/users/${referredUid}`,
+                    actionLabel: 'Переглянути профіль'
                 }
             });
 
