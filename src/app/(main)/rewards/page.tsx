@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useUser } from '@/hooks/use-auth';
+import { bonusRules, type BonusRule } from '@/lib/config/bonus-rules';
+import { cn } from '@/lib/utils';
 
 export default function RewardsPage() {
     const { user } = useUser();
@@ -76,56 +78,69 @@ export default function RewardsPage() {
                 </div>
             </section>
 
-            {/* SECTION 2: How to earn */}
-            <section className="py-20 border-y border-border/50">
-                <div className="container mx-auto px-6">
-                    <div className="mb-12">
-                        <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-foreground mb-4">
-                            За що ви отримуєте бали
+            {/* SECTION 2: How to earn (Refined) */}
+            <section className="py-24 border-y border-border/50 bg-background relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/3 h-full bg-accent/[0.01] -skew-x-12 transform origin-top pointer-events-none" />
+                
+                <div className="container mx-auto px-6 relative z-10">
+                    <div className="max-w-3xl mb-16">
+                        <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-foreground mb-6">
+                            За що нараховуються бонуси
                         </h2>
-                        <p className="text-muted-foreground font-medium">
-                            Бали нараховуються за дії, які посилюють вашу присутність у системі та допомагають розвивати екосистему платформи.
+                        <p className="text-lg text-muted-foreground font-medium leading-relaxed">
+                            Виконуйте корисні дії на платформі, розвивайте свій профіль і накопичуйте внутрішні бонуси екосистеми LECTOR.
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[
-                            {
-                                icon: UserPlus,
-                                title: "Заповнення профілю",
-                                text: "Додавання ключової інформації про себе, оформлення профілю та посилення своєї присутності на платформі."
-                            },
-                            {
-                                icon: PenSquare,
-                                title: "Публікація контенту",
-                                text: "Створення постів і участь у розвитку публічного середовища LECTOR."
-                            },
-                            {
-                                icon: Activity,
-                                title: "Активність у системі",
-                                text: "Дії, які показують вашу залученість і послідовну присутність у платформі."
-                            },
-                            {
-                                icon: Share2,
-                                title: "Участь у Launch Referral Sprint",
-                                text: "Активність, пов’язана з раннім залученням аудиторії через Sprint-програму."
-                            },
-                            {
-                                icon: TrendingUp,
-                                title: "Розвиток присутності",
-                                text: "Кроки, які допомагають зробити ваш профіль повнішим, помітнішим і сильнішим усередині системи."
-                            }
-                        ].map((item, i) => (
-                            <Card key={i} className="bg-background border-border/40 hover:border-accent/30 transition-all group">
-                                <CardContent className="p-8">
-                                    <div className="h-12 w-12 rounded-2xl bg-accent/5 flex items-center justify-center text-accent mb-6 group-hover:scale-110 transition-transform duration-500">
-                                        <item.icon className="h-6 w-6" />
-                                    </div>
-                                    <h3 className="text-lg font-black uppercase tracking-tight text-foreground mb-3">{item.title}</h3>
-                                    <p className="text-sm text-muted-foreground/70 leading-relaxed font-medium">{item.text}</p>
-                                </CardContent>
-                            </Card>
-                        ))}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                        {/* Group: Site */}
+                        <div className="space-y-8">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="h-8 w-8 rounded-full bg-accent/10 flex items-center justify-center">
+                                    <PenSquare className="h-4 w-4 text-accent" />
+                                </div>
+                                <h3 className="text-xl font-black uppercase tracking-widest text-foreground/90">На сайті</h3>
+                            </div>
+                            
+                            <div className="grid gap-4">
+                                {bonusRules.filter(r => r.platform === 'site' && r.isActive).map((rule) => (
+                                    <RuleCard key={rule.id} rule={rule} />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Group: App */}
+                        <div className="space-y-8">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="h-8 w-8 rounded-full bg-accent/10 flex items-center justify-center">
+                                    <Zap className="h-4 w-4 text-accent" />
+                                </div>
+                                <h3 className="text-xl font-black uppercase tracking-widest text-foreground/90">У додатку</h3>
+                            </div>
+                            
+                            <div className="grid gap-4">
+                                {bonusRules.filter(r => r.platform === 'app' && r.isActive).map((rule) => (
+                                    <RuleCard key={rule.id} rule={rule} />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Disclaimer & CTA */}
+                    <div className="mt-20 pt-12 border-t border-border/40">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+                            <div className="max-w-xl">
+                                <p className="text-sm text-muted-foreground/60 font-medium leading-relaxed italic">
+                                    * Бонуси — це внутрішній ресурс екосистеми LECTOR. Вони не є готівкою і не підлягають прямому виведенню. Використовуються для активації преміум-можливостей платформи.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-4 text-right">
+                                <p className="text-sm font-bold uppercase tracking-widest text-accent/80">
+                                    Заповніть профіль, публікуйте контент і розкривайте можливості екосистеми
+                                </p>
+                                <ArrowRight className="h-4 w-4 text-accent animate-pulse" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -306,6 +321,17 @@ export default function RewardsPage() {
                 </div>
             </section>
 
+            {/* DISCLAIMER */}
+            <section className="py-12 bg-background border-t border-border/30">
+                <div className="container mx-auto px-6">
+                    <p className="text-[10px] md:text-[11px] text-muted-foreground/40 text-center max-w-3xl mx-auto uppercase tracking-widest font-medium leading-relaxed">
+                        Бали (Bonus Credits) є внутрішнім інструментом вимірювання активності та залученості учасників екосистеми LECTOR. 
+                        Вони не є грошовими коштами, не мають ринкової вартості та не можуть бути обміняні на готівку або виведені з системи. 
+                        Використання балів регулюється внутрішньою політикою платформи.
+                    </p>
+                </div>
+            </section>
+
             <Footer />
         </main>
     );
@@ -316,3 +342,32 @@ const Activity = (props: React.SVGProps<SVGSVGElement>) => (
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
     </svg>
 );
+
+function RuleCard({ rule }: { rule: BonusRule }) {
+    return (
+        <div className="group relative p-5 md:p-6 rounded-2xl bg-white border border-border/40 hover:border-accent/30 hover:shadow-xl hover:shadow-accent/[0.02] transition-all duration-300 flex items-start justify-between gap-4">
+            <div className="space-y-1.5 flex-grow">
+                <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-widest text-accent/50">{rule.category}</span>
+                    {rule.platform === 'app' && (
+                         <span className="text-[8px] px-1.5 py-0.5 rounded-sm bg-accent/5 text-accent font-black uppercase tracking-tighter">APP-ONLY</span>
+                    )}
+                </div>
+                <h4 className="text-base md:text-lg font-black uppercase tracking-tight text-foreground group-hover:text-accent transition-colors leading-tight">
+                    {rule.title}
+                </h4>
+                <p className="text-sm text-muted-foreground/70 font-medium leading-snug max-w-[90%]">
+                    {rule.description}
+                </p>
+            </div>
+            
+            <div className="shrink-0 pt-1">
+                <div className="px-3 py-1.5 rounded-full bg-accent/5 border border-accent/10 flex items-center justify-center min-w-[70px]">
+                    <span className="text-xs md:text-sm font-black text-accent whitespace-nowrap">
+                        +{rule.amount} {rule.unit}
+                    </span>
+                </div>
+            </div>
+        </div>
+    );
+}

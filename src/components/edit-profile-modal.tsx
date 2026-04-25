@@ -24,8 +24,9 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import type { UserProfile } from "@/lib/types";
-import { db, storage } from "@/lib/firebase/client";
+import { db, storage, functions } from "@/lib/firebase/client";
 import { doc, updateDoc } from "firebase/firestore";
+import { httpsCallable } from "firebase/functions";
 import React, { useState } from 'react';
 import Image from "next/image";
 import { Progress } from "./ui/progress";
@@ -160,21 +161,16 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
         description: "Ваші зміни було успішно збережено.",
       });
 
-      // Check for points milestones
+      // Check for points milestones via shared Cloud Function
       if (user) {
-        try {
-          const idToken = await user.getIdToken();
-          fetch('/api/points/award', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${idToken}`
-            },
-            body: JSON.stringify({ kind: 'check_milestones' })
-          }).catch(err => console.warn("Milestone check failed:", err));
-        } catch (err) {
-          console.warn("Auth token for milestones failed:", err);
-        }
+        const checkMilestones = httpsCallable(functions, 'checkProfileBonusMilestones');
+        checkMilestones()
+          .then((result) => {
+            console.log("Milestones check result:", result.data);
+          })
+          .catch((err) => {
+            console.warn("Milestone check failed:", err);
+          });
       }
 
       setOpen(false);

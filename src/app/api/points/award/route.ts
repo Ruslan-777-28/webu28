@@ -2,6 +2,11 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { calculateProfileCompletion } from '@/lib/utils/profile-completion';
+/**
+ * @deprecated This route is part of the legacy manual bonus awarding system.
+ * New implementations should use shared Cloud Functions (e.g., checkProfileBonusMilestones)
+ * or rely on backend Firestore triggers (e.g., onPostCreatedBonus).
+ */
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +14,8 @@ export async function POST(req: NextRequest) {
     try {
         const adminAuth = getAdminAuth();
         const adminDb = getAdminDb();
+        
+        console.warn(`[DEPRECATED] API /api/points/award called. UID verification follows.`);
 
         // 1. Verify Authentication
         const idToken = req.headers.get('authorization')?.split('Bearer ')[1];
@@ -25,7 +32,8 @@ export async function POST(req: NextRequest) {
 
         const uid = decodedToken.uid;
         const { kind } = await req.json();
-
+        console.warn(`[DEPRECATED] API /api/points/award called. Kind: ${kind}. UID verification follows.`);
+        
         if (!kind) {
             return NextResponse.json({ success: false, message: 'Kind is required' }, { status: 400 });
         }

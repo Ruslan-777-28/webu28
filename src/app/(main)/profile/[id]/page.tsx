@@ -130,7 +130,7 @@ function RoleMetricsCard({ title, icon: Icon, metrics }: { title: string, icon: 
                 <div className="grid grid-cols-2 gap-y-4 gap-x-4">
                     <div className="flex flex-col">
                         <span className="text-[10px] text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                             <MessageSquare className="h-3 w-3" /> Відгуки
+                            <MessageSquare className="h-3 w-3" /> Відгуки
                         </span>
                         <span className="text-base font-bold">{formatZeroMetric(metrics?.ratingCount)}</span>
                     </div>
@@ -146,7 +146,7 @@ function RoleMetricsCard({ title, icon: Icon, metrics }: { title: string, icon: 
                     </div>
                     <div className="flex flex-col">
                         <span className="text-[10px] text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                             <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" /> Рейтинг
+                            <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" /> Рейтинг
                         </span>
                         <span className="text-base font-bold">{formatZeroMetric(metrics?.ratingAvg, true)}</span>
                     </div>
@@ -199,8 +199,8 @@ function CommunicationOfferCard({ offer, onAction }: { offer: CommunicationOffer
                 <span className="text-[10px] uppercase font-bold text-muted-foreground leading-tight">{getLabel()}</span>
                 <span className="text-[11px] font-bold text-foreground leading-tight truncate w-full">{getPriceLabel()}</span>
             </div>
-            <Button 
-                onClick={() => onAction(offer.id)} 
+            <Button
+                onClick={() => onAction(offer.id)}
                 variant="outline"
                 className={`w-full h-10 rounded-xl text-xs font-bold gap-2 shadow-sm transition-transform active:scale-95 ${getButtonStyle()}`}
             >
@@ -229,11 +229,11 @@ function OffersRow({ offers, onAction, onCalendarClick }: { offers: Communicatio
                     </div>
                 )}
             </div>
-            
+
             <div className="shrink-0 flex items-end">
-                <Button 
-                    variant="outline" 
-                    className="text-foreground gap-2 font-bold text-xs h-10 px-5 rounded-xl bg-background hover:bg-muted border-muted-foreground/20 flex items-center justify-center min-w-[120px] relative" 
+                <Button
+                    variant="outline"
+                    className="text-foreground gap-2 font-bold text-xs h-10 px-5 rounded-xl bg-background hover:bg-muted border-muted-foreground/20 flex items-center justify-center min-w-[120px] relative"
                     onClick={onCalendarClick}
                 >
                     <Calendar className="h-4 w-4 text-violet-600" />
@@ -371,10 +371,15 @@ export default function PublicProfilePage() {
         window.addEventListener('pagehide', () => clearTimeout(fallbackTimer), { once: true });
     };
 
-    const handleCopyPromoCode = (code: string) => {
+    const handleCopyPromoCode = (code: string, isOwner: boolean) => {
         navigator.clipboard.writeText(code);
         setCopiedCode(true);
-        toast({ title: "Промокод скопійовано" });
+        toast({
+            title: "Код скопійовано",
+            description: isOwner
+                ? "Ви можете поділитися цим кодом із запрошеними користувачами."
+                : "Використайте цей код під час реєстрації."
+        });
         setTimeout(() => setCopiedCode(false), 2000);
     };
 
@@ -388,7 +393,7 @@ export default function PublicProfilePage() {
             }
             setIsLoading(false);
         });
-        
+
         const postsQuery = query(collection(db, 'posts'), where('authorId', '==', profileId), where('status', '==', 'published'));
         const unsubPosts = onSnapshot(postsQuery, (snapshot) => {
             setPosts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post)));
@@ -402,8 +407,8 @@ export default function PublicProfilePage() {
         });
 
         const offersQuery = query(
-            collection(db, 'communicationOffers'), 
-            where('ownerId', '==', profileId), 
+            collection(db, 'communicationOffers'),
+            where('ownerId', '==', profileId),
             where('status', '==', 'active')
         );
         const unsubOffers = onSnapshot(offersQuery, (snapshot) => {
@@ -449,7 +454,7 @@ export default function PublicProfilePage() {
             setEditModalOpen(true);
         }
     }, [searchParams, currentUser, profileId]);
-    
+
     const isOwnProfile = currentUser?.uid === profileId;
 
     const mainCategory = useMemo(() => {
@@ -482,7 +487,7 @@ export default function PublicProfilePage() {
 
     const customerMetrics = profile?.profileMetrics?.customer?.[selectedSubcategoryId];
     const professionalMetrics = profile?.profileMetrics?.professional?.[selectedSubcategoryId];
-    
+
     const filteredOffers = useMemo(() => {
         return offers.filter(o => o.subcategoryId === selectedSubcategoryId);
     }, [offers, selectedSubcategoryId]);
@@ -494,6 +499,8 @@ export default function PublicProfilePage() {
     if (!profile) {
         return <div>Профіль не знайдено.</div>;
     }
+
+    const referralCode = profile?.referralCode?.trim();
 
     return (
         <div className="flex flex-col min-h-screen bg-background relative w-full overflow-x-hidden">
@@ -507,7 +514,7 @@ export default function PublicProfilePage() {
                     <Image src={profile.coverUrl} alt="Background" layout="fill" objectFit="cover" className="opacity-[0.25] blur-xl md:blur-2xl" />
                 </div>
             ) : null}
-            
+
             <div className="relative z-10 flex flex-col min-h-screen">
                 <Navigation />
                 <main className="flex-grow pt-3 md:pt-4 pb-12 relative lg:pt-8 w-full">
@@ -526,25 +533,12 @@ export default function PublicProfilePage() {
                             {/* Block A: Identity Card - Rectangular redesign */}
                             <Card className="shadow-md border-muted/40 bg-background/80 backdrop-blur-md overflow-hidden relative mt-1 md:mt-2 lg:mt-0 w-full flex flex-col h-full">
                                 <TrustStrip profile={profile} />
-                                {architectAssignment && (
-                                    <Link href="/community-architects" className="block relative z-30">
-                                        <div className="w-full px-3 py-2 bg-accent/5 border-b border-accent/10 flex items-center justify-center gap-2 cursor-pointer hover:bg-accent/10 transition-all group/strip">
-                                            <Landmark className="h-3 w-3 text-accent/60 group-hover/strip:text-accent" />
-                                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-accent/80 group-hover/strip:text-accent">
-                                                {architectAssignment.subcategoryName && architectAssignment.countryName 
-                                                    ? `Community Architect — ${architectAssignment.subcategoryName}, ${architectAssignment.countryName}`
-                                                    : 'Community Architect'
-                                                }
-                                            </span>
-                                        </div>
-                                    </Link>
-                                )}
                                 {/* Avatar Block - Rectangular top block */}
                                 <div className="w-full h-40 md:h-48 lg:h-52 shrink-0 relative overflow-hidden bg-muted/20 group">
                                     {isPlayingIntro && profile.introVideoUrl ? (
                                         <div className="absolute inset-0 z-20 bg-black">
-                                            <video 
-                                                src={profile.introVideoUrl} 
+                                            <video
+                                                src={profile.introVideoUrl}
                                                 poster={profile.introVideoPosterUrl || profile.avatarUrl || undefined}
                                                 className="w-full h-full object-cover"
                                                 autoPlay
@@ -552,9 +546,9 @@ export default function PublicProfilePage() {
                                                 playsInline
                                                 onEnded={() => setIsPlayingIntro(false)}
                                             />
-                                            <Button 
-                                                variant="ghost" 
-                                                size="icon" 
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
                                                 className="absolute top-2 right-2 h-8 w-8 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 text-white z-30"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
@@ -565,21 +559,21 @@ export default function PublicProfilePage() {
                                             </Button>
                                         </div>
                                     ) : (
-                                        <Image 
-                                            src={profile.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.displayName || profile.name || '')}&background=random&size=512`} 
-                                            alt={profile.displayName || profile.name} 
+                                        <Image
+                                            src={profile.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.displayName || profile.name || '')}&background=random&size=512`}
+                                            alt={profile.displayName || profile.name}
                                             layout="fill"
                                             objectFit="cover"
                                             className="transition-transform duration-500 hover:scale-105"
                                         />
                                     )}
                                     <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent pointer-events-none" />
-                                    
+
                                     {profile.introVideoUrl && !isPlayingIntro && (
                                         <div className="absolute inset-0 flex items-center justify-center z-10">
-                                            <Button 
-                                                variant="ghost" 
-                                                size="icon" 
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
                                                 className="h-12 w-12 rounded-full bg-background/40 backdrop-blur-sm hover:bg-background/60 shadow-lg border border-white/20 text-white group-hover:scale-110 transition-all"
                                                 onClick={() => setIsPlayingIntro(true)}
                                             >
@@ -595,8 +589,8 @@ export default function PublicProfilePage() {
                                         <h1 className="text-xl lg:text-2xl font-black leading-tight tracking-tight text-foreground/90 uppercase flex items-center justify-center gap-2" title={profile.displayName || profile.name}>
                                             {profile.displayName || profile.name}
                                             {architectAssignment && (
-                                                <Badge variant="outline" className="border-accent/40 bg-accent/10 text-accent text-[9px] font-black uppercase px-2 py-0.5 tracking-[0.05em] shrink-0 shadow-sm">
-                                                    <Landmark className="h-3 w-3 mr-1" />
+                                                <Badge variant="outline" className="border-accent/40 bg-accent/10 text-accent text-[8px] font-black uppercase px-1.5 h-[17px] tracking-[0.05em] shrink-0 shadow-sm flex items-center leading-none">
+                                                    <Landmark className="h-2.5 w-2.5 mr-1" />
                                                     Architect
                                                 </Badge>
                                             )}
@@ -613,10 +607,10 @@ export default function PublicProfilePage() {
                                         {profile.country && (
                                             <span className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-foreground/60 uppercase tracking-tight">
                                                 <span className="text-lg leading-none filter grayscale opacity-80 -mt-0.5">{getCountryFlag(profile.country)}</span>
-                                                з {safeFormatDate(profile.createdAt).split('.').pop() || '2024'}
+                                                на платформі з {safeFormatDate(profile.createdAt)}
                                             </span>
                                         )}
-                                        
+
                                         <div className="flex items-center gap-3">
                                             {profile.preferredLanguage && (
                                                 <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground uppercase opacity-70">
@@ -629,42 +623,47 @@ export default function PublicProfilePage() {
                                                 {getLanguageLabel(profile.preferredLanguage)}
                                             </span>
                                         </div>
+
+                                        {/* Referral Code */}
+                                        {referralCode && (
+                                            <div className="flex flex-col items-center gap-1 mt-1 w-full">
+                                                <span className="text-[8px] font-black text-muted-foreground/60 uppercase tracking-[0.2em]">
+                                                    {isOwnProfile ? 'ВЛАСНИЙ SPRINT-КОД' : 'SPRINT-КОД ЕКСПЕРТА'}
+                                                </span>
+                                                <Badge variant="outline" className="h-7 px-3 bg-accent/5 border-accent/20 text-[11px] font-black text-accent uppercase tracking-widest flex items-center gap-2 shadow-sm">
+                                                    <Zap className="h-3 w-3 fill-accent/20" />
+                                                    <span>{referralCode}</span>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleCopyPromoCode(referralCode, isOwnProfile);
+                                                        }}
+                                                        className="ml-1 p-1 hover:bg-accent/10 rounded-md transition-colors"
+                                                        title="Скопіювати код"
+                                                    >
+                                                        {copiedCode ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                                                    </button>
+                                                </Badge>
+                                            </div>
+                                        )}
                                     </div>
 
-                                    {/* Action row */}
                                     <div className="flex flex-col items-center gap-3 pt-2">
                                         {isOwnProfile ? (
-                                            <>
-                                                <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
-                                                    <DialogTrigger asChild>
-                                                        <Button variant="outline" size="sm" className="h-8 font-black px-4 rounded-xl border-muted/50 bg-background hover:bg-muted shadow-sm text-[10px] uppercase tracking-wider"><Edit className="mr-1.5 h-3 w-3" />Редагувати</Button>
-                                                    </DialogTrigger>
-                                                    <EditProfileModal profile={profile} setOpen={setEditModalOpen} />
-                                                </Dialog>
-
-                                                <div 
-                                                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent/5 border border-accent/10 cursor-pointer hover:bg-accent/10 transition-colors group"
-                                                    onClick={() => handleCopyPromoCode(profile.referralCode || profile.uid.slice(-6).toUpperCase())}
-                                                >
-                                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Ваш промокод:</span>
-                                                    <span className="text-[11px] font-black text-accent tracking-widest">{profile.referralCode || profile.uid.slice(-6).toUpperCase()}</span>
-                                                    <div className="ml-1">
-                                                        {copiedCode ? (
-                                                            <Check className="h-3 w-3 text-green-500" />
-                                                        ) : (
-                                                            <Copy className="h-3 w-3 text-accent opacity-40 group-hover:opacity-100 transition-opacity" />
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </>
+                                            <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
+                                                <DialogTrigger asChild>
+                                                    <Button variant="outline" size="sm" className="h-8 font-black px-4 rounded-xl border-muted/50 bg-background hover:bg-muted shadow-sm text-[10px] uppercase tracking-wider"><Edit className="mr-1.5 h-3 w-3" />Редагувати</Button>
+                                                </DialogTrigger>
+                                                <EditProfileModal profile={profile} setOpen={setEditModalOpen} />
+                                            </Dialog>
                                         ) : (
                                             <div className="flex items-center gap-2">
-                                                <FavoriteButton 
-                                                    targetId={profileId} 
-                                                    type="user" 
+                                                <FavoriteButton
+                                                    targetId={profileId}
+                                                    type="user"
                                                     className="h-8 px-3 rounded-xl border border-muted/40 hover:border-muted/60"
                                                 />
-                                                <FriendButton 
+                                                <FriendButton
                                                     targetProfile={profile}
                                                     className="h-8 rounded-xl"
                                                 />
@@ -706,8 +705,8 @@ export default function PublicProfilePage() {
                                                             <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
                                                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/80">Privileged Access</span>
                                                         </div>
-                                                        <Link 
-                                                            href="/architect-council" 
+                                                        <Link
+                                                            href="/architect-council"
                                                             className="flex items-center justify-between group/council p-2 px-3 rounded-lg border border-accent/10 bg-accent/5 hover:bg-accent/10 transition-all"
                                                         >
                                                             <div className="flex items-center gap-2">
@@ -721,7 +720,7 @@ export default function PublicProfilePage() {
                                             </div>
                                         </div>
                                     )}
-                                    
+
                                     <div className="h-1" />
                                 </CardContent>
                             </Card>
@@ -747,43 +746,38 @@ export default function PublicProfilePage() {
                                                     <button
                                                         key={sub.id}
                                                         onClick={() => setSelectedSubcategoryId(sub.id)}
-                                                        className={`text-[10px] tracking-[0.1em] transition-all px-2.5 py-2.5 whitespace-nowrap rounded-md flex flex-col items-center gap-1.5 group uppercase ${
-                                                            selectedSubcategoryId === sub.id
+                                                        className={`text-[10px] tracking-[0.1em] transition-all px-2.5 py-2.5 whitespace-nowrap rounded-md flex flex-col items-center gap-1.5 group uppercase ${selectedSubcategoryId === sub.id
                                                                 ? 'font-black text-accent bg-accent/5'
                                                                 : 'font-bold text-muted-foreground/60 hover:text-foreground hover:bg-muted/30'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         <span>{sub.name}</span>
                                                         <div className="flex items-center justify-center gap-1.5 h-2">
                                                             {hasVideo && (
-                                                                <div 
-                                                                    className={`w-1.5 h-1.5 rounded-sm shadow-[0_0_4px_rgba(34,197,94,0.4)] ${
-                                                                        selectedSubcategoryId === sub.id ? 'bg-accent' : 'bg-green-500/60'
-                                                                    }`} 
+                                                                <div
+                                                                    className={`w-1.5 h-1.5 rounded-sm shadow-[0_0_4px_rgba(34,197,94,0.4)] ${selectedSubcategoryId === sub.id ? 'bg-accent' : 'bg-green-500/60'
+                                                                        }`}
                                                                     title="Відеочат"
                                                                 />
                                                             )}
                                                             {hasFile && (
-                                                                <div 
-                                                                    className={`w-1.5 h-1.5 rounded-sm shadow-[0_0_4px_rgba(59,130,246,0.4)] ${
-                                                                        selectedSubcategoryId === sub.id ? 'bg-accent' : 'bg-blue-500/60'
-                                                                    }`} 
+                                                                <div
+                                                                    className={`w-1.5 h-1.5 rounded-sm shadow-[0_0_4px_rgba(59,130,246,0.4)] ${selectedSubcategoryId === sub.id ? 'bg-accent' : 'bg-blue-500/60'
+                                                                        }`}
                                                                     title="Файлообмін"
                                                                 />
                                                             )}
                                                             {hasText && (
-                                                                <div 
-                                                                    className={`w-1.5 h-1.5 rounded-sm shadow-[0_0_4px_rgba(234,179,8,0.4)] ${
-                                                                        selectedSubcategoryId === sub.id ? 'bg-accent' : 'bg-yellow-500/60'
-                                                                    }`} 
+                                                                <div
+                                                                    className={`w-1.5 h-1.5 rounded-sm shadow-[0_0_4px_rgba(234,179,8,0.4)] ${selectedSubcategoryId === sub.id ? 'bg-accent' : 'bg-yellow-500/60'
+                                                                        }`}
                                                                     title="Запитати"
                                                                 />
                                                             )}
                                                             {hasScheduled && (
-                                                                <div 
-                                                                    className={`w-1.5 h-1.5 rounded-sm shadow-[0_0_4px_rgba(139,92,246,0.4)] ${
-                                                                        selectedSubcategoryId === sub.id ? 'bg-accent' : 'bg-violet-500/60'
-                                                                    }`} 
+                                                                <div
+                                                                    className={`w-1.5 h-1.5 rounded-sm shadow-[0_0_4px_rgba(139,92,246,0.4)] ${selectedSubcategoryId === sub.id ? 'bg-accent' : 'bg-violet-500/60'
+                                                                        }`}
                                                                     title="Заплановано"
                                                                 />
                                                             )}
@@ -796,13 +790,13 @@ export default function PublicProfilePage() {
                                 </CardHeader>
                                 <CardContent className="p-4 sm:p-6 flex-grow flex flex-col justify-between">
                                     <div className="space-y-6">
-                                        <OffersRow 
-                                            offers={filteredOffers} 
+                                        <OffersRow
+                                            offers={filteredOffers}
                                             onAction={handleActionClick}
-                                            onCalendarClick={handleActionClick} 
+                                            onCalendarClick={handleActionClick}
                                         />
                                     </div>
-                                    
+
                                     <div className="mt-8 flex flex-col h-full justify-end">
                                         <UnifiedStatsArea customer={customerMetrics} professional={professionalMetrics} />
                                         <ProfileStatusShelf subcategoryName={activeSubcategoryName} />
@@ -856,12 +850,12 @@ export default function PublicProfilePage() {
                                         <div className="h-8 w-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:rotate-12 transition-transform mb-3">
                                             <Trophy className="h-4 w-4" />
                                         </div>
-                                        
+
                                         <div className="min-w-0 flex flex-col">
                                             <h3 className="font-black text-[10px] uppercase tracking-wider text-muted-foreground leading-tight">Біографія, досягнення,</h3>
                                             <h3 className="font-black text-[10px] uppercase tracking-wider text-muted-foreground leading-tight mt-0.5">подробиці</h3>
                                         </div>
-                                        
+
                                         <div className="absolute right-4 bottom-4">
                                             {(() => {
                                                 const completion = calculateProfileCompletion(profile, offers);
@@ -875,7 +869,7 @@ export default function PublicProfilePage() {
                                                 );
                                             })()}
                                         </div>
-                                        
+
                                         {/* Owner hints logic */}
                                         {isOwnProfile && (() => {
                                             const completion = calculateProfileCompletion(profile, offers);
@@ -903,7 +897,7 @@ export default function PublicProfilePage() {
                         </div>
 
                     </div> {/* End General Container */}
-                    
+
                     <Dialog open={isActionModalOpen} onOpenChange={setActionModalOpen}>
                         <DialogContent className="sm:max-w-md bg-card">
                             <DialogHeader>

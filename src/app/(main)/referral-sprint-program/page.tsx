@@ -87,7 +87,7 @@ export default function ReferralSprintProgramPage() {
               </div>
               <div className="mt-8 pt-8 border-t border-border/40 text-center">
                 <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground/60">Сумарно за активованого професіонала</p>
-                <p className="text-3xl font-mono font-thin mt-2">8 bonus credits</p>
+                <p className="text-3xl font-mono font-bold mt-2">8 bonus credits</p>
               </div>
             </div>
           </div>
@@ -188,16 +188,21 @@ export default function ReferralSprintProgramPage() {
         {/* Block 4 — Що буде далі */}
         <section className="py-20 px-4">
           <div className="container mx-auto max-w-5xl">
-            <h2 className="text-2xl font-bold mb-16 text-center uppercase tracking-wider text-muted-foreground/80">Майбутній функціонал</h2>
+            <h2 className="text-2xl font-bold mb-16 text-center uppercase tracking-wider text-muted-foreground/80">Екосистема розвитку</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
-                { icon: Layout, title: "Промокод в реєстрації", desc: "Зручне поле для автоматичної активації коду новим юзером." },
-                { icon: Zap, title: "Copy Promo Code", desc: "Швидка кнопка копіювання коду в один клік у профілі." },
-                { icon: Bell, title: "Сповіщення", desc: "Real-time пуші про кожну успішну реєстрацію та активацію." },
-                { icon: BarChart3, title: "Dashboard вкладу", desc: "Окремий інтерфейс для відстеження накопичених реферальних credits." }
+                { icon: Layout, title: "Промокод в реєстрації", desc: "Функціонал автоматичної активації коду новим користувачем уже активний.", status: "Доступно" },
+                { icon: Zap, title: "Copy Sprint-Code", desc: "Швидка кнопка копіювання коду в профілі для зручного розповсюдження.", status: "Доступно" },
+                { icon: Bell, title: "Сповіщення", desc: "Real-time повідомлення про кожну успішну реєстрацію з вашим кодом.", status: "Доступно" },
+                { icon: BarChart3, title: "Dashboard вкладу", desc: "Розширений інтерфейс для детального відстеження реферальних credits.", status: "В розробці" }
               ].map((item, i) => (
-                <div key={i} className="p-6 border border-border/40 rounded-2xl hover:bg-slate-50 transition-colors">
-                  <item.icon className="h-5 w-5 text-accent/60 mb-4" />
+                <div key={i} className="p-6 border border-border/40 rounded-2xl hover:bg-slate-50 transition-colors relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-2">
+                    <span className={`text-[8px] uppercase font-black px-1.5 py-0.5 rounded ${item.status === 'Доступно' ? 'bg-green-100 text-green-600' : 'bg-muted text-muted-foreground'}`}>
+                      {item.status}
+                    </span>
+                  </div>
+                  <item.icon className="h-5 w-5 text-accent/60 mb-4 transition-transform group-hover:scale-110" />
                   <p className="text-[11px] font-bold uppercase tracking-widest mb-3">{item.title}</p>
                   <p className="text-[11px] text-muted-foreground leading-relaxed">{item.desc}</p>
                 </div>
