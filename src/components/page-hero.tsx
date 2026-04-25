@@ -9,6 +9,8 @@ import Link from 'next/link';
 
 interface PageHeroProps {
   pageId: 'pro' | 'community';
+  headline?: string;
+  subheadline?: string;
   fallbackHeadline?: string;
   fallbackSubheadline?: string;
   fallbackButtonLabel?: string;
@@ -18,6 +20,8 @@ interface PageHeroProps {
 
 export function PageHero({
   pageId,
+  headline: propHeadline,
+  subheadline: propSubheadline,
   fallbackHeadline,
   fallbackSubheadline,
   fallbackButtonLabel,
@@ -78,8 +82,8 @@ export function PageHero({
 
   const showMedia = isEnabled && !!finalRenderType;
 
-  const headline = settings?.headline || fallbackHeadline;
-  const subheadline = settings?.subheadline || fallbackSubheadline;
+  const headline = propHeadline || settings?.headline || fallbackHeadline;
+  const subheadline = propSubheadline || settings?.subheadline || fallbackSubheadline;
   const buttonLabel = settings?.buttonLabel || fallbackButtonLabel;
   const buttonLink = settings?.buttonLink || fallbackButtonLink || '#';
   const secondaryTextBlock = settings?.secondaryTextBlock;
@@ -162,10 +166,18 @@ export function PageHero({
           {(headline || subheadline || secondaryTextBlock) && (
             <div className="max-w-xl text-left">
               {/* Only render headline inside the box if NOT Pro */}
-              {!isPro && headline && (
-                <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-5xl font-semibold tracking-tighter text-foreground/70 uppercase text-balance leading-tight mb-6">
-                  {headline}
-                </h1>
+              {/* Community Hero Text Layout: CMS Title + Brand Line */}
+              {!isPro && (
+                <div className="mb-8 flex flex-col gap-2">
+                  {headline && (
+                    <h1 className="text-lg md:text-xl lg:text-2xl font-medium tracking-tight text-foreground/50 uppercase leading-tight">
+                      {headline}
+                    </h1>
+                  )}
+                  <div className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tighter text-foreground uppercase leading-none">
+                    LECTOR
+                  </div>
+                </div>
               )}
 
               {isPro && (

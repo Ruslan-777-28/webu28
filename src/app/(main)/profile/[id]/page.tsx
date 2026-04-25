@@ -26,6 +26,7 @@ import { calculateProfileCompletion } from '@/lib/utils/profile-completion';
 import { TrustStrip } from '@/components/profile/trust-strip';
 import { Badge } from '@/components/ui/badge';
 import { WelcomeIntentSection } from '@/components/welcome-intent-section';
+import { cn } from '@/lib/utils';
 
 const LANGUAGE_MAP: Record<string, string> = {
     'uk-UA': 'Українська',
@@ -129,23 +130,23 @@ function RoleMetricsCard({ title, icon: Icon, metrics }: { title: string, icon: 
             <CardContent className="p-4 pt-2">
                 <div className="grid grid-cols-2 gap-y-4 gap-x-4">
                     <div className="flex flex-col">
-                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                        <span className="text-[11px] text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                             <MessageSquare className="h-3 w-3" /> Відгуки
                         </span>
                         <span className="text-base font-bold">{formatZeroMetric(metrics?.ratingCount)}</span>
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                        <span className="text-[11px] text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                             <Clock className="h-3 w-3" /> Завершені
                         </span>
                         <span className="text-base font-bold">{formatZeroMetric(metrics?.completedCount)}</span>
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Місце</span>
+                        <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Місце</span>
                         <span className="text-base font-bold">{formatZeroMetric(metrics?.platformRank, false, true)}</span>
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                        <span className="text-[11px] text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                             <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" /> Рейтинг
                         </span>
                         <span className="text-base font-bold">{formatZeroMetric(metrics?.ratingAvg, true)}</span>
@@ -196,8 +197,8 @@ function CommunicationOfferCard({ offer, onAction }: { offer: CommunicationOffer
     return (
         <div className="flex-1 flex flex-col gap-1.5 min-w-[150px]">
             <div className="flex flex-col items-center text-center px-1">
-                <span className="text-[10px] uppercase font-bold text-muted-foreground leading-tight">{getLabel()}</span>
-                <span className="text-[11px] font-bold text-foreground leading-tight truncate w-full">{getPriceLabel()}</span>
+                <span className="text-[11px] uppercase font-bold text-muted-foreground leading-tight">{getLabel()}</span>
+                <span className="text-xs font-bold text-foreground leading-tight truncate w-full">{getPriceLabel()}</span>
             </div>
             <Button
                 onClick={() => onAction(offer.id)}
@@ -239,7 +240,7 @@ function OffersRow({ offers, onAction, onCalendarClick }: { offers: Communicatio
                     <Calendar className="h-4 w-4 text-violet-600" />
                     <span>Календар</span>
                     {offers.length > 0 && (
-                        <div className="absolute -top-1 -right-1 bg-muted-foreground/10 text-muted-foreground text-[9px] w-4 h-4 rounded-full flex items-center justify-center border border-background font-bold">
+                        <div className="absolute -top-1 -right-1 bg-muted-foreground/10 text-muted-foreground text-[10px] w-4 h-4 rounded-full flex items-center justify-center border border-background font-bold">
                             {offers.length}
                         </div>
                     )}
@@ -260,9 +261,9 @@ function UnifiedStatsArea({ customer, professional }: { customer?: any, professi
     return (
         <div className="w-full space-y-2 pt-1 border-t border-muted/30 mt-4">
             <div className="grid grid-cols-3 items-center px-1 py-1">
-                <div className="text-center font-bold text-[10px] uppercase tracking-wider text-muted-foreground opacity-70">Замовник</div>
+                <div className="text-center font-bold text-[11px] uppercase tracking-wider text-muted-foreground opacity-70">Замовник</div>
                 <div />
-                <div className="text-center font-bold text-[10px] uppercase tracking-wider text-muted-foreground opacity-70">Професіонал</div>
+                <div className="text-center font-bold text-[11px] uppercase tracking-wider text-muted-foreground opacity-70">Професіонал</div>
             </div>
 
             <div className="space-y-0.5">
@@ -276,7 +277,7 @@ function UnifiedStatsArea({ customer, professional }: { customer?: any, professi
                             </div>
                             <div className="flex flex-col items-center gap-0.5 px-1 scale-90 md:scale-100">
                                 <row.icon className={`h-3 w-3 ${row.iconColor || 'text-accent/60'}`} />
-                                <span className="text-[8px] uppercase font-bold text-muted-foreground/70 text-center leading-none">{row.label}</span>
+                                <span className="text-[9px] uppercase font-bold text-muted-foreground/70 text-center leading-none">{row.label}</span>
                             </div>
                             <div className={`text-center text-sm ${profVal === '00' ? 'font-medium opacity-40' : 'font-extrabold text-foreground/80'}`}>
                                 {profVal}
@@ -321,7 +322,7 @@ function CircularProgress({ percentage, size = 48 }: { percentage: number, size?
                 />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-[10px] font-extrabold text-foreground leading-none">{percentage}%</span>
+                <span className="text-[11px] font-extrabold text-foreground leading-none">{percentage}%</span>
             </div>
         </div>
     );
@@ -583,17 +584,35 @@ export default function PublicProfilePage() {
                                     )}
                                 </div>
 
-                                <CardContent className="p-4 flex flex-col items-center text-center relative z-10 bg-background pt-4 gap-3">
+                                <CardContent className="p-4 flex flex-col items-center text-center relative z-10 bg-background pt-3 gap-1.5">
+                                    {/* Community Architect Status Line - Moved from bottom to just below avatar */}
+                                    {architectAssignment && (
+                                        <Link href="/community-architects" className="flex items-center justify-center gap-2 mb-0 w-full overflow-hidden group/arch hover:opacity-80 transition-opacity cursor-pointer">
+                                            <Landmark className="h-3 w-3 text-accent/60 shrink-0 group-hover/arch:text-accent transition-colors" />
+                                            <div className="flex items-center gap-1.5 whitespace-nowrap truncate min-w-0">
+                                                <span className="text-[9px] font-black uppercase tracking-[0.1em] text-accent/70 shrink-0">Community Architect</span>
+                                                {architectAssignment.subcategoryName && (
+                                                    <>
+                                                        <span className="text-accent/30 font-bold opacity-60">·</span>
+                                                        <div className="flex items-center gap-1.5 truncate">
+                                                            <span className="text-[10px] font-bold text-foreground/70 truncate uppercase tracking-tight">
+                                                                    {architectAssignment.subcategoryName}
+                                                            </span>
+                                                            {architectAssignment.countryCode && (
+                                                                <span className={cn("fi", `fi-${architectAssignment.countryCode.toLowerCase()}`, "text-[11px] rounded-sm shadow-sm shrink-0")} />
+                                                            )}
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </Link>
+                                    )}
+
                                     {/* Identity info */}
-                                    <div className="w-full flex flex-col items-center gap-1 mt-1">
+                                    <div className="w-full flex flex-col items-center gap-1 mt-0">
                                         <h1 className="text-xl lg:text-2xl font-black leading-tight tracking-tight text-foreground/90 uppercase flex items-center justify-center gap-2" title={profile.displayName || profile.name}>
                                             {profile.displayName || profile.name}
-                                            {architectAssignment && (
-                                                <Badge variant="outline" className="border-accent/40 bg-accent/10 text-accent text-[8px] font-black uppercase px-1.5 h-[17px] tracking-[0.05em] shrink-0 shadow-sm flex items-center leading-none">
-                                                    <Landmark className="h-2.5 w-2.5 mr-1" />
-                                                    Architect
-                                                </Badge>
-                                            )}
+
                                         </h1>
                                         {profile.profileMetrics?.professional?.[selectedSubcategoryId] && (
                                             <span className="text-[10px] font-black text-accent uppercase tracking-[0.1em] opacity-80">
@@ -604,12 +623,7 @@ export default function PublicProfilePage() {
 
                                     {/* Metadata: country / language */}
                                     <div className="flex flex-col items-center gap-1.5 w-full">
-                                        {profile.country && (
-                                            <span className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-foreground/60 uppercase tracking-tight">
-                                                <span className="text-lg leading-none filter grayscale opacity-80 -mt-0.5">{getCountryFlag(profile.country)}</span>
-                                                на платформі з {safeFormatDate(profile.createdAt)}
-                                            </span>
-                                        )}
+
 
                                         <div className="flex items-center gap-3">
                                             {profile.preferredLanguage && (
@@ -625,27 +639,7 @@ export default function PublicProfilePage() {
                                         </div>
 
                                         {/* Referral Code */}
-                                        {referralCode && (
-                                            <div className="flex flex-col items-center gap-1 mt-1 w-full">
-                                                <span className="text-[8px] font-black text-muted-foreground/60 uppercase tracking-[0.2em]">
-                                                    {isOwnProfile ? 'ВЛАСНИЙ SPRINT-КОД' : 'SPRINT-КОД ЕКСПЕРТА'}
-                                                </span>
-                                                <Badge variant="outline" className="h-7 px-3 bg-accent/5 border-accent/20 text-[11px] font-black text-accent uppercase tracking-widest flex items-center gap-2 shadow-sm">
-                                                    <Zap className="h-3 w-3 fill-accent/20" />
-                                                    <span>{referralCode}</span>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleCopyPromoCode(referralCode, isOwnProfile);
-                                                        }}
-                                                        className="ml-1 p-1 hover:bg-accent/10 rounded-md transition-colors"
-                                                        title="Скопіювати код"
-                                                    >
-                                                        {copiedCode ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                                                    </button>
-                                                </Badge>
-                                            </div>
-                                        )}
+
                                     </div>
 
                                     <div className="flex flex-col items-center gap-3 pt-2">
@@ -671,9 +665,8 @@ export default function PublicProfilePage() {
                                         )}
                                     </div>
 
-                                    {/* Credo / Intro Bio */}
                                     <div className="w-[90%] mx-auto pt-3 border-t border-muted/10">
-                                        <p className="text-[12px] font-medium text-foreground/60 leading-relaxed text-center">
+                                        <p className="text-sm font-medium text-foreground/60 leading-relaxed text-center">
                                             {profile.shortBio || profile.bio || 'Користувач ще не додав інформацію про себе.'}
                                         </p>
                                     </div>
@@ -681,22 +674,9 @@ export default function PublicProfilePage() {
                                     {/* Community Architect Public Role Block */}
                                     {architectAssignment && (
                                         <div className="w-[90%] mx-auto pt-3 border-t border-muted/10">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <Landmark className="h-3 w-3 text-accent/60" />
-                                                <span className="text-[9px] font-black uppercase tracking-[0.15em] text-accent/70">Community Architect</span>
-                                            </div>
+
+
                                             <div className="space-y-1">
-                                                <p className="text-[10px] font-bold text-foreground/70">
-                                                    {architectAssignment.subcategoryName} · {architectAssignment.countryName}
-                                                </p>
-                                                {architectAssignment.publicStatement && (
-                                                    <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-3">
-                                                        {architectAssignment.publicStatement}
-                                                    </p>
-                                                )}
-                                                <Link href="/community-architects" className="inline-flex items-center gap-1 text-[9px] font-bold text-accent/60 hover:text-accent transition-colors uppercase tracking-widest mt-1">
-                                                    Дізнатись більше
-                                                </Link>
 
                                                 {/* Architect Council Entry CTA: Only for eligible member viewing own profile */}
                                                 {isOwnProfile && architectAssignment && architectAssignment.councilEligible && (
@@ -721,6 +701,40 @@ export default function PublicProfilePage() {
                                         </div>
                                     )}
 
+
+                                    {/* Registration Date - Above the badge */}
+                                    {profile.createdAt && (
+                                        <div className="w-full pt-4 pb-2 flex justify-center opacity-40">
+                                            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.12em]">
+                                                на платформі з {safeFormatDate(profile.createdAt)}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    {/* SPRINT-ID Badge - Absolute Bottom, Single Line */}
+                                    {referralCode && (
+                                        <div className="w-full pb-2">
+                                            <div 
+                                                className="w-full flex items-center justify-between px-3.5 py-2 bg-accent/5 border border-accent/10 rounded-xl group/sprint cursor-pointer hover:bg-accent/10 transition-all duration-300 shadow-sm"
+                                                onClick={() => handleCopyPromoCode(referralCode, isOwnProfile)}
+                                            >
+                                                <div className="flex items-center gap-1.5 whitespace-nowrap truncate min-w-0">
+                                                    <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.1em] shrink-0">
+                                                        {isOwnProfile ? 'ВЛАСНИЙ SPRINT-ID' : 'SPRINT-ID ЕКСПЕРТА'}
+                                                    </span>
+                                                    <span className="text-accent/30 font-bold opacity-60">·</span>
+                                                    <div className="flex items-center gap-1.5 truncate">
+                                                        <Zap className="h-3 w-3 text-accent fill-accent/20 shrink-0" />
+                                                        <span className="text-xs font-black text-accent uppercase tracking-widest truncate">{referralCode}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="p-1.5 rounded-lg bg-background/50 text-accent group-hover/sprint:bg-accent group-hover/sprint:text-white transition-all shadow-sm shrink-0 ml-2">
+                                                    {copiedCode ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="h-1" />
                                 </CardContent>
                             </Card>
@@ -731,7 +745,7 @@ export default function PublicProfilePage() {
                             <Card className="shadow-sm border-muted/50 h-full flex flex-col bg-background/60 backdrop-blur-sm overflow-hidden min-h-0">
                                 <CardHeader className="p-3 border-b border-muted/30 bg-muted/5 min-h-[50px] shrink-0">
                                     <div className="flex items-center gap-3 overflow-x-auto no-scrollbar scroll-smooth">
-                                        <span className="font-black text-[10px] text-foreground shrink-0 pr-4 border-r border-muted/40 uppercase tracking-[0.15em] opacity-80">
+                                        <span className="font-black text-[11px] text-foreground shrink-0 pr-4 border-r border-muted/40 uppercase tracking-[0.15em] opacity-80">
                                             {esotericsCategoryName}
                                         </span>
                                         <div className="flex items-center gap-2.5 flex-nowrap shrink-0">
@@ -746,7 +760,7 @@ export default function PublicProfilePage() {
                                                     <button
                                                         key={sub.id}
                                                         onClick={() => setSelectedSubcategoryId(sub.id)}
-                                                        className={`text-[10px] tracking-[0.1em] transition-all px-2.5 py-2.5 whitespace-nowrap rounded-md flex flex-col items-center gap-1.5 group uppercase ${selectedSubcategoryId === sub.id
+                                                        className={`text-[11px] tracking-[0.1em] transition-all px-2.5 py-2.5 whitespace-nowrap rounded-md flex flex-col items-center gap-1.5 group uppercase ${selectedSubcategoryId === sub.id
                                                                 ? 'font-black text-accent bg-accent/5'
                                                                 : 'font-bold text-muted-foreground/60 hover:text-foreground hover:bg-muted/30'
                                                             }`}
@@ -815,10 +829,10 @@ export default function PublicProfilePage() {
                                             <BookOpen className="h-4 w-4" />
                                         </div>
                                         <div className="min-w-0 flex flex-col">
-                                            <h3 className="font-black text-[10px] uppercase tracking-wider text-muted-foreground leading-tight">Публікації</h3>
-                                            <span className="text-[9px] font-bold text-foreground truncate mt-0.5">{profile.displayName || profile.name}</span>
+                                            <h3 className="font-black text-[11px] uppercase tracking-wider text-muted-foreground leading-tight">Публікації</h3>
+                                            <span className="text-[10px] font-bold text-foreground truncate mt-0.5">{profile.displayName || profile.name}</span>
                                         </div>
-                                        <div className="absolute right-4 bottom-4 flex items-center justify-center h-6 w-6 rounded-full bg-muted/20 text-[10px] font-black text-muted-foreground/80 group-hover:bg-accent/20 group-hover:text-accent transition-colors">
+                                        <div className="absolute right-4 bottom-4 flex items-center justify-center h-6 w-6 rounded-full bg-muted/20 text-[11px] font-black text-muted-foreground/80 group-hover:bg-accent/20 group-hover:text-accent transition-colors">
                                             {posts.length || 0}
                                         </div>
                                     </CardContent>
@@ -833,10 +847,10 @@ export default function PublicProfilePage() {
                                             <LayoutGrid className="h-4 w-4" />
                                         </div>
                                         <div className="min-w-0 flex flex-col">
-                                            <h3 className="font-black text-[10px] uppercase tracking-wider text-muted-foreground leading-tight">Артефакти</h3>
-                                            <span className="text-[9px] font-bold text-foreground truncate mt-0.5">{profile.displayName || profile.name}</span>
+                                            <h3 className="font-black text-[11px] uppercase tracking-wider text-muted-foreground leading-tight">Артефакти</h3>
+                                            <span className="text-[10px] font-bold text-foreground truncate mt-0.5">{profile.displayName || profile.name}</span>
                                         </div>
-                                        <div className="absolute right-4 bottom-4 flex items-center justify-center h-6 w-6 rounded-full bg-muted/20 text-[10px] font-black text-muted-foreground/80 group-hover:bg-accent/20 group-hover:text-accent transition-colors">
+                                        <div className="absolute right-4 bottom-4 flex items-center justify-center h-6 w-6 rounded-full bg-muted/20 text-[11px] font-black text-muted-foreground/80 group-hover:bg-accent/20 group-hover:text-accent transition-colors">
                                             {products.length || 0}
                                         </div>
                                     </CardContent>
@@ -852,8 +866,8 @@ export default function PublicProfilePage() {
                                         </div>
 
                                         <div className="min-w-0 flex flex-col">
-                                            <h3 className="font-black text-[10px] uppercase tracking-wider text-muted-foreground leading-tight">Біографія, досягнення,</h3>
-                                            <h3 className="font-black text-[10px] uppercase tracking-wider text-muted-foreground leading-tight mt-0.5">подробиці</h3>
+                                            <h3 className="font-black text-[11px] uppercase tracking-wider text-muted-foreground leading-tight">Біографія, досягнення,</h3>
+                                            <h3 className="font-black text-[11px] uppercase tracking-wider text-muted-foreground leading-tight mt-0.5">подробиці</h3>
                                         </div>
 
                                         <div className="absolute right-4 bottom-4">
@@ -862,7 +876,7 @@ export default function PublicProfilePage() {
                                                 return (
                                                     <div className="flex flex-col items-center shrink-0 min-w-[42px]">
                                                         <CircularProgress percentage={completion.percentage} size={42} />
-                                                        <span className="text-[6px] font-black uppercase text-accent mt-1 tracking-tighter leading-none text-center">
+                                                        <span className="text-[8px] font-black uppercase text-accent mt-1 tracking-tighter leading-none text-center">
                                                             {completion.statusLabel}
                                                         </span>
                                                     </div>
@@ -877,10 +891,10 @@ export default function PublicProfilePage() {
                                                 return (
                                                     <div className="mt-4 pt-3 border-t border-muted/10 w-full mb-12">
                                                         <div className="flex flex-col gap-1.5">
-                                                            <span className="text-[9px] font-black uppercase text-muted-foreground/50 tracking-tighter">Порада для росту:</span>
+                                                            <span className="text-[10px] font-black uppercase text-muted-foreground/50 tracking-tighter">Порада для росту:</span>
                                                             <div className="flex flex-wrap gap-x-2 gap-y-1">
                                                                 {completion.hints.slice(0, 2).map((hint, i) => (
-                                                                    <span key={i} className="text-[9px] font-bold text-accent/80 flex items-center gap-0.5">
+                                                                    <span key={i} className="text-[10px] font-bold text-accent/80 flex items-center gap-0.5">
                                                                         + {hint.label} <span className="opacity-60">+{hint.impact}%</span>
                                                                     </span>
                                                                 ))}

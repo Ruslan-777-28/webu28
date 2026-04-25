@@ -39,7 +39,7 @@ export function ProfileStatusShelf({ subcategoryName }: { subcategoryName?: stri
         <button 
             onClick={onClick}
             className={cn(
-                "flex flex-col items-start gap-2 p-2.5 rounded-xl bg-background border border-muted/20 shadow-sm transition-all text-left w-full",
+                "flex flex-col items-start gap-1.5 p-2 rounded-xl bg-background border border-muted/20 shadow-sm transition-all text-left w-full",
                 "hover:border-accent/40 hover:shadow-md hover:bg-muted/[0.02] active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-accent/20 group overflow-hidden",
                 className
             )}
@@ -78,26 +78,28 @@ export function ProfileStatusShelf({ subcategoryName }: { subcategoryName?: stri
 
                         return (
                             <StatusCardBase key={award.id} onClick={() => handleAwardClick(award)}>
-                                <div className="h-6 w-6 rounded-md flex items-center justify-center bg-muted/30 text-foreground/70 group-hover:bg-accent/10 group-hover:text-accent transition-colors shrink-0">
-                                    <Icon className="h-3 w-3" />
-                                </div>
-                                <div className="flex flex-col gap-1 w-full mt-auto">
-                                    <span className="text-[10px] font-bold leading-tight text-foreground/90 line-clamp-2 uppercase tracking-tight" title={def.title}>
-                                        {def.shortLabel || def.title}
-                                    </span>
-                                    <div className="flex flex-wrap items-center gap-1 mt-0.5 min-h-[10px]">
+                                <div className="flex items-center gap-2 w-full">
+                                    <div className="h-6 w-6 rounded-md flex items-center justify-center bg-muted/30 text-foreground/70 group-hover:bg-accent/10 group-hover:text-accent transition-colors shrink-0">
+                                        <Icon className="h-3 w-3" />
+                                    </div>
+                                    <div className="flex items-center gap-1.5 min-w-0">
                                         {levelLabel && (
-                                            <span className="text-[8px] uppercase tracking-wider font-black text-accent/90">
+                                            <span className="text-[8px] uppercase tracking-wider font-black text-accent/90 shrink-0">
                                                 {levelLabel}
                                             </span>
                                         )}
                                         {levelLabel && award.periodLabel && (
                                             <span className="w-0.5 h-0.5 rounded-full bg-muted-foreground/30 shrink-0" />
                                         )}
-                                        <span className="text-[8px] uppercase tracking-wider font-semibold text-muted-foreground/60 truncate max-w-[55px]">
+                                        <span className="text-[8px] uppercase tracking-wider font-semibold text-muted-foreground/60 truncate">
                                             {award.periodLabel}
                                         </span>
                                     </div>
+                                </div>
+                                <div className="w-full pl-0.5">
+                                    <span className="text-[10px] font-bold leading-tight text-foreground/90 line-clamp-1 uppercase tracking-tight" title={def.title}>
+                                        {def.shortLabel || def.title}
+                                    </span>
                                 </div>
                             </StatusCardBase>
                         );

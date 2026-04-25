@@ -32,7 +32,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import Footer from '@/components/layout/footer';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { FaqItem } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -115,10 +115,15 @@ export default function CommunityPage() {
     const [faqItems, setFaqItems] = useState<FaqItem[]>([]);
     const [isLoadingFaq, setIsLoadingFaq] = useState(true);
     const [isAuthModalOpen, setAuthModalOpen] = useState(false);
+    
+    // CMS Hero Text
+    const [heroTitle, setHeroTitle] = useState('');
+    const [heroSubtitle, setHeroSubtitle] = useState('');
 
     useEffect(() => {
-        const fetchFaq = async () => {
+        const fetchData = async () => {
             try {
+                // 1. Fetch FAQ
                 const faqQuery = query(
                     collection(db, 'faqItems'),
                     where('isActive', '==', true),
@@ -126,17 +131,26 @@ export default function CommunityPage() {
                     orderBy('sortOrder', 'asc')
                 );
 
-                const snapshot = await getDocs(faqQuery);
-                const fetchedFaqs = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as FaqItem));
+                const faqSnapshot = await getDocs(faqQuery);
+                const fetchedFaqs = faqSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as FaqItem));
                 setFaqItems(fetchedFaqs);
+
+                // 2. Fetch Hero Text from sitePages/forCommunity
+                const heroDocRef = doc(db, 'sitePages', 'forCommunity');
+                const heroSnap = await getDoc(heroDocRef);
+                if (heroSnap.exists()) {
+                    const data = heroSnap.data();
+                    if (data.heroTitle) setHeroTitle(data.heroTitle);
+                    if (data.heroSubtitle) setHeroSubtitle(data.heroSubtitle);
+                }
             } catch (error) {
-                console.error("Error fetching community FAQ items: ", error);
+                console.error("Error fetching community page data: ", error);
             } finally {
                 setIsLoadingFaq(false);
             }
         };
 
-        fetchFaq();
+        fetchData();
     }, []);
 
     return (
@@ -149,6 +163,8 @@ export default function CommunityPage() {
                     <div className="md:snap-start md:scroll-mt-24">
                         <PageHero 
                             pageId="community"
+                            headline={heroTitle || undefined}
+                            subheadline={heroSubtitle || undefined}
                             fallbackHeadline="Знайдіть ясність у змістовній розмові"
                             fallbackSubheadline="LECTOR — це безпечний простір, де ви можете отримати персональну консультацію, новий погляд на ситуацію та живу взаємодію з перевіреними експертами, практиками й провідниками з усього світу."
                             fallbackButtonLabel="Зареєструватися"

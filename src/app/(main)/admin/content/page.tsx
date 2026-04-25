@@ -42,6 +42,12 @@ const contentPages = [
         href: "/admin/content/user-testimonials",
         icon: Megaphone
     },
+    {
+        title: "User Page Hero Text",
+        description: "Edit the main title and subtitle of the /user page hero section.",
+        href: "/admin/content/user-hero",
+        icon: Edit3
+    },
 ];
 
 export default function ContentAdminPage() {
