@@ -2,7 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, HelpCircle, Users, Link as LinkIcon, Edit3, Mail, Megaphone } from 'lucide-react';
+import { FileText, HelpCircle, Users, Link as LinkIcon, Edit3, Mail, Megaphone, LayoutPanelLeft } from 'lucide-react';
 import Link from 'next/link';
 
 const contentPages = [
@@ -47,6 +47,12 @@ const contentPages = [
         description: "Edit the main title and subtitle of the /user page hero section.",
         href: "/admin/content/user-hero",
         icon: Edit3
+    },
+    {
+        title: "User Page Card",
+        description: "Manage the 'Картка' live feed section on the /user page.",
+        href: "/admin/content/user-page-card",
+        icon: LayoutPanelLeft
     },
 ];
 

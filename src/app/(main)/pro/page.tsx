@@ -68,8 +68,8 @@ import { AuthModal } from '@/components/auth-modal';
 import { PageHero } from '@/components/page-hero';
 import { FloatingStatusLink } from '@/components/floating-status-link';
 import { ArchitectApplyModal } from '@/components/architect-apply-modal';
-
-
+import { LiveFeedCardSection } from '@/components/live-feed-card-section';
+import type { CardSectionData } from '@/lib/types';
 
 const benefits = [
   {
@@ -313,6 +313,7 @@ export default function ProPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [isArchitectModalOpen, setArchitectModalOpen] = useState(false);
+  const [cardSectionData, setCardSectionData] = useState<CardSectionData | null>(null);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -320,12 +321,20 @@ export default function ProPage() {
         const proPageRef = doc(db, 'sitePages', 'pro');
         const contentBlocksRef = collection(proPageRef, 'contentBlocks');
 
-        // 1. Fetch content blocks
-        const [customerSnap, profileSnap, proSnap] = await Promise.all([
+        // 1. Fetch content blocks & page data
+        const [customerSnap, profileSnap, proSnap, pageSnap] = await Promise.all([
           getDoc(doc(contentBlocksRef, 'know-your-customer')),
           getDoc(doc(contentBlocksRef, 'how-users-see-you')),
-          getDoc(doc(contentBlocksRef, 'professionals-already-with-us'))
+          getDoc(doc(contentBlocksRef, 'professionals-already-with-us')),
+          getDoc(proPageRef)
         ]);
+
+        if (pageSnap.exists()) {
+          const data = pageSnap.data();
+          if (data.cardSection) {
+            setCardSectionData(data.cardSection as CardSectionData);
+          }
+        }
 
         if (customerSnap.exists()) setCustomerBlock(customerSnap.data() as ProKnowYourCustomerBlock);
         if (profileSnap.exists()) setProfileBlock(profileSnap.data() as ProHowUsersSeeYouBlock);
@@ -452,6 +461,41 @@ export default function ProPage() {
           </div>
         </section>
 
+        {/* 9. SECTION “Чому це більше, ніж робота через соцмережі...” (Strengthened) */}
+        <section className="py-20 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                  Більше, ніж хаотична робота через соцмережі
+                </h2>
+                <p className="text-lg text-muted-foreground mb-8">
+                  Платформа допомагає зібрати вашу присутність, взаємодію та цінність в єдину професійну систему.
+                </p>
+                <p className="text-md">
+                  Замість розрізнених каналів і випадкових повідомлень ви отримуєте простір, де профіль, формати взаємодії, публічність і монетизація поєднані в одну зрозумілу екосистему. Це допомагає виглядати професійніше, працювати спокійніше й вибудовувати довшу довіру з аудиторією.
+                </p>
+              </div>
+              <div className="bg-card p-8 rounded-lg shadow-sm border space-y-4">
+                {[
+                  'Профіль, контент і взаємодія в одному місці',
+                  'Не потрібно збирати все вручну між месенджерами та соцмережами',
+                  'Легше будувати довіру і професійну подачу',
+                  'Простіше масштабувати свою практику',
+                  'Зручніше працювати з міжнародною аудиторією',
+                  'Менше хаосу, більше структури та статусу',
+                ].map((point, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
+                    <p className="text-md font-medium">{point}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+
         {/* 3. SECTION “Що ви отримуєте на платформі” (Strengthened) */}
         <section className="py-20 bg-background">
           <div className="container mx-auto px-4">
@@ -577,6 +621,13 @@ export default function ProPage() {
             </div>
           </div>
         </section>
+
+        {/* NEW SECTION “Картка” (Live Feed Card) */}
+        <LiveFeedCardSection 
+          data={cardSectionData}
+          fallbackTitle="Жива стрічка: місце, де експертність стає видимою"
+          fallbackSubtitle="Публікуйте думки, відкривайте цифрові товари та створюйте офери комунікації. У LECTOR ваша активність не залишається тільки в профілі — вона потрапляє у живий потік платформи й допомагає спільноті побачити вашу цінність."
+        />
 
         {customerBlock && customerBlock.isActive && (
           <section className="py-24 bg-card overflow-hidden">
@@ -1047,41 +1098,6 @@ export default function ProPage() {
         )}
 
 
-        {/* 9. SECTION “Чому це більше, ніж робота через соцмережі...” (Strengthened) */}
-        <section className="py-20 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  Більше, ніж хаотична робота через соцмережі
-                </h2>
-                <p className="text-lg text-muted-foreground mb-8">
-                  Платформа допомагає зібрати вашу присутність, взаємодію та цінність в єдину професійну систему.
-                </p>
-                <p className="text-md">
-                  Замість розрізнених каналів і випадкових повідомлень ви отримуєте простір, де профіль, формати взаємодії, публічність і монетизація поєднані в одну зрозумілу екосистему. Це допомагає виглядати професійніше, працювати спокійніше й вибудовувати довшу довіру з аудиторією.
-                </p>
-              </div>
-              <div className="bg-card p-8 rounded-lg shadow-sm border space-y-4">
-                {[
-                  'Профіль, контент і взаємодія в одному місці',
-                  'Не потрібно збирати все вручну між месенджерами та соцмережами',
-                  'Легше будувати довіру і професійну подачу',
-                  'Простіше масштабувати свою практику',
-                  'Зручніше працювати з міжнародною аудиторією',
-                  'Менше хаосу, більше структури та статусу',
-                ].map((point, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
-                    <p className="text-md font-medium">{point}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-
 
         {/* 11. Professionals Showcase */}
         {professionalsBlock && professionalsBlock.isActive && (
@@ -1209,26 +1225,6 @@ export default function ProPage() {
 
 
 
-        {/* 7. NEW BLOCK: Safety, Support & Fair Play */}
-        <section className="py-20 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {safetyAndSupportItems.map((item, index) => (
-                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow bg-card/50 border">
-                  <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
-                    <div className="bg-background p-2 rounded-lg border">
-                      <item.icon className="h-6 w-6 text-accent" />
-                    </div>
-                    <CardTitle className="text-lg">{item.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">{item.text}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* 13. FAQ SECTION (Strengthened) */}
         <section className="py-20 bg-background">
@@ -1261,6 +1257,27 @@ export default function ProPage() {
                 )}
               </>
             )}
+          </div>
+        </section>
+
+        {/* 7. NEW BLOCK: Safety, Support & Fair Play */}
+        <section className="py-20 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {safetyAndSupportItems.map((item, index) => (
+                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow bg-card/50 border">
+                  <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
+                    <div className="bg-background p-2 rounded-lg border">
+                      <item.icon className="h-6 w-6 text-accent" />
+                    </div>
+                    <CardTitle className="text-lg">{item.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">{item.text}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </section>
 

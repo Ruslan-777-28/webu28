@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { CustomerPreviewForm } from './_components/customer-preview-form';
 import { ProfilePreviewForm } from './_components/profile-preview-form';
 import { ProfessionalsCarouselForm } from './_components/professionals-carousel-form';
+import { CardSectionForm } from '../_components/card-section-form';
 import {
   Tabs,
   TabsContent,
@@ -22,10 +23,11 @@ export default function ProPageContentAdmin() {
       </div>
 
       <Tabs defaultValue="customer-block" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="customer-block">"Know Customer" Block</TabsTrigger>
           <TabsTrigger value="profile-block">"User Sees You" Block</TabsTrigger>
           <TabsTrigger value="carousel-block">Professionals Carousel</TabsTrigger>
+          <TabsTrigger value="card-block">Картка</TabsTrigger>
         </TabsList>
         <TabsContent value="customer-block">
            <Card>
@@ -57,6 +59,17 @@ export default function ProPageContentAdmin() {
                 </CardHeader>
                 <CardContent>
                     <ProfessionalsCarouselForm />
+                </CardContent>
+            </Card>
+        </TabsContent>
+         <TabsContent value="card-block">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Block: "Картка"</CardTitle>
+                    <CardDescription>Edit the live feed card section for the professionals page.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <CardSectionForm docId="pro" />
                 </CardContent>
             </Card>
         </TabsContent>

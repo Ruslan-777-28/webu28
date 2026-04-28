@@ -41,6 +41,8 @@ import { FloatingStatusLink } from '@/components/floating-status-link';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { AuthModal } from '@/components/auth-modal';
 import { ReviewCarousel } from '@/components/review-carousel';
+import { LiveFeedCardSection } from '@/components/live-feed-card-section';
+import type { CardSectionData } from '@/lib/types';
 
 const whyNeedItItems = [
     {
@@ -119,6 +121,7 @@ export default function CommunityPage() {
     // CMS Hero Text
     const [heroTitle, setHeroTitle] = useState('');
     const [heroSubtitle, setHeroSubtitle] = useState('');
+    const [cardSectionData, setCardSectionData] = useState<CardSectionData | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -142,6 +145,7 @@ export default function CommunityPage() {
                     const data = heroSnap.data();
                     if (data.heroTitle) setHeroTitle(data.heroTitle);
                     if (data.heroSubtitle) setHeroSubtitle(data.heroSubtitle);
+                    if (data.cardSection) setCardSectionData(data.cardSection as CardSectionData);
                 }
             } catch (error) {
                 console.error("Error fetching community page data: ", error);
@@ -173,7 +177,7 @@ export default function CommunityPage() {
                         />
                     </div>
 
-                    {/* 10. SECTION “Для яких ситуацій...” */}
+                    {/* 2. SECTION “Для яких ситуацій...” (Situational Awareness) */}
                     <section className="pt-32 pb-20 bg-background md:snap-start md:scroll-mt-24">
                         <div className="container mx-auto px-4">
                             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
@@ -193,7 +197,7 @@ export default function CommunityPage() {
                     </section>
 
 
-                    {/* 8. SECTION “Чому це краще...” */}
+                    {/* 3. SECTION “Чому це краще...” (Problem Awareness) */}
                     <section className="pt-20 pb-10 bg-card">
                         <div className="container mx-auto px-4">
                             <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -230,7 +234,31 @@ export default function CommunityPage() {
                         </div>
                     </section>
 
-                    {/* NEW EXPERTS BLOCK */}
+                    {/* 4. SECTION “Чому людям це потрібно” (Value/Trust) */}
+                    <section className="py-20 bg-background">
+                        <div className="container mx-auto px-4">
+                            <div className="text-center max-w-3xl mx-auto mb-12">
+                                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                                    Коли потрібна не випадкова думка, а справжня ясність
+                                </h2>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {whyNeedItItems.map((item, index) => (
+                                <Card key={index} className="text-center border-none shadow-none">
+                                    <CardContent className="p-6">
+                                    <div className="inline-flex items-center justify-center bg-card rounded-full p-3 mb-4">
+                                        <item.icon className="h-8 w-8 text-accent" />
+                                    </div>
+                                    <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                                    <p className="text-muted-foreground">{item.text}</p>
+                                    </CardContent>
+                                </Card>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* 5. NEW EXPERTS BLOCK (Proof) */}
                     <section className="pt-4 pb-24 bg-card overflow-hidden md:snap-start md:scroll-mt-24">
                         <div className="container mx-auto px-4">
                             <div className="mb-1 lg:mb-2 max-w-4xl mx-auto text-center">
@@ -246,75 +274,16 @@ export default function CommunityPage() {
                         </div>
                     </section>
 
-                    {/* 4. SECTION “Що ви отримуєте після реєстрації” */}
-                    <section className="py-20 bg-background md:snap-start md:scroll-mt-24">
-                        <div className="container mx-auto px-4">
-                            <div className="text-center max-w-3xl mx-auto mb-12">
-                                <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                                    Що відкриває для вас реєстрація
-                                </h2>
-                                <p className="text-lg text-muted-foreground">
-                                   Це не просто формальність, а вхід у повну екосистему для персональної взаємодії та росту.
-                                </p>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {registrationBenefits.map((item, index) => (
-                                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow">
-                                    <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
-                                        <div className="bg-background p-2 rounded-lg">
-                                            <item.icon className="h-6 w-6 text-accent" />
-                                        </div>
-                                        <CardTitle className="text-lg">{item.title}</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p className="text-muted-foreground">{item.text}</p>
-                                    </CardContent>
-                                </Card>
-                                ))}
-                            </div>
-                        </div>
-                    </section>
+                    {/* 6. NEW SECTION “Картка” (Live Feed Card) */}
+                    <div className="md:snap-start md:scroll-mt-24">
+                        <LiveFeedCardSection 
+                            data={cardSectionData}
+                            fallbackTitle="Відкривайте експертів через живу стрічку"
+                            fallbackSubtitle="У LECTOR ви знаходите людей не лише за анкетами. Пости, цифрові матеріали та офери комунікації допомагають побачити стиль, підхід і цінність експерта ще до першого звернення."
+                        />
+                    </div>
 
-                    {/* 5. SECTION “Як це працює” */}
-                    <section className="pt-10 pb-20 bg-card overflow-hidden md:snap-start md:scroll-mt-24">
-                        <div className="container mx-auto px-4 text-center">
-                            <h2 className="text-3xl md:text-4xl font-bold mb-16 tracking-tight">
-                                Як це працює
-                            </h2>
-                            <div className="relative max-w-5xl mx-auto">
-                                {/* Horizontal connecting line (Desktop only) */}
-                                <div className="absolute top-6 left-[10%] right-[10%] hidden md:block h-[1px] bg-border/40 z-0" />
-                                
-                                <div className="grid grid-cols-1 md:grid-cols-5 gap-10 md:gap-4 relative z-10">
-                                    {howItWorksSteps.map((item) => (
-                                    <div key={item.step} className="flex flex-col items-center">
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background border border-border/40 shadow-sm mb-6 transition-colors hover:border-accent/40 duration-300">
-                                            <span className="text-base font-medium text-foreground/70">{item.step}</span>
-                                        </div>
-                                        
-                                        <div className="flex flex-col space-y-2 px-1">
-                                            <h3 className="text-lg font-bold text-foreground tracking-tight leading-snug md:min-h-[5rem] flex items-start justify-center">
-                                                {item.title}
-                                            </h3>
-                                            <p className="text-muted-foreground text-[0.9rem] leading-relaxed font-light px-2">
-                                                {item.text}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                    
-                    {/* 6. CTA #1 */}
-                    <section className="pb-20 bg-background">
-                        <div className="container mx-auto px-4 text-center">
-                            <Button size="lg" onClick={() => setAuthModalOpen(true)}>Створити акаунт і почати</Button>
-                        </div>
-                    </section>
-                    
-                    {/* 7. SECTION “Формати взаємодії” */}
+                    {/* 7. SECTION “Формати взаємодії” (Methods) */}
                     <section className="py-20 bg-card">
                         <div className="container mx-auto px-4">
                             <div className="text-center max-w-3xl mx-auto mb-12">
@@ -345,30 +314,60 @@ export default function CommunityPage() {
                         </div>
                     </section>
 
-                    {/* 9. CTA #2 */}
-                    <section className="pb-20 bg-card">
+                    {/* 8. SECTION “Як це працює” */}
+                    <section className="pt-10 pb-20 bg-card overflow-hidden md:snap-start md:scroll-mt-24">
                         <div className="container mx-auto px-4 text-center">
-                            <Button variant="outline" size="lg" onClick={() => setAuthModalOpen(true)}>Відкрити доступ до платформи</Button>
+                            <h2 className="text-3xl md:text-4xl font-bold mb-16 tracking-tight">
+                                Як це працює
+                            </h2>
+                            <div className="relative max-w-5xl mx-auto">
+                                {/* Horizontal connecting line (Desktop only) */}
+                                <div className="absolute top-6 left-[10%] right-[10%] hidden md:block h-[1px] bg-border/40 z-0" />
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-5 gap-10 md:gap-4 relative z-10">
+                                    {howItWorksSteps.map((item) => (
+                                    <div key={item.step} className="flex flex-col items-center">
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background border border-border/40 shadow-sm mb-6 transition-colors hover:border-accent/40 duration-300">
+                                            <span className="text-base font-medium text-foreground/70">{item.step}</span>
+                                        </div>
+                                        
+                                        <div className="flex flex-col space-y-2 px-1">
+                                            <h3 className="text-lg font-bold text-foreground tracking-tight leading-snug md:min-h-[5rem] flex items-start justify-center">
+                                                {item.title}
+                                            </h3>
+                                            <p className="text-muted-foreground text-[0.9rem] leading-relaxed font-light px-2">
+                                                {item.text}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </section>
 
-                    {/* 3. SECTION “Чому людям це потрібно” */}
-                    <section className="py-20 bg-background">
+                    {/* 9. SECTION “Що ви отримуєте після реєстрації” */}
+                    <section className="py-20 bg-background md:snap-start md:scroll-mt-24">
                         <div className="container mx-auto px-4">
                             <div className="text-center max-w-3xl mx-auto mb-12">
                                 <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                                    Коли потрібна не випадкова думка, а справжня ясність
+                                    Що відкриває для вас реєстрація
                                 </h2>
+                                <p className="text-lg text-muted-foreground">
+                                   Це не просто формальність, а вхід у повну екосистему для персональної взаємодії та росту.
+                                </p>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {whyNeedItItems.map((item, index) => (
-                                <Card key={index} className="text-center border-none shadow-none">
-                                    <CardContent className="p-6">
-                                    <div className="inline-flex items-center justify-center bg-card rounded-full p-3 mb-4">
-                                        <item.icon className="h-8 w-8 text-accent" />
-                                    </div>
-                                    <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                                    <p className="text-muted-foreground">{item.text}</p>
+                                {registrationBenefits.map((item, index) => (
+                                <Card key={index} className="shadow-sm hover:shadow-lg transition-shadow">
+                                    <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
+                                        <div className="bg-background p-2 rounded-lg">
+                                            <item.icon className="h-6 w-6 text-accent" />
+                                        </div>
+                                        <CardTitle className="text-lg">{item.title}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-muted-foreground">{item.text}</p>
                                     </CardContent>
                                 </Card>
                                 ))}
@@ -377,7 +376,7 @@ export default function CommunityPage() {
                     </section>
 
 
-                    {/* 11. FAQ SECTION */}
+                    {/* 10. FAQ SECTION */}
                     <section className="py-20 bg-card md:snap-start md:scroll-mt-24">
                         <div className="container mx-auto px-4 max-w-3xl">
                             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
@@ -406,7 +405,7 @@ export default function CommunityPage() {
                         </div>
                     </section>
 
-                    {/* 12. FINAL CTA SECTION */}
+                    {/* 11. FINAL CTA SECTION */}
                     <section className="py-20 md:py-28 bg-background md:snap-start md:scroll-mt-24">
                         <div className="container mx-auto px-4 text-center">
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">

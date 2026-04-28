@@ -144,20 +144,32 @@ export function PageHero({
             </div>
 
             {/* Desktop: seamless fades (Enhanced Atmospheric Layers) */}
-            <div className="hidden md:block absolute inset-y-0 right-[-1px] w-64 bg-gradient-to-l from-background to-transparent pointer-events-none backdrop-blur-[4px]" />
-            <div className="hidden md:block absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background via-background/60 to-transparent pointer-events-none backdrop-blur-[2px]" />
-            <div className="hidden md:block absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background via-background/90 to-transparent pointer-events-none" />
+            {!isPro && (
+              <>
+                <div className="hidden md:block absolute inset-y-0 right-[-1px] w-64 bg-gradient-to-l from-background to-transparent pointer-events-none backdrop-blur-[4px]" />
+                <div className="hidden md:block absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background via-background/60 to-transparent pointer-events-none backdrop-blur-[2px]" />
+                <div className="hidden md:block absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background via-background/90 to-transparent pointer-events-none" />
+              </>
+            )}
 
-            <div className="hidden md:block absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-background to-transparent pointer-events-none" />
-            <div className="hidden md:block absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background via-background/50 to-transparent pointer-events-none" />
+            {!isPro && (
+              <>
+                <div className="hidden md:block absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-background to-transparent pointer-events-none" />
+                <div className="hidden md:block absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background via-background/50 to-transparent pointer-events-none" />
 
-            <div className="hidden md:block absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent pointer-events-none backdrop-blur-[1px]" />
-            <div className="hidden md:block absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background via-background/50 to-transparent pointer-events-none backdrop-blur-[0.5px]" />
+                <div className="hidden md:block absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent pointer-events-none backdrop-blur-[1px]" />
+                <div className="hidden md:block absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background via-background/50 to-transparent pointer-events-none backdrop-blur-[0.5px]" />
+              </>
+            )}
 
             {/* Mobile: seamless fades */}
-            <div className="block md:hidden absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background to-transparent pointer-events-none" />
-            <div className="block md:hidden absolute inset-x-0 bottom-[-1px] h-20 bg-gradient-to-t from-background to-transparent pointer-events-none" />
-            <div className="block md:hidden absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none" />
+            {!isPro && (
+              <>
+                <div className="block md:hidden absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background to-transparent pointer-events-none" />
+                <div className="block md:hidden absolute inset-x-0 bottom-[-1px] h-20 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+                <div className="block md:hidden absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none" />
+              </>
+            )}
           </div>
         )}
 
@@ -221,7 +233,7 @@ export function PageHero({
               )}
 
               {secondaryTextBlock && isPro && (
-                <p className="text-[14px] md:text-[1rem] text-muted-foreground/60 leading-relaxed font-light">
+                <p className="text-[14px] md:text-[1rem] text-muted-foreground/90 leading-relaxed font-light">
                   {secondaryTextBlock}
                 </p>
               )}

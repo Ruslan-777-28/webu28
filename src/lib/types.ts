@@ -457,6 +457,25 @@ export type FaqItem = {
   updatedBy: string; // UID of admin
 }
 
+// --- Site Pages Generic Types ---
+export type CardSectionSlide = {
+  id: string;
+  imageUrl: string;
+  imageAlt?: string;
+  order: number;
+  enabled: boolean;
+  label?: string;
+  title?: string;
+  description?: string;
+};
+
+export type CardSectionData = {
+  enabled: boolean;
+  title: string;
+  subtitle: string;
+  carouselImages: CardSectionSlide[];
+};
+
 // --- Homepage Settings Types ---
 
 export type HomeHeroMediaSettings = {
