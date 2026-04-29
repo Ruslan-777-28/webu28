@@ -118,6 +118,13 @@ export function RoadmapClient() {
                         
                         {/* DESKTOP TIMELINE & CARDS */}
                         <div className="hidden lg:flex relative items-start gap-6 mb-12 xl:mb-16">
+                            {/* 2026 Year Marker */}
+                            <div className="absolute bottom-full left-0 right-0 flex justify-center pointer-events-none select-none z-0 translate-y-4 xl:translate-y-6">
+                                <span className="text-[120px] xl:text-[160px] font-bold text-transparent bg-clip-text bg-gradient-to-b from-foreground/10 to-transparent tracking-tighter leading-none">
+                                    2026
+                                </span>
+                            </div>
+
                             {/* Continuous horizontal line */}
                             <div className="absolute top-[5px] left-[10%] right-[80px] h-px bg-border/40 z-0" />
                             
@@ -163,7 +170,14 @@ export function RoadmapClient() {
                         </div>
 
                         {/* TABLET / MOBILE VIEW */}
-                        <div className="lg:hidden flex flex-col space-y-8 mb-10">
+                        <div className="lg:hidden flex flex-col space-y-8 mb-10 relative">
+                            {/* 2026 Year Marker (Mobile) */}
+                            <div className="absolute bottom-full left-0 right-0 flex justify-center pointer-events-none select-none z-0 translate-y-2">
+                                <span className="text-[80px] md:text-[100px] font-bold text-transparent bg-clip-text bg-gradient-to-b from-foreground/10 to-transparent tracking-tighter leading-none">
+                                    2026
+                                </span>
+                            </div>
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {stages.map((stage, idx) => {
                                     const Icon = iconMap[stage.icon] || Layers;
