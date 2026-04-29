@@ -1,11 +1,16 @@
-
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, HelpCircle, Users, Link as LinkIcon, Edit3, Mail, Megaphone, LayoutPanelLeft } from 'lucide-react';
+import { FileText, HelpCircle, Users, Link as LinkIcon, Edit3, Mail, Megaphone, LayoutPanelLeft, Map } from 'lucide-react';
 import Link from 'next/link';
 
 const contentPages = [
+    {
+        title: "Roadmap Content",
+        description: "Edit content blocks and timeline on the /roadmap page.",
+        href: "/admin/content/roadmap",
+        icon: Map
+    },
     {
         title: "'For Experts' Page Blocks",
         description: "Edit content blocks on the /pro page.",

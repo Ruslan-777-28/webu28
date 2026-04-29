@@ -74,6 +74,7 @@ export default function Footer() {
     { href: '/community-architects', label: 'Community Architects' },
     { href: '/contact', label: 'Контакти' },
     { href: '/info/privacy-policy', label: 'Privacy Policy' },
+    { href: '/info/payouts', label: 'Вивід коштів' },
   ];
 
   const getLinkWithFrom = (href: string) => {
