@@ -1,20 +1,39 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 interface PageCloseButtonProps {
   fallbackHref?: string;
 }
 
-export function PageCloseButton({ fallbackHref = '/' }: PageCloseButtonProps) {
+function CloseButtonInner({ fallbackHref = '/' }: PageCloseButtonProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleClose = () => {
-    // Check if we have internal history to go back to
-    if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
-      router.back();
-    } else {
+    if (typeof window !== 'undefined') {
+      const from = searchParams.get('from');
+      const referrer = document.referrer;
+      const host = window.location.host;
+
+      // 1. Prioritize 'from' parameter
+      if (from) {
+        // Ensure it starts with / and append footer anchor
+        const targetUrl = (from.startsWith('/') ? from : `/${from}`).split('#')[0] + '#site-footer';
+        router.push(targetUrl);
+        return;
+      }
+
+      // 2. Secondary fallback: existing referrer logic
+      if (referrer && referrer.includes(host)) {
+        const targetUrl = referrer.split('#')[0] + '#site-footer';
+        router.push(targetUrl);
+        return;
+      }
+
+      // 3. Ultimate fallback
       router.push(fallbackHref);
     }
   };
@@ -27,5 +46,13 @@ export function PageCloseButton({ fallbackHref = '/' }: PageCloseButtonProps) {
     >
       <X className="w-5 h-5 md:w-6 md:h-6 transition-transform group-hover:scale-110" strokeWidth={1.5} />
     </button>
+  );
+}
+
+export function PageCloseButton(props: PageCloseButtonProps) {
+  return (
+    <Suspense fallback={<div className="absolute top-4 right-4 md:top-8 md:right-8 p-2 w-9 h-9 md:w-10 md:h-10" />}>
+      <CloseButtonInner {...props} />
+    </Suspense>
   );
 }

@@ -2,6 +2,8 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
 import { Twitter, Instagram, Linkedin, Youtube, Facebook } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
@@ -35,7 +37,9 @@ const socialIconMap: { [key: string]: React.ElementType } = {
 };
 
 export default function Footer() {
+  const pathname = usePathname();
   const [settings, setSettings] = useState<FooterSettings | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -59,11 +63,8 @@ export default function Footer() {
     { href: '/info/community-rules', label: 'Правила спільноти' },
     { href: '/status', label: 'Статус' },
     { href: '/rewards', label: 'Система балів' },
-    { href: '/status/nominations', label: 'Вітрина номінацій' },
     { href: '/trust-verification', label: 'Довіра і верифікація' },
     { href: '/status/legend', label: 'Умовні позначки' },
-    { href: '/status/hall-of-fame', label: 'Hall of Fame' },
-    { href: '/status/archive', label: 'Архів статусів' },
   ];
 
   const informationLinksLegal = [
@@ -73,15 +74,29 @@ export default function Footer() {
     { href: '/community-architects', label: 'Community Architects' },
     { href: '/contact', label: 'Контакти' },
     { href: '/info/privacy-policy', label: 'Privacy Policy' },
-    { href: '/info/terms-of-use', label: 'Terms of Use' },
   ];
+
+  const getLinkWithFrom = (href: string) => {
+    if (!pathname || href.startsWith('http') || href.startsWith('mailto:')) return href;
+    
+    try {
+        const url = new URL(href, 'https://placeholder.com');
+        url.searchParams.set('from', pathname);
+        // We only want the relative part
+        return url.pathname + url.search + url.hash;
+    } catch (e) {
+        // Fallback for simple strings if URL parsing fails
+        const separator = href.includes('?') ? '&' : '?';
+        return `${href}${separator}from=${encodeURIComponent(pathname)}`;
+    }
+  };
 
   const activeSocialLinks = settings?.socialLinks 
     ? Object.entries(settings.socialLinks).filter(([, value]) => value.isActive && value.url)
     : [];
 
   return (
-    <footer className="bg-sidebar text-sidebar-foreground">
+    <footer id="site-footer" className="bg-sidebar text-sidebar-foreground">
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
           {/* Brand Column */}
@@ -93,7 +108,7 @@ export default function Footer() {
               </p>
             </div>
             <div className="pt-6 mt-auto">
-              <Link href="/manifest" className="text-xs uppercase tracking-[0.2em] font-medium text-sidebar-foreground/50 hover:text-accent transition-colors w-max">
+              <Link href={getLinkWithFrom("/manifest")} className="text-xs uppercase tracking-[0.2em] font-medium text-sidebar-foreground/50 hover:text-accent transition-colors w-max">
                 manifest
               </Link>
             </div>
@@ -105,7 +120,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {informationLinksPlatform.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-sm text-sidebar-foreground/70 hover:text-accent transition-colors">
+                  <Link href={getLinkWithFrom(link.href)} className="text-sm text-sidebar-foreground/70 hover:text-accent transition-colors">
                       {link.label}
                   </Link>
                 </li>
@@ -119,7 +134,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {informationLinksLegal.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-sm text-sidebar-foreground/70 hover:text-accent transition-colors">
+                  <Link href={getLinkWithFrom(link.href)} className="text-sm text-sidebar-foreground/70 hover:text-accent transition-colors">
                       {link.label}
                   </Link>
                 </li>

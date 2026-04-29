@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Navigation } from '@/components/navigation';
+import { PageCloseButton } from '@/components/page-close-button';
 import Footer from '@/components/layout/footer';
 import { 
   Users, 
@@ -23,6 +24,7 @@ export default function ReferralSprintProgramPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navigation subtitle="Referral Sprint Program" />
+      <PageCloseButton fallbackHref="/" />
       
       <main className="flex-grow">
         {/* Block 1 — Hero */}

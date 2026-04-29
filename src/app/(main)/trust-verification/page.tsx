@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Navigation } from '@/components/navigation';
+import { PageCloseButton } from '@/components/page-close-button';
 import Footer from '@/components/layout/footer';
 
 type StepStatus = 'obtained' | 'available' | 'not_available' | 'action_required';
@@ -41,6 +42,7 @@ export default function TrustVerificationPage() {
     return (
       <div className="flex flex-col min-h-screen">
         <Navigation />
+        <PageCloseButton fallbackHref="/" />
         <main className="flex-grow container mx-auto max-w-3xl p-4 md:p-8 space-y-6 pt-10">
           <Skeleton className="h-40 w-full rounded-3xl" />
           <div className="space-y-4">
@@ -58,6 +60,7 @@ export default function TrustVerificationPage() {
     return (
       <div className="flex flex-col min-h-screen">
         <Navigation />
+        <PageCloseButton fallbackHref="/" />
         <main className="flex-grow flex flex-col items-center justify-center p-8 text-center">
           <h1 className="text-2xl font-black uppercase tracking-tight mb-2">Приватний розділ</h1>
           <p className="text-muted-foreground max-w-xs">Ця сторінка доступна лише для зареєстрованих користувачів.</p>
@@ -139,6 +142,7 @@ export default function TrustVerificationPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Navigation />
+      <PageCloseButton fallbackHref="/" />
       
       <main className="flex-grow container mx-auto max-w-4xl p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700 pt-10">
         {/* Hero Header */}

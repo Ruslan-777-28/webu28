@@ -9,6 +9,7 @@ import { Navigation } from '@/components/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { LEVEL_LOCALE } from '@/lib/status/constants';
 import { getActiveStatusSnapshot, getStatusTableRowsForSubcategory } from '@/lib/status/selectors';
+import { PageCloseButton } from '@/components/page-close-button';
 import { StatusHeaderNav } from '@/components/status-header-nav';
 import { Shield, Mic, MessageCircle, Repeat, TrendingUp, Crown, Star, Calendar, X, User, Heart, Clock, Sparkles, Users, ShoppingBag, Award, Globe, PenTool } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -164,30 +165,12 @@ export default function StatusPage() {
         return rows;
     }, [activeSubcatName, activeSubcategoryId, taxonomyTabs]);
 
-    const handleClose = () => {
-        if (typeof window !== 'undefined' && window.history.length > 2) {
-            router.back();
-        } else {
-            router.push('/');
-        }
-    };
+
 
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-accent/30 selection:text-accent relative">
             <Navigation />
-            
-            {/* Close Button UI (B) */}
-            <div className="absolute top-6 right-6 md:top-10 md:right-10 z-50">
-                <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={handleClose}
-                    className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-muted/10 border border-muted/20 hover:bg-muted/20 hover:border-muted/40 transition-all group"
-                >
-                    <X className="w-5 h-5 md:w-6 h-6 text-muted-foreground group-hover:text-foreground" />
-                </Button>
-            </div>
-            
+            <PageCloseButton fallbackHref="/" />
             <main className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-16 mt-[32px] md:mt-[40px]">
                 <WelcomeIntentSection />
                 {/* Header Section */}

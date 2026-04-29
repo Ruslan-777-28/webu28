@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Navigation } from '@/components/navigation';
+import { PageCloseButton } from '@/components/page-close-button';
 import Footer from '@/components/layout/footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { ASSIGNMENT_TYPE_LOCALE } from '@/lib/status/constants';
@@ -21,6 +22,7 @@ export default function StatusLegendPage() {
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-accent/30 selection:text-accent">
             <Navigation />
+            <PageCloseButton fallbackHref="/" />
             
             <main className="flex-1 w-full max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-16 mt-[80px]">
                 {/* Header Section */}

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Navigation } from '@/components/navigation';
+import { PageCloseButton } from '@/components/page-close-button';
 import Footer from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -29,6 +30,7 @@ export default function RewardsPage() {
     return (
         <main className="min-h-screen bg-background">
             <Navigation />
+            <PageCloseButton fallbackHref="/" />
 
             {/* HERO SECTION */}
             <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 border-b border-border/50 overflow-hidden">

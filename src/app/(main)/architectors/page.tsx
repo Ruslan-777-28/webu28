@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Navigation } from '@/components/navigation';
+import { PageCloseButton } from '@/components/page-close-button';
 import { Info } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -86,6 +87,7 @@ export default function ArchitectorsPage() {
                 Using it here but keeping the overall header zone as compact as possible.
             */}
             <Navigation subtitle="Matrix Wall" />
+            <PageCloseButton fallbackHref="/" />
             
             <div className="container max-w-[1400px] mx-auto px-1.5 pt-4">
                 <WelcomeIntentSection />
