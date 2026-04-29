@@ -32,7 +32,18 @@ const getLevelLabel = (level?: StatusAwardLevel | 'holder'): string => {
 export default function StatusPage() {
     const router = useRouter();
     const [blogSettings, setBlogSettings] = useState<BlogSettings | null>(null);
-    const [activeSubcategoryId, setActiveSubcategoryId] = useState<string>('all');
+    const [activeSubcategoryId, setActiveSubcategoryId] = useState<string>('tarot'); // default to Tarot
+
+    // Parse explicit query params
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab');
+            if (tab) {
+                setActiveSubcategoryId(tab);
+            }
+        }
+    }, []);
 
     // Fetch taxonomy from Firestore
     useEffect(() => {
@@ -68,8 +79,12 @@ export default function StatusPage() {
     const activeSnapshot = getActiveStatusSnapshot();
     
     const activeSubcatName = useMemo(() => {
-        if (activeSubcategoryId === 'all') return undefined;
-        return taxonomyTabs.find(t => t.id === activeSubcategoryId)?.name;
+        if (String(activeSubcategoryId).toLowerCase() === 'all') return undefined;
+        let tab = taxonomyTabs.find(t => t.id === activeSubcategoryId);
+        if (!tab) {
+            tab = taxonomyTabs.find(t => String(t.id).toLowerCase() === String(activeSubcategoryId).toLowerCase());
+        }
+        return tab?.name;
     }, [activeSubcategoryId, taxonomyTabs]);
 
     const tableRows = useMemo<FormattedStatusTableRow[]>(() => {
@@ -136,7 +151,7 @@ export default function StatusPage() {
         };
 
         // AGGREGATED VIEW: 'Усі статуси'
-        if (activeSubcategoryId === 'all') {
+        if (String(activeSubcategoryId).toLowerCase() === 'all') {
             const aggregated: FormattedStatusTableRow[] = [];
             // Map over all available taxonomy tabs (except 'all')
             taxonomyTabs.filter(t => t.id !== 'all').forEach(tab => {
@@ -173,63 +188,29 @@ export default function StatusPage() {
             <PageCloseButton fallbackHref="/" />
             <main className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-16 mt-[32px] md:mt-[40px]">
                 <WelcomeIntentSection />
-                {/* Header Section */}
-                <div className="flex flex-col gap-10 mb-8">
-                    <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-                        <div className="space-y-5 max-w-2xl">
-                            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-foreground leading-none">
-                                Статус у LECTOR
-                            </h1>
-                            <div className="space-y-3">
-                                <p className="text-sm md:text-lg text-muted-foreground font-bold leading-relaxed">
-                                    Статус у LECTOR — це не одна позначка, а система розвитку присутності, довіри та визнання в екосистемі платформи.
-                                </p>
-                                <p className="text-xs md:text-sm text-muted-foreground/70 font-medium leading-relaxed">
-                                    У цій системі поєднуються рівні наповнення профілю, рівні довіри, особливі ролі та публічні відзнаки.
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
-                            {/* Dynamic Snapshot Marker */}
-                            {activeSnapshot && (
-                                <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-muted/5 border border-muted/20">
-                                    <Calendar className="w-4 h-4 text-muted-foreground/50" />
-                                    <div className="flex flex-col">
-                                        <span className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground/60">
-                                            Поточний зріз
-                                        </span>
-                                        <span className="text-xs font-black tracking-wider text-foreground/90">
-                                            {activeSnapshot.title}
-                                        </span>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Status System Map - Reinforcement Layer */}
-                <StatusSystemMap />
-
+                {/* Subcategory Navigation & Ranking Grid - MOVED TO TOP */}
                 <div className="sticky top-[72px] md:top-[88px] z-40 bg-background/95 backdrop-blur-md pt-4 pb-2 mb-8 -mx-4 px-4 md:-mx-6 md:px-6 border-b border-muted/10">
                     <StatusHeaderNav className="w-full max-w-fit mb-4" />
 
                     {/* Subcategory Navigation (A) */}
                     <div className="w-full">
                         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
-                            {taxonomyTabs.map((sub) => (
-                                <button
-                                    key={sub.id}
-                                    onClick={() => setActiveSubcategoryId(sub.id)}
-                                    className={`px-5 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all rounded-full whitespace-nowrap border ${
-                                        activeSubcategoryId === sub.id 
-                                        ? 'bg-foreground text-background border-foreground shadow-sm' 
-                                        : 'bg-transparent text-muted-foreground border-transparent hover:border-muted/30 hover:bg-muted/5 hover:text-foreground'
-                                    }`}
-                                >
-                                    {sub.name}
-                                </button>
-                            ))}
+                            {taxonomyTabs.map((sub) => {
+                                const isActive = String(activeSubcategoryId).toLowerCase() === String(sub.id).toLowerCase();
+                                return (
+                                    <button
+                                        key={sub.id}
+                                        onClick={() => setActiveSubcategoryId(sub.id)}
+                                        className={`px-5 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all rounded-full whitespace-nowrap border ${
+                                            isActive 
+                                            ? 'bg-foreground text-background border-foreground shadow-sm' 
+                                            : 'bg-transparent text-muted-foreground border-transparent hover:border-muted/30 hover:bg-muted/5 hover:text-foreground'
+                                        }`}
+                                    >
+                                        {sub.name}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -332,6 +313,47 @@ export default function StatusPage() {
                         </CardContent>
                     </Card>
                 )}
+
+                {/* Explanatory / Landing Sections - MOVED TO BOTTOM */}
+                <div className="mt-20 space-y-16 border-t border-muted/10 pt-16">
+                    {/* Header Section */}
+                    <div className="flex flex-col gap-10">
+                        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                            <div className="space-y-5 max-w-2xl">
+                                <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-foreground leading-none">
+                                    Статус у LECTOR
+                                </h1>
+                                <div className="space-y-3">
+                                    <p className="text-sm md:text-lg text-muted-foreground font-bold leading-relaxed">
+                                        Статус у LECTOR — це не одна позначка, а система розвитку присутності, довіри та визнання в екосистемі платформи.
+                                    </p>
+                                    <p className="text-xs md:text-sm text-muted-foreground/70 font-medium leading-relaxed">
+                                        У цій системі поєднуються рівні наповнення профілю, рівні довіри, особливі ролі та публічні відзнаки.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
+                                {/* Dynamic Snapshot Marker */}
+                                {activeSnapshot && (
+                                    <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-muted/5 border border-muted/20">
+                                        <Calendar className="w-4 h-4 text-muted-foreground/50" />
+                                        <div className="flex flex-col">
+                                            <span className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground/60">
+                                                Поточний зріз
+                                            </span>
+                                            <span className="text-xs font-black tracking-wider text-foreground/90">
+                                                {activeSnapshot.title}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Status System Map - Reinforcement Layer */}
+                    <StatusSystemMap />
+                </div>
             </main>
         </div>
     );
