@@ -659,7 +659,7 @@ export default function ProPage() {
                   <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-0">
                     
                     {/* Card 1: Static Visual Mirror Placeholder (Now on the LEFT) */}
-                    <div className="relative z-0 w-full max-w-[280px] bg-background p-4 rounded-xl shadow-xl border border-border/40 flex flex-col sm:mt-16 scale-95 transition-all duration-500">
+                    <div className="relative z-0 w-full max-w-[280px] bg-background p-4 rounded-xl shadow-xl border border-border/40 flex flex-col sm:mt-16 scale-95 premium-mockup-hover">
                       <div className="flex flex-col space-y-1.5">
                         <div className="flex justify-between items-center w-full">
                           <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
@@ -753,7 +753,7 @@ export default function ProPage() {
                     </div>
 
                     {/* Card 2: Existing Content (Main Floating Card - Now on the RIGHT with minimal overlap) */}
-                    <div className="relative z-10 w-full max-w-[280px] bg-background p-4 rounded-xl shadow-2xl border border-border/60 flex flex-col sm:-ml-6 sm:mt-4 hover:shadow-accent/5 transition-all duration-500 hover:-translate-y-1">
+                    <div className="relative z-10 w-full max-w-[280px] bg-background p-4 rounded-xl shadow-2xl border border-border/60 flex flex-col sm:-ml-6 sm:mt-4 premium-mockup-hover">
                       <div className="flex flex-col space-y-1.5">
                         <div className="flex justify-between items-center w-full">
                           <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">

@@ -40,7 +40,7 @@ export function LiveFeedCardSection({ data, fallbackTitle, fallbackSubtitle }: L
   // Sort and filter active slides
   const slides = data?.carouselImages
     ? [...data.carouselImages]
-        .filter(img => img.enabled)
+        .filter(img => img.enabled && img.imageUrl)
         .sort((a, b) => a.order - b.order)
     : [];
 
@@ -83,10 +83,10 @@ export function LiveFeedCardSection({ data, fallbackTitle, fallbackSubtitle }: L
                 </button>
               )}
 
-             <div className="relative w-full aspect-[9/19] rounded-[2rem] border-[8px] border-zinc-900 dark:border-zinc-800 bg-background shadow-2xl ring-1 ring-inset ring-white/10 overflow-hidden flex flex-col z-10">
-                {/* Hardware details: modern dynamic island style notch */}
-                <div className="absolute top-3 inset-x-0 h-6 flex justify-center z-20 pointer-events-none">
-                    <div className="w-[32%] h-full bg-zinc-900/90 dark:bg-black/90 backdrop-blur-md rounded-full shadow-[inset_0px_-1px_1px_rgba(255,255,255,0.05)]"></div>
+             <div className="relative w-full aspect-[9/19] rounded-[2rem] border-[6px] border-zinc-900 dark:border-zinc-800 bg-background shadow-2xl ring-1 ring-inset ring-white/10 overflow-hidden flex flex-col z-10 premium-mockup-hover">
+                {/* Hardware details: minimal modern cutout */}
+                <div className="absolute top-2 inset-x-0 h-1.5 flex justify-center z-20 pointer-events-none">
+                    <div className="w-12 h-full bg-zinc-900/90 dark:bg-black/90 backdrop-blur-md rounded-full shadow-[inset_0px_-1px_1px_rgba(255,255,255,0.05)]"></div>
                 </div>
 
                 {slides.length > 0 ? (
@@ -105,8 +105,7 @@ export function LiveFeedCardSection({ data, fallbackTitle, fallbackSubtitle }: L
                             ))}
                         </CarouselContent>
                         
-                        {/* Gradient overlay to ensure dots are readable */}
-                        <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10 pointer-events-none" />
+
 
                         {/* Dots Navigation */}
                         {count > 1 && (

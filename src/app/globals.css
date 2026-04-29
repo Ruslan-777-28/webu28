@@ -88,3 +88,28 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  @media (hover: hover) and (pointer: fine) {
+    .premium-mockup-hover {
+      transition: transform 0.22s cubic-bezier(0.33, 1, 0.68, 1), 
+                  box-shadow 0.22s cubic-bezier(0.33, 1, 0.68, 1) !important;
+      will-change: transform;
+    }
+    .premium-mockup-hover:hover {
+      transform: scale(1.05) !important;
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.1) !important;
+      z-index: 50 !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .premium-mockup-hover {
+      transition: none !important;
+    }
+    .premium-mockup-hover:hover {
+      transform: scale(1.02) !important;
+    }
+  }
+}
+

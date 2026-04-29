@@ -36,7 +36,7 @@ const formSchema = z.object({
   enabled: z.boolean().default(true),
   title: z.string().min(1, 'Заголовок обов’язковий'),
   subtitle: z.string().min(1, 'Підзаголовок обов’язковий'),
-  carouselImages: z.array(slideSchema).max(3, 'Максимум 3 слайди'),
+  carouselImages: z.array(slideSchema).max(4, 'Максимум 4 слайди'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -201,13 +201,13 @@ export function CardSectionForm({ docId }: CardSectionFormProps) {
               variant="outline" 
               size="sm" 
               onClick={() => append({ id: Date.now().toString(), imageUrl: '', order: fields.length, enabled: true, label: '', title: '', description: '' })}
-              disabled={fields.length >= 3}
+              disabled={fields.length >= 4}
             >
               <PlusCircle className="w-4 h-4 mr-2" /> Додати слайд
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {fields.map((field, index) => (
               <Card key={field.id} className="relative pt-6">
                 <Button 
