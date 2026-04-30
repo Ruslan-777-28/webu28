@@ -44,22 +44,88 @@ export default function HomePage() {
         <Navigation hideBalance />
         
         {/* Main content area */}
-        <main className="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
-            <div className="flex flex-col md:flex-row items-center justify-center md:gap-16 w-full">
-                {/* Circle */}
-                <div className="relative w-[350px] h-[350px] md:w-[443px] md:h-[443px] flex-shrink-0">
-                    <div className="absolute inset-0 rounded-full border border-border pointer-events-none z-10" />
-                    <HeroCircleMedia />
+        <main className="flex-grow flex flex-col items-center justify-center p-4 md:p-8 relative">
+                {/* Left Symbolic Slogan Composition: Purely decorative/conceptual */}
+                <div className="hidden lg:flex absolute left-8 md:left-12 xl:left-24 top-[35%] -translate-y-1/2 flex-col items-center gap-0 text-foreground/60 font-light uppercase tracking-[0.4em] text-[10px] pointer-events-none select-none z-10 leading-none">
+                    <span className="opacity-90">time</span>
+                    <span className="text-2xl font-extralight opacity-50">=</span>
+                    <span className="opacity-90">energy</span>
                 </div>
-                {/* Timer */}
-                <div className="flex-shrink-0 mt-8 md:mt-0">
-                    <div className="flex flex-col items-center justify-center text-center">
-                        <p className="text-sm text-muted-foreground mb-2">час=енергія</p>
-                        <CountdownTimer />
-                        <p className="text-xs text-muted-foreground mt-2">до старту залишилось</p>
+
+                {/* Main Hero Content: Dense layout with tighter gaps */}
+                <div className="flex flex-col md:flex-row items-center justify-center w-full max-w-[1200px] mx-auto md:ml-auto md:mr-0 md:pr-12 lg:pr-16 md:gap-12 lg:gap-16 relative">
+                    {/* Circle/Medallion */}
+                    <div className="relative w-[350px] h-[350px] md:w-[443px] md:h-[443px] flex-shrink-0">
+                        <div className="absolute inset-0 rounded-full border border-border pointer-events-none z-10" />
+                        <HeroCircleMedia />
+                    </div>
+
+                    {/* Information Column */}
+                    <div className="flex-shrink-0 mt-8 md:mt-0">
+                        <div 
+                            className="flex flex-col items-start py-5 px-6 md:py-6 md:px-8 bg-background/5 border border-border/10 backdrop-blur-[2px] rounded-sm transition-all duration-500 hover:border-border/20 w-full max-w-[260px]" 
+                            aria-label="Launch Information and Countdown"
+                        >
+                            {/* Launch Timeline Section: Minimal gap with delicate divider */}
+                            <div className="w-full mb-6">
+                                <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/30 mb-4">
+                                    Launch Timeline
+                                </h3>
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between gap-4 group">
+                                        <div className="flex flex-col items-start text-left">
+                                            <span className="text-xs font-bold text-foreground/70 tracking-tight">21.06.2026</span>
+                                            <span className="text-[10px] font-medium text-muted-foreground/50 uppercase tracking-wide">Founding Access</span>
+                                        </div>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <button className="p-1.5 rounded-full hover:bg-muted transition-colors opacity-30 group-hover:opacity-100 outline-none" aria-label="Info: Founding Access">
+                                                    <Info className="h-3 w-3" />
+                                                </button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-64 p-4 text-[11px] leading-relaxed animate-in fade-in zoom-in duration-200 shadow-2xl border-white/5" align="end" sideOffset={12}>
+                                                <div className="space-y-2">
+                                                    <p className="font-bold uppercase tracking-widest text-[10px]">Founding Access — 21.06.2026</p>
+                                                    <p className="text-muted-foreground">
+                                                        The first opening phase of LECTOR. Early experts, first users and selected participants get access to the platform before the full public launch.
+                                                    </p>
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+
+                                    <div className="flex items-center justify-between gap-4 group">
+                                        <div className="flex flex-col items-start text-left">
+                                            <span className="text-xs font-bold text-foreground/70 tracking-tight">08.08.2026</span>
+                                            <span className="text-[10px] font-medium text-muted-foreground/50 uppercase tracking-wide">Full Platform Launch</span>
+                                        </div>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <button className="p-1.5 rounded-full hover:bg-muted transition-colors opacity-30 group-hover:opacity-100 outline-none" aria-label="Info: Full Platform Launch">
+                                                    <Info className="h-3 w-3" />
+                                                </button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-64 p-4 text-[11px] leading-relaxed animate-in fade-in zoom-in duration-200 shadow-2xl border-white/5" align="end" sideOffset={12}>
+                                                <div className="space-y-2">
+                                                    <p className="font-bold uppercase tracking-widest text-[10px]">Full Platform Launch — 08.08.2026</p>
+                                                    <p className="text-muted-foreground">
+                                                        Official public opening of the full LECTOR platform functionality.
+                                                    </p>
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Countdown Section: Tight vertical spacing at the bottom */}
+                            <div className="pt-5 border-t border-border/10 w-full">
+                                <CountdownTimer className="text-left" />
+                                <p className="text-[10px] text-muted-foreground/40 uppercase tracking-widest mt-1">до старту залишилось</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
              {/* Text Block */}
             <div className="text-center text-sm text-muted-foreground max-w-5xl mt-12">
                 <h2 className="text-2xl font-bold mb-8 text-foreground text-center max-w-4xl mx-auto">ВІДКРИЙ ДОСТУП ДО ЗНАНЬ БЕЗ КОРДОНІВ 24/7</h2>

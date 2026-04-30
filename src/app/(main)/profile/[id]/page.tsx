@@ -86,9 +86,11 @@ const safeFormatDate = (timestamp: any) => {
 
 function ProfileLoadingSkeleton() {
     return (
-        <div className="flex flex-col min-h-screen">
-            <Navigation />
-            <main className="flex-grow">
+        <div className="flex flex-col min-h-screen bg-background">
+            <div className="relative z-50 w-full sticky top-0">
+                <Navigation />
+            </div>
+            <main className="flex-grow pt-8 md:pt-10">
                 <div className="h-20 md:h-24 bg-muted animate-pulse" />
                 <div className="container mx-auto px-4 -mt-10 md:-mt-8">
                     <div className="flex items-end gap-3">
@@ -216,25 +218,25 @@ function CommunicationOfferCard({ offer, onAction }: { offer: CommunicationOffer
 
 function OffersRow({ offers, onAction, onCalendarClick }: { offers: CommunicationOffer[], onAction: (id: string) => void, onCalendarClick: () => void }) {
     return (
-        <div className="flex items-end justify-between gap-3 flex-wrap md:flex-nowrap">
-            <div className="flex-grow grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="flex items-end justify-between gap-3 flex-wrap md:flex-nowrap min-h-[86px]">
+            <div className="flex-grow grid grid-cols-1 sm:grid-cols-3 gap-3 h-full">
                 {offers.length > 0 ? (
                     offers.slice(0, 3).map(offer => (
                         <CommunicationOfferCard key={offer.id} offer={offer} onAction={onAction} />
                     ))
                 ) : (
-                    <div className="col-span-3 py-4 text-center border border-dashed rounded-xl bg-muted/5">
-                        <span className="text-xs text-muted-foreground italic">
+                    <div className="col-span-3 h-[86px] flex items-center justify-center border border-dashed rounded-xl bg-muted/5">
+                        <span className="text-[11px] uppercase font-bold text-muted-foreground/40 tracking-widest">
                             Автор ще не додав пропозицій
                         </span>
                     </div>
                 )}
             </div>
 
-            <div className="shrink-0 flex items-end">
+            <div className="shrink-0 flex items-end h-full">
                 <Button
                     variant="outline"
-                    className="text-foreground gap-2 font-bold text-xs h-10 px-5 rounded-xl bg-background hover:bg-muted border-muted-foreground/20 flex items-center justify-center min-w-[120px] relative"
+                    className="text-foreground gap-2 font-bold text-xs h-10 px-5 rounded-xl bg-background hover:bg-muted border-muted-foreground/20 flex items-center justify-center min-w-[120px] relative mt-auto"
                     onClick={onCalendarClick}
                 >
                     <Calendar className="h-4 w-4 text-violet-600" />
@@ -250,7 +252,9 @@ function OffersRow({ offers, onAction, onCalendarClick }: { offers: Communicatio
     );
 }
 
-function UnifiedStatsArea({ customer, professional }: { customer?: any, professional?: any }) {
+function UnifiedStatsArea({ customer, professional, onReviewsClick }: { customer?: any, professional?: any, onReviewsClick?: () => void }) {
+    const hasAnyReviews = (customer?.ratingCount || 0) > 0 || (professional?.ratingCount || 0) > 0;
+
     const rows = [
         { label: 'на платформі', icon: Trophy, getValue: (m: any) => formatZeroMetric(m?.platformRank, false, true) },
         { label: 'комунікацій', icon: CheckCircle, getValue: (m: any) => formatZeroMetric(m?.completedCount) },
@@ -259,25 +263,35 @@ function UnifiedStatsArea({ customer, professional }: { customer?: any, professi
     ];
 
     return (
-        <div className="w-full space-y-2 pt-1 border-t border-muted/30 mt-4">
-            <div className="grid grid-cols-3 items-center px-1 py-1">
+        <div className="w-full max-w-[340px] mx-auto space-y-2 pt-3 border-t border-muted/30 mt-0 min-h-[190px]">
+            <div className="grid grid-cols-3 items-center px-1 py-1 h-6">
                 <div className="text-center font-bold text-[11px] uppercase tracking-wider text-muted-foreground opacity-70">Замовник</div>
                 <div />
                 <div className="text-center font-bold text-[11px] uppercase tracking-wider text-muted-foreground opacity-70">Професіонал</div>
             </div>
 
-            <div className="space-y-0.5">
+            <div className="space-y-2">
                 {rows.map((row, idx) => {
                     const custVal = row.getValue(customer);
                     const profVal = row.getValue(professional);
                     return (
-                        <div key={idx} className="grid grid-cols-3 items-center hover:bg-muted/5 transition-colors py-1 px-1">
+                        <div key={idx} className="grid grid-cols-3 items-center hover:bg-muted/5 transition-colors py-1.5 px-1">
                             <div className={`text-center text-sm ${custVal === '00' ? 'font-medium opacity-40' : 'font-extrabold text-foreground/80'}`}>
                                 {custVal}
                             </div>
-                            <div className="flex flex-col items-center gap-0.5 px-1 scale-90 md:scale-100">
-                                <row.icon className={`h-3 w-3 ${row.iconColor || 'text-accent/60'}`} />
-                                <span className="text-[9px] uppercase font-bold text-muted-foreground/70 text-center leading-none">{row.label}</span>
+                            <div
+                                className={cn(
+                                    "flex flex-col items-center gap-0 px-2 -mt-2.5 rounded-lg border transition-all h-[42px] justify-center",
+                                    row.label === 'відгуки' && hasAnyReviews && onReviewsClick
+                                        ? "border-accent/40 bg-accent/5 cursor-pointer hover:bg-accent/10 hover:border-accent/60 shadow-sm"
+                                        : row.label === 'відгуки'
+                                            ? "border-accent/10 opacity-40 grayscale cursor-not-allowed"
+                                            : "border-transparent"
+                                )}
+                                onClick={() => row.label === 'відгуки' && hasAnyReviews && onReviewsClick && onReviewsClick()}
+                            >
+                                <row.icon className={`h-[18px] w-[18px] ${row.iconColor || 'text-accent/60'}`} />
+                                <span className="text-[10px] uppercase font-bold text-muted-foreground/70 text-center leading-none">{row.label}</span>
                             </div>
                             <div className={`text-center text-sm ${profVal === '00' ? 'font-medium opacity-40' : 'font-extrabold text-foreground/80'}`}>
                                 {profVal}
@@ -504,7 +518,7 @@ export default function PublicProfilePage() {
     const referralCode = profile?.referralCode?.trim();
 
     return (
-        <div className="flex flex-col min-h-screen bg-background relative w-full overflow-x-hidden">
+        <div className="flex flex-col min-h-screen bg-background relative w-full">
             {/* Background: Architect custom theme takes priority, then coverUrl */}
             {architectAssignment?.profileThemeEnabled && architectAssignment?.profileThemeUrl ? (
                 <div className="fixed inset-0 z-0 pointer-events-none">
@@ -516,14 +530,16 @@ export default function PublicProfilePage() {
                 </div>
             ) : null}
 
-            <div className="relative z-10 flex flex-col min-h-screen">
+            <div className="relative z-50 w-full sticky top-0">
                 <Navigation />
-                <main className="flex-grow pt-3 md:pt-4 pb-12 relative lg:pt-8 w-full">
+            </div>
+            <div className="relative z-10 flex flex-col min-h-screen overflow-x-hidden">
+                <main className="flex-grow pt-8 md:pt-10 pb-12 relative lg:pt-12 w-full">
                     <div className="container max-w-[1400px] mx-auto px-3 md:px-4">
                         <WelcomeIntentSection />
                     </div>
                     <div className="container max-w-[1400px] mx-auto px-3 md:px-4 space-y-4 lg:space-y-0 lg:grid lg:grid-cols-[3fr_6.5fr_2.5fr] lg:gap-4 lg:items-stretch items-start relative z-10 w-full mb-10">
-                        <div className="absolute top-[-36px] right-2 md:top-[-44px] md:right-4 lg:top-[-60px] lg:right-4 z-50">
+                        <div className="absolute top-[-24px] right-2 md:top-[-28px] md:right-4 lg:top-[-36px] lg:right-4 z-50">
                             <Button variant="ghost" size="icon" className="h-8 w-8 md:h-9 md:w-9 rounded-full bg-background/50 backdrop-blur hover:bg-background/80 shadow-sm border border-muted/30" onClick={handleClose}>
                                 <X className="h-3.5 w-3.5 md:h-4 md:w-4 text-foreground/70" />
                             </Button>
@@ -584,10 +600,10 @@ export default function PublicProfilePage() {
                                     )}
                                 </div>
 
-                                <CardContent className="p-4 flex flex-col items-center text-center relative z-10 bg-background pt-3 gap-1.5">
+                                <CardContent className="p-4 flex-grow flex flex-col items-center text-center relative z-10 bg-background pt-3 gap-1.5">
                                     {/* Community Architect Status Line - Moved from bottom to just below avatar */}
                                     {architectAssignment && (
-                                        <Link href="/community-architects" className="flex items-center justify-center gap-2 mb-0 w-full overflow-hidden group/arch hover:opacity-80 transition-opacity cursor-pointer">
+                                        <Link href="/community-architects" className="flex items-center justify-center gap-2 mb-0 w-full overflow-hidden shrink-0 group/arch hover:opacity-80 transition-opacity cursor-pointer">
                                             <Landmark className="h-3 w-3 text-accent/60 shrink-0 group-hover/arch:text-accent transition-colors" />
                                             <div className="flex items-center gap-1.5 whitespace-nowrap truncate min-w-0">
                                                 <span className="text-[9px] font-black uppercase tracking-[0.1em] text-accent/70 shrink-0">Community Architect</span>
@@ -596,7 +612,7 @@ export default function PublicProfilePage() {
                                                         <span className="text-accent/30 font-bold opacity-60">·</span>
                                                         <div className="flex items-center gap-1.5 truncate">
                                                             <span className="text-[10px] font-bold text-foreground/70 truncate uppercase tracking-tight">
-                                                                    {architectAssignment.subcategoryName}
+                                                                {architectAssignment.subcategoryName}
                                                             </span>
                                                             {architectAssignment.countryCode && (
                                                                 <span className={cn("fi", `fi-${architectAssignment.countryCode.toLowerCase()}`, "text-[11px] rounded-sm shadow-sm shrink-0")} />
@@ -609,7 +625,7 @@ export default function PublicProfilePage() {
                                     )}
 
                                     {/* Identity info */}
-                                    <div className="w-full flex flex-col items-center gap-1 mt-0">
+                                    <div className="w-full flex flex-col items-center gap-1 mt-0 shrink-0">
                                         <h1 className="text-xl lg:text-2xl font-black leading-tight tracking-tight text-foreground/90 uppercase flex items-center justify-center gap-2" title={profile.displayName || profile.name}>
                                             {profile.displayName || profile.name}
 
@@ -622,7 +638,7 @@ export default function PublicProfilePage() {
                                     </div>
 
                                     {/* Metadata: country / language */}
-                                    <div className="flex flex-col items-center gap-1.5 w-full">
+                                    <div className="flex flex-col items-center gap-1.5 w-full shrink-0">
 
 
                                         <div className="flex items-center gap-3">
@@ -701,39 +717,40 @@ export default function PublicProfilePage() {
                                         </div>
                                     )}
 
+                                    <div className="mt-auto w-full">
+                                        {/* Registration Date - Above the badge */}
+                                        {profile.createdAt && (
+                                            <div className="w-full pt-0.5 pb-0.5 flex justify-center opacity-40">
+                                                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.12em]">
+                                                    на платформі з {safeFormatDate(profile.createdAt)}
+                                                </span>
+                                            </div>
+                                        )}
 
-                                    {/* Registration Date - Above the badge */}
-                                    {profile.createdAt && (
-                                        <div className="w-full pt-4 pb-2 flex justify-center opacity-40">
-                                            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.12em]">
-                                                на платформі з {safeFormatDate(profile.createdAt)}
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    {/* SPRINT-ID Badge - Absolute Bottom, Single Line */}
-                                    {referralCode && (
-                                        <div className="w-full pb-2">
-                                            <div 
-                                                className="w-full flex items-center justify-between px-3.5 py-2 bg-accent/5 border border-accent/10 rounded-xl group/sprint cursor-pointer hover:bg-accent/10 transition-all duration-300 shadow-sm"
-                                                onClick={() => handleCopyPromoCode(referralCode, isOwnProfile)}
-                                            >
-                                                <div className="flex items-center gap-1.5 whitespace-nowrap truncate min-w-0">
-                                                    <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.1em] shrink-0">
-                                                        {isOwnProfile ? 'ВЛАСНИЙ SPRINT-ID' : 'SPRINT-ID ЕКСПЕРТА'}
-                                                    </span>
-                                                    <span className="text-accent/30 font-bold opacity-60">·</span>
-                                                    <div className="flex items-center gap-1.5 truncate">
-                                                        <Zap className="h-3 w-3 text-accent fill-accent/20 shrink-0" />
-                                                        <span className="text-xs font-black text-accent uppercase tracking-widest truncate">{referralCode}</span>
+                                        {/* SPRINT-ID Badge - Absolute Bottom, Single Line */}
+                                        {referralCode && (
+                                            <div className="w-full pb-0">
+                                                <div 
+                                                    className="w-full h-[72px] flex items-center justify-between px-4 bg-accent/5 border border-accent/10 rounded-xl group/sprint cursor-pointer hover:bg-accent/10 transition-all duration-300 shadow-sm"
+                                                    onClick={() => handleCopyPromoCode(referralCode, isOwnProfile)}
+                                                >
+                                                    <div className="flex items-center gap-2 truncate min-w-0">
+                                                        <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.1em] shrink-0">
+                                                            {isOwnProfile ? 'ВЛАСНИЙ SPRINT-ID' : 'SPRINT-ID ЕКСПЕРТА'}
+                                                        </span>
+                                                        <span className="text-muted-foreground/30 font-bold shrink-0">·</span>
+                                                        <div className="flex items-center gap-1.5 truncate">
+                                                            <Zap className="h-3.5 w-3.5 text-accent fill-accent/20 shrink-0" />
+                                                            <span className="text-sm font-black text-accent uppercase tracking-widest truncate">{referralCode}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="p-2.5 rounded-lg bg-background/50 text-accent group-hover/sprint:bg-accent group-hover/sprint:text-white transition-all shadow-sm shrink-0 ml-2">
+                                                        {copiedCode ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                                                     </div>
                                                 </div>
-                                                <div className="p-1.5 rounded-lg bg-background/50 text-accent group-hover/sprint:bg-accent group-hover/sprint:text-white transition-all shadow-sm shrink-0 ml-2">
-                                                    {copiedCode ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                                                </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
 
                                     <div className="h-1" />
                                 </CardContent>
@@ -742,8 +759,8 @@ export default function PublicProfilePage() {
 
                         {/* CENTER COLUMN: Block B (Main block) */}
                         <div className="w-full flex flex-col gap-4 h-full relative">
-                            <Card className="shadow-sm border-muted/50 h-full flex flex-col bg-background/60 backdrop-blur-sm overflow-hidden min-h-0">
-                                <CardHeader className="p-3 border-b border-muted/30 bg-muted/5 min-h-[50px] shrink-0">
+                            <Card className="shadow-sm border-muted/50 h-full flex flex-col bg-background/60 backdrop-blur-sm overflow-hidden min-h-[580px]">
+                                <CardHeader className="px-4 py-1.5 border-b border-muted/30 bg-muted/5 min-h-[44px] shrink-0">
                                     <div className="flex items-center gap-3 overflow-x-auto no-scrollbar scroll-smooth">
                                         <span className="font-black text-[11px] text-foreground shrink-0 pr-4 border-r border-muted/40 uppercase tracking-[0.15em] opacity-80">
                                             {esotericsCategoryName}
@@ -760,9 +777,9 @@ export default function PublicProfilePage() {
                                                     <button
                                                         key={sub.id}
                                                         onClick={() => setSelectedSubcategoryId(sub.id)}
-                                                        className={`text-[11px] tracking-[0.1em] transition-all px-2.5 py-2.5 whitespace-nowrap rounded-md flex flex-col items-center gap-1.5 group uppercase ${selectedSubcategoryId === sub.id
-                                                                ? 'font-black text-accent bg-accent/5'
-                                                                : 'font-bold text-muted-foreground/60 hover:text-foreground hover:bg-muted/30'
+                                                        className={`text-[11px] tracking-[0.1em] transition-all px-2.5 py-1.5 whitespace-nowrap rounded-md flex flex-col items-center gap-1 group uppercase min-w-[60px] ${selectedSubcategoryId === sub.id
+                                                            ? 'font-black text-accent bg-accent/5'
+                                                            : 'font-bold text-muted-foreground/60 hover:text-foreground hover:bg-muted/30'
                                                             }`}
                                                     >
                                                         <span>{sub.name}</span>
@@ -802,8 +819,8 @@ export default function PublicProfilePage() {
                                         </div>
                                     </div>
                                 </CardHeader>
-                                <CardContent className="p-4 sm:p-6 flex-grow flex flex-col justify-between">
-                                    <div className="space-y-6">
+                                <CardContent className="px-4 sm:px-6 py-2 sm:py-3 pt-1.5 sm:pt-2 flex-grow flex flex-col justify-start">
+                                    <div className="space-y-3">
                                         <OffersRow
                                             offers={filteredOffers}
                                             onAction={handleActionClick}
@@ -811,20 +828,26 @@ export default function PublicProfilePage() {
                                         />
                                     </div>
 
-                                    <div className="mt-8 flex flex-col h-full justify-end">
-                                        <UnifiedStatsArea customer={customerMetrics} professional={professionalMetrics} />
-                                        <ProfileStatusShelf subcategoryName={activeSubcategoryName} />
+                                    <div className="mt-3 flex flex-col min-h-[280px]">
+                                        <UnifiedStatsArea
+                                            customer={customerMetrics}
+                                            professional={professionalMetrics}
+                                            onReviewsClick={() => router.push(`/profile/${profile.uid}/reviews?sub=${selectedSubcategoryId}`)}
+                                        />
+                                        <div className="mt-2 h-[80px] shrink-0">
+                                            <ProfileStatusShelf subcategoryName={activeSubcategoryName} />
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>
                         </div>
 
                         {/* RIGHT COLUMN: 3-Card Stack */}
-                        <div className="w-full flex flex-col gap-4 h-full relative min-h-[260px]">
+                        <div className="w-full flex flex-col gap-4 relative h-full">
                             {/* Card 1: Publications */}
-                            <Link href={`/blog?author=${profile.uid}`} className="flex-1 flex flex-col min-h-[80px]">
-                                <Card className="hover:shadow-md hover:border-accent/40 transition-all cursor-pointer group bg-card/80 backdrop-blur-sm border-muted/40 overflow-hidden flex-1 flex items-center h-full">
-                                    <CardContent className="p-4 xl:p-5 h-full w-full flex flex-col items-start relative">
+                            <Link href={`/blog?author=${profile.uid}`} className="w-full flex-1 flex flex-col group">
+                                <Card className="hover:shadow-md hover:border-accent/40 transition-all cursor-pointer bg-card/80 backdrop-blur-sm border-muted/40 overflow-hidden flex-1 flex flex-col">
+                                    <CardContent className="p-4 xl:p-5 flex-1 flex flex-col items-start relative">
                                         <div className="h-8 w-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform mb-3">
                                             <BookOpen className="h-4 w-4" />
                                         </div>
@@ -832,17 +855,19 @@ export default function PublicProfilePage() {
                                             <h3 className="font-black text-[11px] uppercase tracking-wider text-muted-foreground leading-tight">Публікації</h3>
                                             <span className="text-[10px] font-bold text-foreground truncate mt-0.5">{profile.displayName || profile.name}</span>
                                         </div>
-                                        <div className="absolute right-4 bottom-4 flex items-center justify-center h-6 w-6 rounded-full bg-muted/20 text-[11px] font-black text-muted-foreground/80 group-hover:bg-accent/20 group-hover:text-accent transition-colors">
-                                            {posts.length || 0}
+                                        <div className="mt-auto w-full flex justify-end">
+                                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-muted/20 text-[11px] font-black text-muted-foreground/80 group-hover:bg-accent/20 group-hover:text-accent transition-colors">
+                                                {posts.length || 0}
+                                            </div>
                                         </div>
                                     </CardContent>
                                 </Card>
                             </Link>
 
                             {/* Card 2: Store */}
-                            <Link href={`/profile/${profile.uid}/store`} className="flex-1 flex flex-col min-h-[80px]">
-                                <Card className="hover:shadow-md hover:border-accent/40 transition-all cursor-pointer group bg-card/80 backdrop-blur-sm border-muted/40 overflow-hidden flex-1 flex items-center h-full">
-                                    <CardContent className="p-4 xl:p-5 h-full w-full flex flex-col items-start relative">
+                            <Link href={`/profile/${profile.uid}/store`} className="w-full flex-1 flex flex-col group">
+                                <Card className="hover:shadow-md hover:border-accent/40 transition-all cursor-pointer bg-card/80 backdrop-blur-sm border-muted/40 overflow-hidden flex-1 flex flex-col">
+                                    <CardContent className="p-4 xl:p-5 flex-1 flex flex-col items-start relative">
                                         <div className="h-8 w-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform mb-3">
                                             <LayoutGrid className="h-4 w-4" />
                                         </div>
@@ -850,17 +875,19 @@ export default function PublicProfilePage() {
                                             <h3 className="font-black text-[11px] uppercase tracking-wider text-muted-foreground leading-tight">Артефакти</h3>
                                             <span className="text-[10px] font-bold text-foreground truncate mt-0.5">{profile.displayName || profile.name}</span>
                                         </div>
-                                        <div className="absolute right-4 bottom-4 flex items-center justify-center h-6 w-6 rounded-full bg-muted/20 text-[11px] font-black text-muted-foreground/80 group-hover:bg-accent/20 group-hover:text-accent transition-colors">
-                                            {products.length || 0}
+                                        <div className="mt-auto w-full flex justify-end">
+                                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-muted/20 text-[11px] font-black text-muted-foreground/80 group-hover:bg-accent/20 group-hover:text-accent transition-colors">
+                                                {products.length || 0}
+                                            </div>
                                         </div>
                                     </CardContent>
                                 </Card>
                             </Link>
 
                             {/* Card 3: Biography & Completion */}
-                            <Link href={`/profile/${profile.uid}/achievements`} className="flex-1 flex flex-col min-h-[80px]">
-                                <Card className="hover:shadow-md hover:border-accent/50 transition-all cursor-pointer group bg-card/90 backdrop-blur-sm border-muted/50 overflow-hidden flex-1 flex flex-col justify-center h-full">
-                                    <CardContent className="p-4 xl:p-5 flex flex-col items-start relative h-full">
+                            <Link href={`/profile/${profile.uid}/achievements`} className="w-full flex-1 flex flex-col group">
+                                <Card className="hover:shadow-md hover:border-accent/50 transition-all cursor-pointer bg-card/90 backdrop-blur-sm border-muted/50 overflow-hidden flex-1 flex flex-col">
+                                    <CardContent className="p-4 xl:p-5 flex-1 flex flex-col items-start relative">
                                         <div className="h-8 w-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:rotate-12 transition-transform mb-3">
                                             <Trophy className="h-4 w-4" />
                                         </div>
@@ -870,48 +897,24 @@ export default function PublicProfilePage() {
                                             <h3 className="font-black text-[11px] uppercase tracking-wider text-muted-foreground leading-tight mt-0.5">подробиці</h3>
                                         </div>
 
-                                        <div className="absolute right-4 bottom-4">
+                                        <div className="mt-auto w-full flex justify-end">
                                             {(() => {
                                                 const completion = calculateProfileCompletion(profile, offers);
                                                 return (
                                                     <div className="flex flex-col items-center shrink-0 min-w-[42px]">
-                                                        <CircularProgress percentage={completion.percentage} size={42} />
-                                                        <span className="text-[8px] font-black uppercase text-accent mt-1 tracking-tighter leading-none text-center">
+                                                        <CircularProgress percentage={completion.percentage} size={38} />
+                                                        <span className="text-[7px] font-black uppercase text-accent mt-1 tracking-tighter leading-none text-center">
                                                             {completion.statusLabel}
                                                         </span>
                                                     </div>
                                                 );
                                             })()}
                                         </div>
-
-                                        {/* Owner hints logic */}
-                                        {isOwnProfile && (() => {
-                                            const completion = calculateProfileCompletion(profile, offers);
-                                            if (completion.percentage < 100) {
-                                                return (
-                                                    <div className="mt-4 pt-3 border-t border-muted/10 w-full mb-12">
-                                                        <div className="flex flex-col gap-1.5">
-                                                            <span className="text-[10px] font-black uppercase text-muted-foreground/50 tracking-tighter">Порада для росту:</span>
-                                                            <div className="flex flex-wrap gap-x-2 gap-y-1">
-                                                                {completion.hints.slice(0, 2).map((hint, i) => (
-                                                                    <span key={i} className="text-[10px] font-bold text-accent/80 flex items-center gap-0.5">
-                                                                        + {hint.label} <span className="opacity-60">+{hint.impact}%</span>
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            }
-                                            return null;
-                                        })()}
                                     </CardContent>
                                 </Card>
                             </Link>
                         </div>
-
-                    </div> {/* End General Container */}
-
+                    </div> {/* End Grid Row */}
                     <Dialog open={isActionModalOpen} onOpenChange={setActionModalOpen}>
                         <DialogContent className="sm:max-w-md bg-card">
                             <DialogHeader>
@@ -930,7 +933,6 @@ export default function PublicProfilePage() {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
-
                 </main>
             </div>
         </div>

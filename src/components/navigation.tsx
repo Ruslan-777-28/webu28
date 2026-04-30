@@ -57,7 +57,7 @@ export function Navigation({ hideBalance = false, subtitle }: NavigationProps) {
   };
 
   return (
-    <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm p-4 md:p-8 flex justify-between items-center">
+    <div className="sticky top-0 z-40 bg-background p-4 md:p-8 flex justify-between items-center">
         <div className="flex items-center gap-2">
             {renderAuthControl()}
             <span className="text-sm font-thin tracking-[0.2em] uppercase text-foreground">LECTOR</span>

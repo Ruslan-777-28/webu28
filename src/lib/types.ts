@@ -721,3 +721,19 @@ export type UserTestimonialsSettings = {
   updatedBy: string;
   slides: UserTestimonialSlide[];
 };
+
+export type Review = {
+  id: string;
+  sourceId: string;
+  sourceKind: 'call' | 'request';
+  communicationType: 'video' | 'text' | 'file' | 'product';
+  reviewerId: string;
+  reviewerRole: 'customer' | 'professional';
+  targetId: string;
+  targetRole: 'customer' | 'professional';
+  categoryId: string;
+  subcategoryId: string;
+  rating: number;
+  text?: string;
+  createdAt: any; // Firestore Timestamp
+};

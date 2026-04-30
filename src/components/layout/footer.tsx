@@ -22,7 +22,7 @@ type FooterSettings = {
 };
 
 const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" {...props}>
         <path d="M448 209.9a210.1 210.1 0 0 1 -122.8-39.25V349.38A162.6 162.6 0 1 1 185 188.31V278.2a74.62 74.62 0 1 0 52.23 71.18V0h88a121.18 121.18 0 0 0 122.77 122.77z" />
     </svg>
 );
@@ -60,21 +60,21 @@ export default function Footer() {
   }, []);
 
   const informationLinksPlatform = [
-    { href: '/info/community-rules', label: 'Правила спільноти' },
-    { href: '/status', label: 'Статус' },
+    { href: '/contact', label: 'Контакти' },
     { href: '/rewards', label: 'Система балів' },
-    { href: '/trust-verification', label: 'Довіра і верифікація' },
+    { href: '/info/privacy-policy', label: 'Privacy Policy' },
     { href: '/status/legend', label: 'Умовні позначки' },
+    { href: '/info/community-rules', label: 'Правила спільноти' },
+    { href: '/trust-verification', label: 'Довіра і верифікація' },
   ];
 
   const informationLinksLegal = [
+    { href: '/status', label: 'Статус' },
     { href: '/roadmap', label: 'Roadmap' },
-    { href: '/referral-sprint-program', label: 'Referral Sprint Program' },
-    { href: '/architectors', label: 'architectors' },
-    { href: '/community-architects', label: 'Community Architects' },
-    { href: '/contact', label: 'Контакти' },
-    { href: '/info/privacy-policy', label: 'Privacy Policy' },
+    { href: '/architectors', label: 'Архітектори' },
     { href: '/info/payouts', label: 'Вивід коштів' },
+    { href: '/community-architects', label: 'Community Architects' },
+    { href: '/referral-sprint-program', label: 'Referral Sprint Program' },
   ];
 
   const getLinkWithFrom = (href: string) => {
@@ -105,7 +105,7 @@ export default function Footer() {
             <div className="space-y-4">
               <h3 className="text-2xl font-bold text-accent">LECTOR</h3>
               <p className="text-sm max-w-xs text-sidebar-foreground/70">
-                Глобальний простір знань, взаємодії та живої цінності.
+                Глобальний простір знань,<br />взаємодії та живої цінності.
               </p>
             </div>
             <div className="pt-6 mt-auto">
@@ -146,14 +146,14 @@ export default function Footer() {
           {/* Socials Column */}
           <div className="md:col-span-2 space-y-4">
              <h4 className="font-semibold tracking-wider uppercase text-sidebar-foreground/80">Спільнота</h4>
-             <div className="flex space-x-4">
+             <div className="flex flex-col space-y-4">
                  {isLoading ? (
-                    <div className="flex space-x-4"><Skeleton className="h-6 w-6" /><Skeleton className="h-6 w-6" /><Skeleton className="h-6 w-6" /></div>
+                    <div className="flex flex-col space-y-4"><Skeleton className="h-6 w-6" /><Skeleton className="h-6 w-6" /><Skeleton className="h-6 w-6" /></div>
                  ) : activeSocialLinks.length > 0 ? (
                     activeSocialLinks.map(([platform, link]) => {
                         const Icon = socialIconMap[platform];
                         return Icon ? (
-                             <Link key={platform} href={link.url} target="_blank" rel="noopener noreferrer" aria-label={platform} className="text-sidebar-foreground/70 hover:text-accent transition-colors">
+                             <Link key={platform} href={link.url} target="_blank" rel="noopener noreferrer" aria-label={platform} className="text-sidebar-foreground/70 hover:text-accent transition-colors w-fit">
                                 <Icon className="h-5 w-5" />
                             </Link>
                         ) : null;
