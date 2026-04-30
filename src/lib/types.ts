@@ -323,6 +323,7 @@ export type UserProfile = {
   verification?: UserVerification;
 
   usageIntent?: string;
+  extraDetails?: string;
 };
 
 export type AdminActionLog = {

@@ -150,7 +150,7 @@ export const calculateProfileCompletion = (
   }
 
   // 11. Values / credo / extra details (10)
-  const extraLength = ((profile as any).credo || (profile as any).values || (profile as any).extraDetails || '').trim().length;
+  const extraLength = (profile.extraDetails || (profile as any).credo || (profile as any).values || '').trim().length;
   if (extraLength === 0) {
     scores.values = 0;
     hints.push({ field: 'credo', label: 'Цінності / Кредо / Подробиці', impact: 10 });
