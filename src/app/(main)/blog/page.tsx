@@ -16,6 +16,7 @@ import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { CreatePostModal } from '@/components/create-post-modal';
 import type { Post } from '@/lib/types';
 import type { DemoPost } from '@/lib/blog2/demo-blog2-data';
+import { BlogSearchSheet } from '@/components/blog2/blog-search-sheet';
 
 // LECTOR Editorial post IDs — posts from sites published = blog content type
 // When LECTOR _editorial_ chip is selected, show only contentType="blog" posts
@@ -402,6 +403,7 @@ function BlogPageInner() {
                 </section>
             </main>
 
+            <BlogSearchSheet categories={data?.settings?.categories || []} />
             <Footer />
         </div>
     );
