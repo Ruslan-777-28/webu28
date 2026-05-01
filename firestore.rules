@@ -100,8 +100,24 @@ service cloud.firestore {
     // ---------- Posts ----------
     match /posts/{postId} {
       allow get, list: if true;
-      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
-      allow update: if isSignedIn() && resource.data.authorId == request.auth.uid;
+
+      // Authors can create posts but cannot self-assign staff-only privileges.
+      // Admin SDK (server-side) bypasses these rules for editorial operations.
+      allow create: if isSignedIn()
+        && request.resource.data.authorId == request.auth.uid
+        && request.resource.data.sitePublished == false
+        && request.resource.data.get('featured', false) == false
+        && request.resource.data.get('pinned', false) == false
+        && request.resource.data.get('editorialStatus', 'draft') in ['draft', 'submitted'];
+
+      // Authors can update own posts but cannot modify staff-controlled fields.
+      allow update: if isSignedIn()
+        && resource.data.authorId == request.auth.uid
+        && request.resource.data.authorId == resource.data.authorId
+        && request.resource.data.get('sitePublished', false) == resource.data.get('sitePublished', false)
+        && request.resource.data.get('featured', false) == resource.data.get('featured', false)
+        && request.resource.data.get('pinned', false) == resource.data.get('pinned', false);
+
       allow delete: if isSignedIn() && resource.data.authorId == request.auth.uid;
 
       match /comments/{commentId} {

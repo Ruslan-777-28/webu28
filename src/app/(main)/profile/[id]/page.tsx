@@ -1,8 +1,8 @@
 'use client';
 
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, useMemo } from 'react';
-import { doc, onSnapshot, collection, query, where, addDoc, deleteDoc, getDocs } from 'firebase/firestore';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { doc, onSnapshot, collection, query, where, addDoc, deleteDoc, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useUser } from '@/hooks/use-auth';
 import type { UserProfile, Post, BlogSettings, CommunicationOffer, Product, CommunityArchitectAssignment } from '@/lib/types';
@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, Bookmark, Star, Users, Briefcase, Award, MapPin, Globe, Clock, MessageCircle, LayoutGrid, Zap, X, Calendar, Video, FileText, HelpCircle, MessageSquare, Trophy, CheckCircle, Megaphone, Paperclip, Phone, BookOpen, BookmarkPlus, Flag, Play, Copy, Check, Landmark, ArrowRight, Crown } from 'lucide-react';
+import { Edit, Bookmark, Star, Users, Briefcase, Award, MapPin, Globe, Clock, MessageCircle, LayoutGrid, Zap, X, Calendar, Video, FileText, HelpCircle, MessageSquare, Trophy, CheckCircle, Megaphone, Paperclip, Phone, BookOpen, BookmarkPlus, Flag, Play, Copy, Check, Landmark, ArrowRight, Crown, Plus } from 'lucide-react';
 import { FavoriteButton } from '@/components/social/favorite-button';
 import { FriendButton } from '@/components/friend-button';
 import { EditProfileModal } from '@/components/edit-profile-modal';
@@ -27,6 +27,7 @@ import { TrustStrip } from '@/components/profile/trust-strip';
 import { Badge } from '@/components/ui/badge';
 import { WelcomeIntentSection } from '@/components/welcome-intent-section';
 import { cn } from '@/lib/utils';
+import { CreateUserPostModal } from '@/components/profile/create-user-post-modal';
 
 const LANGUAGE_MAP: Record<string, string> = {
     'uk-UA': 'Українська',
@@ -359,6 +360,8 @@ export default function PublicProfilePage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [isActionModalOpen, setActionModalOpen] = useState(false);
     const [isPlayingIntro, setIsPlayingIntro] = useState(false);
+    const [isCreatePostOpen, setCreatePostOpen] = useState(false);
+    const [postRefreshKey, setPostRefreshKey] = useState(0);
 
     const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string>('');
     const [copiedCode, setCopiedCode] = useState(false);
@@ -409,9 +412,21 @@ export default function PublicProfilePage() {
             setIsLoading(false);
         });
 
-        const postsQuery = query(collection(db, 'posts'), where('authorId', '==', profileId), where('status', '==', 'published'));
+        // Fetch all posts by this author, ordered by newest first.
+        // Client-side filter: user posts (contentType=='post', showInAuthorProfile!=false)
+        const postsQuery = query(
+            collection(db, 'posts'),
+            where('authorId', '==', profileId),
+            orderBy('createdAt', 'desc')
+        );
         const unsubPosts = onSnapshot(postsQuery, (snapshot) => {
-            setPosts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post)));
+            const allPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+            // Include: user posts visible in profile + published blog posts
+            const filtered = allPosts.filter(p =>
+                (p.contentType === 'post' && p.showInAuthorProfile !== false) ||
+                (p.status === 'published')
+            );
+            setPosts(filtered);
         });
 
         const settingsRef = doc(db, 'blogSettings', 'main');
@@ -461,7 +476,17 @@ export default function PublicProfilePage() {
             unsubOffers();
             unsubProducts();
         };
-    }, [profileId]);
+    }, [profileId, postRefreshKey]);
+
+    // Callback for when a new user post is created
+    const handlePostCreated = useCallback(() => {
+        setPostRefreshKey(k => k + 1);
+    }, []);
+
+    // User posts count (contentType === 'post' only)
+    const userPostsCount = useMemo(() => {
+        return posts.filter(p => p.contentType === 'post' && p.showInAuthorProfile !== false).length;
+    }, [posts]);
 
     // Handle auto-edit mode from welcome flow
     useEffect(() => {
@@ -845,24 +870,44 @@ export default function PublicProfilePage() {
                         {/* RIGHT COLUMN: 3-Card Stack */}
                         <div className="w-full flex flex-col gap-4 relative h-full">
                             {/* Card 1: Publications */}
-                            <Link href={`/blog?author=${profile.uid}`} className="w-full flex-1 flex flex-col group">
-                                <Card className="hover:shadow-md hover:border-accent/40 transition-all cursor-pointer bg-card/80 backdrop-blur-sm border-muted/40 overflow-hidden flex-1 flex flex-col">
-                                    <CardContent className="p-4 xl:p-5 flex-1 flex flex-col items-start relative">
-                                        <div className="h-8 w-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform mb-3">
-                                            <BookOpen className="h-4 w-4" />
-                                        </div>
-                                        <div className="min-w-0 flex flex-col">
-                                            <h3 className="font-black text-[11px] uppercase tracking-wider text-muted-foreground leading-tight">Публікації</h3>
-                                            <span className="text-[10px] font-bold text-foreground truncate mt-0.5">{profile.displayName || profile.name}</span>
-                                        </div>
-                                        <div className="mt-auto w-full flex justify-end">
-                                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-muted/20 text-[11px] font-black text-muted-foreground/80 group-hover:bg-accent/20 group-hover:text-accent transition-colors">
-                                                {posts.length || 0}
+                            <div className="w-full flex-1 flex flex-col">
+                                <Link href={`/blog?author=${profile.uid}`} className="w-full flex-1 flex flex-col group">
+                                    <Card className="hover:shadow-md hover:border-accent/40 transition-all cursor-pointer bg-card/80 backdrop-blur-sm border-muted/40 overflow-hidden flex-1 flex flex-col">
+                                        <CardContent className="p-4 xl:p-5 flex-1 flex flex-col items-start relative">
+                                            <div className="h-8 w-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform mb-3">
+                                                <BookOpen className="h-4 w-4" />
                                             </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </Link>
+                                            <div className="min-w-0 flex flex-col">
+                                                <h3 className="font-black text-[11px] uppercase tracking-wider text-muted-foreground leading-tight">Публікації</h3>
+                                                <span className="text-[10px] font-bold text-foreground truncate mt-0.5">{profile.displayName || profile.name}</span>
+                                            </div>
+                                            <div className="mt-auto w-full flex items-center justify-between">
+                                                {/* Add post button — only for own profile */}
+                                                {isOwnProfile ? (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            setCreatePostOpen(true);
+                                                        }}
+                                                        className="flex items-center gap-1 text-[10px] font-bold text-accent hover:text-accent/80 transition-colors uppercase tracking-wider group/add"
+                                                    >
+                                                        <div className="h-5 w-5 rounded-full bg-accent/10 flex items-center justify-center group-hover/add:bg-accent/20 transition-colors">
+                                                            <Plus className="h-3 w-3" />
+                                                        </div>
+                                                        <span>Додати</span>
+                                                    </button>
+                                                ) : (
+                                                    <div />
+                                                )}
+                                                <div className="flex items-center justify-center h-7 w-7 rounded-full bg-muted/20 text-[11px] font-black text-muted-foreground/80 group-hover:bg-accent/20 group-hover:text-accent transition-colors">
+                                                    {userPostsCount || posts.length || 0}
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            </div>
 
                             {/* Card 2: Store */}
                             <Link href={`/profile/${profile.uid}/store`} className="w-full flex-1 flex flex-col group">
@@ -933,6 +978,17 @@ export default function PublicProfilePage() {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
+
+                    {/* Quick-create user post modal */}
+                    {isOwnProfile && (
+                        <Dialog open={isCreatePostOpen} onOpenChange={setCreatePostOpen}>
+                            <CreateUserPostModal
+                                profile={profile}
+                                setOpen={setCreatePostOpen}
+                                onPostCreated={handlePostCreated}
+                            />
+                        </Dialog>
+                    )}
                 </main>
             </div>
         </div>
