@@ -62,6 +62,7 @@ export default function Footer() {
   const informationLinksPlatform = [
     { href: '/contact', label: 'Контакти' },
     { href: '/rewards', label: 'Система балів' },
+    { href: '/info/trust-levels', label: 'Рівні довіри' },
     { href: '/info/privacy-policy', label: 'Privacy Policy' },
     { href: '/status/legend', label: 'Умовні позначки' },
     { href: '/info/community-rules', label: 'Правила спільноти' },
