@@ -155,7 +155,7 @@ export default function DetailedMatrixPage() {
                             "h-1.5 w-4 rounded-full transition-all duration-500",
                             i <= level 
                                 ? "bg-violet-600 shadow-[0_0_8px_rgba(139,92,246,0.3)]" 
-                                : "bg-slate-200/50"
+                                : "bg-slate-400/40"
                         )}
                     />
                 ))}
