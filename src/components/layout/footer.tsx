@@ -66,6 +66,7 @@ export default function Footer() {
     { href: '/status/legend', label: 'Умовні позначки' },
     { href: '/info/community-rules', label: 'Правила спільноти' },
     { href: '/trust-verification', label: 'Довіра і верифікація' },
+    { href: '/functionality', label: 'Функціональність' },
   ];
 
   const informationLinksLegal = [
