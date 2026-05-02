@@ -12,8 +12,6 @@ import { InterestSelector, SubcategoryChip, LECTOR_EDITORIAL_ID } from '@/compon
 import { ArrowRight, BookOpen, Sparkles, ChevronRight, X } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import { CreatePostModal } from '@/components/create-post-modal';
 import type { Post } from '@/lib/types';
 import type { DemoPost } from '@/lib/blog2/demo-blog2-data';
 import { BlogSearchSheet } from '@/components/blog2/blog-search-sheet';
@@ -33,7 +31,6 @@ function BlogPageInner() {
     const [data, setData] = useState<Blog2Data | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
-    const [isPostModalOpen, setPostModalOpen] = useState(false);
 
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -385,14 +382,6 @@ function BlogPageInner() {
                     </p>
                     
                     <div className="pt-12 flex flex-col items-center gap-8">
-                        <Dialog open={isPostModalOpen} onOpenChange={setPostModalOpen}>
-                            <DialogTrigger asChild>
-                                <Button size="lg" className="rounded-full px-12 py-8 font-black uppercase tracking-[0.2em] text-[10px] bg-primary text-primary-foreground hover:scale-105 transition-all shadow-2xl">
-                                    хочу опублікувати контент
-                                </Button>
-                            </DialogTrigger>
-                            <CreatePostModal setOpen={setPostModalOpen} />
-                        </Dialog>
 
                         <Link href="/">
                             <Button variant="ghost" className="text-[10px] font-black uppercase tracking-[0.5em] hover:bg-transparent hover:text-primary transition-colors">

@@ -110,8 +110,8 @@ export default function Footer() {
                 Глобальний простір знань,<br />взаємодії та живої цінності.
               </p>
             </div>
-            <div className="pt-6 mt-auto">
-              <Link href={getLinkWithFrom("/manifest")} className="text-xs uppercase tracking-[0.2em] font-medium text-sidebar-foreground/50 hover:text-accent transition-colors w-max">
+            <div className="pt-8 mt-auto">
+              <Link href={getLinkWithFrom("/manifest")} className="text-base md:text-lg uppercase tracking-[0.22em] font-bold text-white hover:text-white transition-all duration-300 w-max">
                 manifest
               </Link>
             </div>
