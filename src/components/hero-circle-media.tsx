@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { HomeHeroMediaSettings } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 export function HeroCircleMedia() {
   const [settings, setSettings] = useState<HomeHeroMediaSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isVideoReady, setIsVideoReady] = useState(false);
 
   useEffect(() => {
     const docRef = doc(db, 'siteSettings', 'homeHeroMedia');
@@ -27,6 +29,43 @@ export function HeroCircleMedia() {
     });
   }, []);
 
+  // Reset video ready state when URL changes
+  const rawVideoUrl = settings?.desktopVideoUrl || settings?.mobileVideoUrl;
+  useEffect(() => {
+    setIsVideoReady(false);
+  }, [rawVideoUrl]);
+
+  // Use values from Firestore
+  const isEnabled = settings?.enabled !== false;
+  
+  let effectiveMediaType = settings?.mediaType;
+  if (!effectiveMediaType && settings) {
+    if (settings.desktopVideoUrl || settings.mobileVideoUrl) effectiveMediaType = 'video';
+    else if (settings.imageUrl) effectiveMediaType = 'image';
+  }
+
+  const hasVideo = !!(settings?.desktopVideoUrl || settings?.mobileVideoUrl);
+  const hasImage = !!settings?.imageUrl;
+  
+  const finalRenderType = (effectiveMediaType === 'video' && hasVideo) ? 'video' : 
+                         (effectiveMediaType === 'image' && hasImage) ? 'image' : 
+                         hasVideo ? 'video' : 
+                         hasImage ? 'image' : null;
+
+  // Cache-busting and Key logic
+  const { safeVideoSrc, videoKey } = useMemo(() => {
+    if (!rawVideoUrl || !settings) return { safeVideoSrc: '', videoKey: '' };
+    
+    const version = settings.updatedAt?.toMillis?.() || settings.version || 0;
+    const connector = rawVideoUrl.includes('?') ? '&' : '?';
+    const src = version ? `${rawVideoUrl}${connector}v=${version}` : rawVideoUrl;
+    
+    return {
+      safeVideoSrc: src,
+      videoKey: `${rawVideoUrl}-${version}`
+    };
+  }, [rawVideoUrl, settings]);
+
   if (loading) {
     return (
       <div className="absolute inset-0 rounded-full overflow-hidden bg-background/50 flex items-center justify-center">
@@ -35,47 +74,33 @@ export function HeroCircleMedia() {
     );
   }
 
-  // Use values from Firestore
-  const isEnabled = settings?.enabled !== false; // Active by default if not strictly disabled
-  
-  // Resilient media type detection
-  let effectiveMediaType = settings?.mediaType;
-  if (!effectiveMediaType && settings) {
-    if (settings.desktopVideoUrl || settings.mobileVideoUrl) effectiveMediaType = 'video';
-    else if (settings.imageUrl) effectiveMediaType = 'image';
-  }
-
-  // Final check for media presence (including fallbacks)
-  const hasVideo = !!(settings?.desktopVideoUrl || settings?.mobileVideoUrl);
-  const hasImage = !!settings?.imageUrl;
-  
-  // Decide what to actually render based on priority and availability
-  const finalRenderType = (effectiveMediaType === 'video' && hasVideo) ? 'video' : 
-                         (effectiveMediaType === 'image' && hasImage) ? 'image' : 
-                         hasVideo ? 'video' : 
-                         hasImage ? 'image' : null;
-
   if (!isEnabled || !finalRenderType || !settings) {
-    return null; // Fallback to just the border from parent
+    return null;
   }
 
   return (
-    <div className="absolute inset-0 rounded-full overflow-hidden z-0">
+    <div className="absolute inset-0 rounded-full overflow-hidden z-0 bg-slate-50/10">
       {finalRenderType === 'video' ? (
         <video
-          className="w-full h-full object-cover"
+          key={videoKey}
+          className={cn(
+            "w-full h-full object-cover transition-opacity duration-700 ease-in-out",
+            isVideoReady ? "opacity-100" : "opacity-0"
+          )}
           autoPlay
           muted
           loop
           playsInline
-          poster={settings.posterUrl}
-          src={settings.desktopVideoUrl || settings.mobileVideoUrl}
+          onLoadedData={() => setIsVideoReady(true)}
+          onCanPlay={() => setIsVideoReady(true)}
+          poster=""
+          src={safeVideoSrc}
         />
       ) : (finalRenderType === 'image' && settings.imageUrl) ? (
         <img
           src={settings.imageUrl}
           alt="Hero representation"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover animate-in fade-in duration-700"
         />
       ) : null}
     </div>
