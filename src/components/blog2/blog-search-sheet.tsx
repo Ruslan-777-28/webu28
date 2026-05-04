@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { BlogCategory } from '@/lib/types';
 
+import { COUNTRIES } from '@/lib/countries';
+
 interface BlogSearchSheetProps {
   categories: BlogCategory[];
 }
@@ -23,15 +25,12 @@ export function BlogSearchSheet({ categories }: BlogSearchSheetProps) {
   const [profileCategory, setProfileCategory] = useState('');
   const [profileSubcategory, setProfileSubcategory] = useState('');
   const [profileCountry, setProfileCountry] = useState('');
-  const [profileLanguage, setProfileLanguage] = useState('');
-  const [profileHasOffers, setProfileHasOffers] = useState(false);
 
   // ─── Post form state ───
   const [postQuery, setPostQuery] = useState('');
   const [postCategory, setPostCategory] = useState('');
   const [postSubcategory, setPostSubcategory] = useState('');
   const [postType, setPostType] = useState('all');
-  const [postAuthor, setPostAuthor] = useState('');
   const [postSort, setPostSort] = useState('relevance');
 
   // ─── Subcategories derived from selected category ───
@@ -55,12 +54,10 @@ export function BlogSearchSheet({ categories }: BlogSearchSheetProps) {
     if (profileCategory) params.set('category', profileCategory);
     if (profileSubcategory) params.set('subcategory', profileSubcategory);
     if (profileCountry) params.set('country', profileCountry);
-    if (profileLanguage) params.set('language', profileLanguage);
-    if (profileHasOffers) params.set('hasOffers', 'true');
 
     setIsOpen(false);
     router.push(`/search?${params.toString()}`);
-  }, [profileQuery, profileCategory, profileSubcategory, profileCountry, profileLanguage, profileHasOffers, router]);
+  }, [profileQuery, profileCategory, profileSubcategory, profileCountry, router]);
 
   const handlePostSubmit = useCallback((e?: React.FormEvent) => {
     e?.preventDefault();
@@ -72,12 +69,11 @@ export function BlogSearchSheet({ categories }: BlogSearchSheetProps) {
     if (postCategory) params.set('category', postCategory);
     if (postSubcategory) params.set('subcategory', postSubcategory);
     if (postType !== 'all') params.set('type', postType);
-    if (postAuthor.trim()) params.set('author', postAuthor.trim());
     if (postSort !== 'relevance') params.set('sort', postSort);
 
     setIsOpen(false);
     router.push(`/search?${params.toString()}`);
-  }, [postQuery, postCategory, postSubcategory, postType, postAuthor, postSort, router]);
+  }, [postQuery, postCategory, postSubcategory, postType, postSort, router]);
 
   // Shared select styling
   const selectClass = "w-full h-10 px-3 rounded-lg border border-border/40 bg-background text-sm font-medium text-foreground/80 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all appearance-none cursor-pointer";
@@ -105,16 +101,25 @@ export function BlogSearchSheet({ categories }: BlogSearchSheetProps) {
         <Search className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
       </button>
 
-      {/* ─── Bottom Sheet ─── */}
+      {/* ─── Bottom Sheet / Modal ─── */}
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent
           side="bottom"
-          className="rounded-t-3xl max-h-[85vh] overflow-y-auto p-0 border-t-0 shadow-[0_-16px_64px_rgba(0,0,0,0.15)]"
+          className={cn(
+            "p-0 border-none overflow-y-auto transition-all duration-500 ease-in-out",
+            // Mobile: Bottom Sheet
+            "rounded-t-3xl max-h-[85vh] shadow-[0_-16px_64px_rgba(0,0,0,0.15)]",
+            // Desktop: Centered Modal Card
+            "lg:fixed lg:left-1/2 lg:top-[18vh] lg:bottom-auto lg:right-auto",
+            "lg:w-[min(840px,calc(100vw-48px))] lg:-translate-x-1/2",
+            "lg:rounded-[28px] lg:shadow-2xl lg:border lg:border-border/40",
+            "lg:max-h-[70vh] lg:animate-in lg:fade-in lg:zoom-in-95 lg:slide-in-from-top-4"
+          )}
         >
           {/* ─── Header ─── */}
-          <SheetHeader className="px-6 pt-6 pb-4 border-b border-border/20 sticky top-0 bg-background z-10">
+          <SheetHeader className="px-6 pt-5 pb-3 border-b border-border/20 sticky top-0 bg-background z-10">
             <div className="flex items-center justify-between">
-              <SheetTitle className="text-lg font-black tracking-tight">
+              <SheetTitle className="text-lg font-black uppercase tracking-tight">
                 Знайти в LECTOR
               </SheetTitle>
               <button
@@ -126,23 +131,23 @@ export function BlogSearchSheet({ categories }: BlogSearchSheetProps) {
             </div>
           </SheetHeader>
 
-          {/* ─── Tabs ─── */}
-          <div className="px-6 pt-4 pb-8">
+          {/* ─── Tabs & Content ─── */}
+          <div className="px-6 pt-3 pb-8 lg:pb-10">
             <Tabs
               value={activeTab}
               onValueChange={(v) => setActiveTab(v as 'profiles' | 'posts')}
             >
-              <TabsList className="w-full bg-muted/50 p-1 rounded-xl h-12">
+              <TabsList className="w-full bg-muted/50 p-1 rounded-xl h-11 lg:max-w-md lg:mx-auto lg:flex">
                 <TabsTrigger
                   value="profiles"
-                  className="flex-1 rounded-lg font-bold text-xs uppercase tracking-widest gap-2 data-[state=active]:shadow-md h-10"
+                  className="flex-1 rounded-lg font-bold text-xs uppercase tracking-widest gap-2 data-[state=active]:shadow-md h-9"
                 >
                   <Users className="h-3.5 w-3.5" />
                   LECTORS
                 </TabsTrigger>
                 <TabsTrigger
                   value="posts"
-                  className="flex-1 rounded-lg font-bold text-xs uppercase tracking-widest gap-2 data-[state=active]:shadow-md h-10"
+                  className="flex-1 rounded-lg font-bold text-xs uppercase tracking-widest gap-2 data-[state=active]:shadow-md h-9"
                 >
                   <FileText className="h-3.5 w-3.5" />
                   Пости
@@ -150,34 +155,34 @@ export function BlogSearchSheet({ categories }: BlogSearchSheetProps) {
               </TabsList>
 
               {/* ─── Tab: Profiles ─── */}
-              <TabsContent value="profiles" className="mt-5">
-                <form onSubmit={handleProfileSubmit} className="space-y-4">
+              <TabsContent value="profiles" className="mt-4 lg:mt-6">
+                <form onSubmit={handleProfileSubmit} className="space-y-4 lg:space-y-6">
                   {/* Main query */}
-                  <div>
+                  <div className="lg:max-w-2xl lg:mx-auto w-full">
                     <label className={labelClass}>Кого шукаємо?</label>
                     <input
                       type="text"
                       value={profileQuery}
                       onChange={(e) => setProfileQuery(e.target.value)}
                       placeholder="Ім'я, нік, спеціалізація або ключове слово"
-                      className={inputClass}
+                      className={cn(inputClass, "lg:h-14 lg:text-base lg:px-6")}
                       autoFocus
                     />
                     {profileQuery.length > 0 && profileQuery.length < 2 && (
-                      <p className="text-[10px] text-muted-foreground/50 mt-1 font-medium">
+                      <p className="text-[10px] text-muted-foreground/50 mt-1.5 font-medium">
                         Мінімум 2 символи для пошуку
                       </p>
                     )}
                   </div>
 
                   {/* Filters row */}
-                  <div className="space-y-3">
+                  <div className="space-y-2.5 lg:max-w-2xl lg:mx-auto w-full">
                     <div className="flex items-center gap-2 text-muted-foreground/40">
                       <SlidersHorizontal className="h-3 w-3" />
                       <span className="text-[9px] font-black uppercase tracking-[0.2em]">Фільтри</span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                       {/* Category */}
                       <div>
                         <label className={labelClass}>Категорія</label>
@@ -215,101 +220,65 @@ export function BlogSearchSheet({ categories }: BlogSearchSheetProps) {
                       {/* Country */}
                       <div>
                         <label className={labelClass}>Країна</label>
-                        <input
-                          type="text"
+                        <select
                           value={profileCountry}
                           onChange={(e) => setProfileCountry(e.target.value)}
-                          placeholder="Наприклад: Україна"
-                          className={selectClass}
-                        />
-                      </div>
-
-                      {/* Language */}
-                      <div>
-                        <label className={labelClass}>Мова</label>
-                        <select
-                          value={profileLanguage}
-                          onChange={(e) => setProfileLanguage(e.target.value)}
                           className={selectClass}
                         >
                           <option value="">Усі</option>
-                          <option value="uk">Українська</option>
-                          <option value="en">English</option>
-                          <option value="ru">Русский</option>
+                          {COUNTRIES.map(c => (
+                            <option key={c.code} value={c.code}>
+                              {c.flag} {c.nameUk}
+                            </option>
+                          ))}
                         </select>
                       </div>
-                    </div>
-
-                    {/* Quick filter */}
-                    <div className="flex items-center gap-2 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => setProfileHasOffers(false)}
-                        className={cn(
-                          "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all",
-                          !profileHasOffers
-                            ? "bg-foreground text-background border-foreground"
-                            : "bg-transparent text-foreground/60 border-border/40 hover:border-foreground/30"
-                        )}
-                      >
-                        Усі
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setProfileHasOffers(true)}
-                        className={cn(
-                          "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all",
-                          profileHasOffers
-                            ? "bg-foreground text-background border-foreground"
-                            : "bg-transparent text-foreground/60 border-border/40 hover:border-foreground/30"
-                        )}
-                      >
-                        З активними оферами
-                      </button>
                     </div>
                   </div>
 
                   {/* Submit */}
-                  <Button
-                    type="submit"
-                    disabled={profileQuery.trim().length < 2}
-                    className="w-full h-12 rounded-xl font-black uppercase tracking-[0.2em] text-[11px] shadow-lg mt-2"
-                  >
-                    <Search className="h-4 w-4 mr-2" />
-                    Шукати персонажів
-                  </Button>
+                  <div className="flex justify-center pt-2 lg:pt-4">
+                    <Button
+                      type="submit"
+                      disabled={profileQuery.trim().length < 2}
+                      className="w-full lg:w-auto lg:min-w-[280px] h-12 lg:h-14 rounded-2xl font-black uppercase tracking-[0.25em] text-[11px] shadow-xl hover:shadow-primary/20 hover:scale-[1.02] transition-all duration-300"
+                    >
+                      <Search className="h-4 w-4 mr-3" />
+                      Шукати персонажів
+                    </Button>
+                  </div>
                 </form>
               </TabsContent>
 
               {/* ─── Tab: Posts ─── */}
-              <TabsContent value="posts" className="mt-5">
-                <form onSubmit={handlePostSubmit} className="space-y-4">
+              <TabsContent value="posts" className="mt-4 lg:mt-6">
+                <form onSubmit={handlePostSubmit} className="space-y-4 lg:space-y-6">
                   {/* Main query */}
-                  <div>
+                  <div className="lg:max-w-2xl lg:mx-auto w-full">
                     <label className={labelClass}>Що шукаємо?</label>
                     <input
                       type="text"
                       value={postQuery}
                       onChange={(e) => setPostQuery(e.target.value)}
-                      placeholder="Тема, слово, тег або назва публікації"
-                      className={inputClass}
+                      placeholder="Заголовок або підзаголовок публікації"
+                      className={cn(inputClass, "lg:h-14 lg:text-base lg:px-6")}
                       autoFocus
                     />
                     {postQuery.length > 0 && postQuery.length < 2 && (
-                      <p className="text-[10px] text-muted-foreground/50 mt-1 font-medium">
+                      <p className="text-[10px] text-muted-foreground/50 mt-1.5 font-medium">
                         Мінімум 2 символи для пошуку
                       </p>
                     )}
                   </div>
 
                   {/* Filters */}
-                  <div className="space-y-3">
+                  <div className="space-y-2.5 lg:max-w-2xl lg:mx-auto w-full">
                     <div className="flex items-center gap-2 text-muted-foreground/40">
                       <SlidersHorizontal className="h-3 w-3" />
                       <span className="text-[9px] font-black uppercase tracking-[0.2em]">Фільтри</span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                       {/* Category */}
                       <div>
                         <label className={labelClass}>Категорія</label>
@@ -372,29 +341,19 @@ export function BlogSearchSheet({ categories }: BlogSearchSheetProps) {
                         </select>
                       </div>
                     </div>
-
-                    {/* Author */}
-                    <div>
-                      <label className={labelClass}>Автор (опціонально)</label>
-                      <input
-                        type="text"
-                        value={postAuthor}
-                        onChange={(e) => setPostAuthor(e.target.value)}
-                        placeholder="Ім'я автора"
-                        className={selectClass}
-                      />
-                    </div>
                   </div>
 
                   {/* Submit */}
-                  <Button
-                    type="submit"
-                    disabled={postQuery.trim().length < 2}
-                    className="w-full h-12 rounded-xl font-black uppercase tracking-[0.2em] text-[11px] shadow-lg mt-2"
-                  >
-                    <Search className="h-4 w-4 mr-2" />
-                    Шукати публікації
-                  </Button>
+                  <div className="flex justify-center pt-2 lg:pt-4">
+                    <Button
+                      type="submit"
+                      disabled={postQuery.trim().length < 2}
+                      className="w-full lg:w-auto lg:min-w-[280px] h-12 lg:h-14 rounded-2xl font-black uppercase tracking-[0.25em] text-[11px] shadow-xl hover:shadow-primary/20 hover:scale-[1.02] transition-all duration-300"
+                    >
+                      <Search className="h-4 w-4 mr-3" />
+                      Шукати публікації
+                    </Button>
+                  </div>
                 </form>
               </TabsContent>
             </Tabs>

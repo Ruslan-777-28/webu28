@@ -41,7 +41,7 @@ export function EditorialHeader({ post, categoryName }: { post: Post | DemoPost,
         <section className="space-y-12 mb-32 animate-in fade-in slide-in-from-bottom-6 duration-[1200ms]">
             
             {/* ── TOP: Title & Branding ── */}
-            <div className="space-y-8 max-w-5xl">
+            <div className="space-y-8 max-w-7xl">
                 <div className="flex items-center gap-4">
                     <div className="h-px w-16 bg-primary/30" />
                     <span className="text-[11px] font-black uppercase tracking-[0.5em] text-muted-foreground whitespace-nowrap">
@@ -57,7 +57,7 @@ export function EditorialHeader({ post, categoryName }: { post: Post | DemoPost,
                 </div>
 
                 <Link href={`${BLOG2_ARTICLE_BASE}/${post.slug}`} className="block group">
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tighter text-foreground group-hover:text-primary transition-colors">
+                    <h1 className="max-w-6xl text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight leading-[0.95] text-foreground group-hover:text-primary transition-colors">
                         {post.title}
                     </h1>
                 </Link>

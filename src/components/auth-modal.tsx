@@ -35,6 +35,8 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 
+import { COUNTRIES } from "@/lib/countries";
+
 const loginSchema = z.object({
   email: z.string().email({ message: "Неправильна адреса електронної пошти." }),
   password: z.string().min(6, { message: "Пароль має містити щонайменше 6 символів." }),
@@ -85,8 +87,8 @@ export function AuthModal({ setOpen }: { setOpen?: (open: boolean) => void }) {
   const onboardingForm = useForm<z.infer<typeof onboardingSchema>>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
-      country: "Україна",
-      language: "українська",
+      country: "UA",
+      language: "uk-UA",
       intent: "explore",
       promoCode: ""
     },
@@ -147,7 +149,7 @@ export function AuthModal({ setOpen }: { setOpen?: (open: boolean) => void }) {
         name: options.name || user.displayName || user.email?.split('@')[0] || 'New User',
         avatarUrl: options.avatarUrl || user.photoURL || `https://i.pravatar.cc/150?u=${user.uid}`,
         bio: '',
-        preferredLanguage: options.preferredLanguage || 'українська',
+        preferredLanguage: options.preferredLanguage || 'uk-UA',
         country: options.country || '',
         usageIntent: options.usageIntent || '',
         availability: {
@@ -468,11 +470,11 @@ export function AuthModal({ setOpen }: { setOpen?: (open: boolean) => void }) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Україна">Україна</SelectItem>
-                          <SelectItem value="Польща">Польща</SelectItem>
-                          <SelectItem value="Німеччина">Німеччина</SelectItem>
-                          <SelectItem value="США">США</SelectItem>
-                          <SelectItem value="Інша">Інша</SelectItem>
+                          {COUNTRIES.map((c) => (
+                            <SelectItem key={c.code} value={c.code}>
+                              {c.flag} {c.nameUk}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -492,9 +494,9 @@ export function AuthModal({ setOpen }: { setOpen?: (open: boolean) => void }) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="українська">Українська</SelectItem>
-                          <SelectItem value="англійська">Англійська</SelectItem>
-                          <SelectItem value="польська">Польська</SelectItem>
+                          <SelectItem value="uk-UA">Українська</SelectItem>
+                          <SelectItem value="en-US">English</SelectItem>
+                          <SelectItem value="pl-PL">Polski</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

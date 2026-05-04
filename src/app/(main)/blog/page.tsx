@@ -5,11 +5,12 @@ import { Navigation } from '@/components/navigation';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Footer from '@/components/layout/footer';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from "@/lib/utils";
 import { getBlog2Data, Blog2Data } from '@/lib/blog2/get-blog-data';
 import { EditorialHeader, PremiumPostCard, CuratedFeaturedBlock } from '@/components/blog2/editorial-elements';
 import { SidebarPosts, VoiceOfTheDay, EmotionalNavigation } from '@/components/blog2/sidebar-elements';
 import { InterestSelector, SubcategoryChip, LECTOR_EDITORIAL_ID } from '@/components/blog2/interest-selector';
-import { ArrowRight, BookOpen, Sparkles, ChevronRight, X } from 'lucide-react';
+import { ArrowRight, BookOpen, Sparkles, ChevronRight, X, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import type { Post } from '@/lib/types';
@@ -190,7 +191,7 @@ function BlogPageInner() {
         <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 font-sans tracking-tight">
             <Navigation />
 
-            <main className="container mx-auto px-4 md:px-6 py-16 md:py-24 space-y-32">
+            <main className="container mx-auto px-4 md:px-6 pt-10 pb-16 sm:pt-12 lg:pt-16 lg:pb-24 space-y-20 md:space-y-24 lg:space-y-28">
 
                 {/* 1. Header Section */}
                 {displayHero && (
@@ -202,12 +203,83 @@ function BlogPageInner() {
 
                 {/* 2. Interest Selector — between hero and featured block */}
                 {availableSubcategories.length > 0 && (
-                    <InterestSelector
-                        subcategories={availableSubcategories}
-                        selectedIds={selectedIds}
-                        onToggle={handleToggle}
-                        onClear={handleClear}
-                    />
+                    <div className="space-y-6">
+                        <InterestSelector
+                            subcategories={availableSubcategories}
+                            selectedIds={selectedIds}
+                            onToggle={handleToggle}
+                            onClear={handleClear}
+                        />
+
+                        {/* 2.1 Forum v1 Prototype Block — dynamically tied to focus */}
+                        {(() => {
+                            const activeFocusId = selectedIds.find(id => id !== LECTOR_EDITORIAL_ID);
+                            const activeFocusLabel = activeFocusId 
+                                ? availableSubcategories.find(s => s.id === activeFocusId)?.name 
+                                : 'LECTOR';
+                            const isGeneral = !activeFocusId;
+
+                            return (
+                                <div className="animate-in fade-in slide-in-from-top-2 duration-700">
+                                    <div className="mb-3 text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/70">
+                                        ФОРУМ
+                                    </div>
+
+                                    <div className="rounded-2xl sm:rounded-[22px] border border-border/60 bg-white p-1 shadow-sm shadow-black/[0.01]">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5">
+                                            <div className="flex items-start gap-4">
+                                                <div className="shrink-0 mt-1">
+                                                    <MessageSquare className="h-5 w-5 text-muted-foreground/40" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <h3 className="text-sm sm:text-base font-bold tracking-tight text-foreground">
+                                                        Що вас турбує сьогодні?
+                                                    </h3>
+                                                    <p className="text-xs text-muted-foreground font-light leading-relaxed max-w-xl">
+                                                        {isGeneral ? (
+                                                            <>Поставте питання у спільноті <span className="font-bold text-foreground/80">LECTOR</span>. Відповідати зможуть експерти, архітектори та практики платформи.</>
+                                                        ) : (
+                                                            <>Поставте питання у темі <span className="font-bold text-foreground/80">{activeFocusLabel}</span>. Відповідати зможуть експерти, архітектори та практики LECTOR.</>
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
+                                                <div className={cn(
+                                                    "rounded-full border px-3 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em]",
+                                                    isGeneral 
+                                                        ? "border-border/50 bg-background/50 text-muted-foreground/80" 
+                                                        : "border-primary/20 bg-primary/5 text-primary"
+                                                )}>
+                                                    {activeFocusLabel}
+                                                </div>
+                                                <div className="rounded-full border border-border/50 bg-background/50 px-3 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground/80">
+                                                    Level 1+
+                                                </div>
+                                                <Button 
+                                                    variant="outline" 
+                                                    size="sm" 
+                                                    disabled
+                                                    className="rounded-full h-9 px-5 text-[10px] font-black uppercase tracking-widest bg-muted/20 border-border/40 text-muted-foreground/40 cursor-not-allowed"
+                                                >
+                                                    Поставити питання
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        {/* Bottom info line */}
+                                        <div className="px-5 py-3 border-t border-border/40 bg-muted/5 rounded-b-[21px] flex items-center justify-center sm:justify-start gap-2">
+                                            <div className="h-1 w-1 rounded-full bg-primary/40" />
+                                            <span className="text-[9px] sm:text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground/60">
+                                                Питання спільноти • відповіді експертів • модерація архітекторів
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })()}
+                    </div>
                 )}
 
                 {/* 2.5 Author Filter Context */}
@@ -353,7 +425,7 @@ function BlogPageInner() {
                         </div>
 
                         {/* Topics Recirculation */}
-                        <div className="space-y-8 p-1">
+                        <div className="space-y-8 max-w-7xl">
                             <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground border-l-4 border-primary pl-6">
                                 Подорож по Темах
                             </h3>

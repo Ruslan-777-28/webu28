@@ -42,6 +42,8 @@ import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebas
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useUser } from "@/hooks/use-auth";
 
+import { COUNTRIES } from "@/lib/countries";
+
 const profileSchema = z.object({
   name: z.string().min(2, { message: "Ім'я має містити щонайменше 2 символи." }),
   shortBio: z.string().max(140, { message: "Максимум 140 символів." }).optional().or(z.literal('')),
@@ -333,9 +335,20 @@ export function EditProfileModal({ profile, setOpen }: { profile: UserProfile, s
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Країна</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Наприклад: Україна" {...field} />
-                      </FormControl>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Оберіть країну" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {COUNTRIES.map((c) => (
+                            <SelectItem key={c.code} value={c.code}>
+                              {c.flag} {c.nameUk}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
