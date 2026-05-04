@@ -10,9 +10,10 @@ import { getBlog2Data, Blog2Data } from '@/lib/blog2/get-blog-data';
 import { EditorialHeader, PremiumPostCard, CuratedFeaturedBlock } from '@/components/blog2/editorial-elements';
 import { SidebarPosts, VoiceOfTheDay, EmotionalNavigation } from '@/components/blog2/sidebar-elements';
 import { InterestSelector, SubcategoryChip, LECTOR_EDITORIAL_ID } from '@/components/blog2/interest-selector';
-import { ArrowRight, BookOpen, Sparkles, ChevronRight, X, MessageSquare } from 'lucide-react';
+import { ArrowRight, BookOpen, Sparkles, ChevronRight, X, MessageSquare, Info } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import type { Post } from '@/lib/types';
 import type { DemoPost } from '@/lib/blog2/demo-blog2-data';
 import { BlogSearchSheet } from '@/components/blog2/blog-search-sheet';
@@ -263,9 +264,43 @@ function BlogPageInner() {
                                                     )}>
                                                         {activeFocusLabel}
                                                     </div>
-                                                    <div className="rounded-full border border-border/50 bg-background/50 px-3 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground/80">
-                                                        Level 1+
-                                                    </div>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <button className="rounded-full border border-border/50 bg-background/50 px-3 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground/80 hover:bg-muted transition-all cursor-help flex items-center gap-1.5">
+                                                                Level 1+
+                                                                <Info className="h-3 w-3 opacity-40" />
+                                                            </button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-80 p-5 rounded-2xl border-border/40 shadow-xl" align="center" sideOffset={12}>
+                                                            <div className="space-y-4">
+                                                                <div className="flex items-center gap-2 text-primary">
+                                                                    <div className="p-1.5 rounded-lg bg-primary/5">
+                                                                        <Info className="h-4 w-4" />
+                                                                    </div>
+                                                                    <span className="text-[10px] font-black uppercase tracking-widest">Доступ до форуму</span>
+                                                                </div>
+                                                                <p className="text-xs text-muted-foreground font-medium leading-relaxed">
+                                                                    Ставити питання, відповідати та коментувати у форумі можуть лише зареєстровані учасники з рівнем довіри Level 1 або вище.
+                                                                </p>
+                                                                <Link 
+                                                                    href="/info/detailed-matrix" 
+                                                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary hover:underline group pt-1"
+                                                                >
+                                                                    Як отримати Level 1
+                                                                    <ChevronRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
+                                                                </Link>
+                                                            </div>
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                    <Link href="/forum-rules">
+                                                        <Button 
+                                                            variant="outline" 
+                                                            size="sm" 
+                                                            className="rounded-full h-9 px-5 text-[10px] font-black uppercase tracking-widest border-border/60 hover:bg-muted transition-all active:scale-95"
+                                                        >
+                                                            Правила форуму
+                                                        </Button>
+                                                    </Link>
                                                     <Button 
                                                         variant="outline" 
                                                         size="sm" 

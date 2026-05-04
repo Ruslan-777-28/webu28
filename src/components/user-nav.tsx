@@ -24,6 +24,8 @@ import { useFavorites } from "@/hooks/use-favorites";
 import { useFriends } from "@/hooks/use-friends";
 import { useNotifications } from "@/hooks/use-notifications";
 import { useShares } from "@/hooks/use-shares";
+import { useArchitectForumAccess } from "@/hooks/use-architect-forum-access";
+import { ArchitectForumPendingIndicator } from './architect/forum-pending-indicator';
 
 export function UserNav() {
   const { user, profile, loading } = useUser();
@@ -32,6 +34,7 @@ export function UserNav() {
   const { friends } = useFriends();
   const { unreadCount: shareUnreadCount } = useShares();
   const { unreadCount: notifUnreadCount } = useNotifications();
+  const { hasAccess: isArchitect } = useArchitectForumAccess();
 
   const totalUnread = shareUnreadCount + notifUnreadCount;
 
@@ -101,6 +104,14 @@ export function UserNav() {
               Довіра і верифікація
             </DropdownMenuItem>
           </Link>
+          {isArchitect && (
+            <Link href="/architect-council/forum">
+              <DropdownMenuItem className="cursor-pointer flex justify-between items-center">
+                <span>Форум</span>
+                <ArchitectForumPendingIndicator />
+              </DropdownMenuItem>
+            </Link>
+          )}
           {canAccessAdmin && (
             <Link href="/admin" prefetch={false}>
               <DropdownMenuItem className="cursor-pointer">

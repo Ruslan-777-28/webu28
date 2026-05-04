@@ -109,9 +109,14 @@ export default function ArchitectCouncilPage() {
             const json = await res.json();
             if (json.success) {
                 setThreads(json.data);
+            } else {
+                console.error('Error in threads API:', json.message);
+                // Keep existing threads or set to empty array, don't crash
+                setThreads([]);
             }
         } catch (error) {
             console.error('Error fetching threads:', error);
+            setThreads([]);
         }
     };
 

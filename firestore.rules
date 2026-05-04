@@ -323,6 +323,15 @@ service cloud.firestore {
       allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
 
+    // ---------- Community Architect Assignments ----------
+    match /communityArchitectAssignments/{assignmentId} {
+      // Architects can read their own assignments (userId == auth.uid)
+      // Public can read active assignments (for profile display, community pages)
+      allow read: if true;
+      // Only admins can write assignments
+      allow write: if isSignedIn() && request.auth.token.admin == true;
+    }
+
     // ---------- Default deny ----------
     match /{document=**} {
       allow read, write: if false;

@@ -46,6 +46,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: true, data: threads });
   } catch (error: any) {
     console.error('API architect-council/threads GET error:', error);
+    
+    // Handle missing index error specifically
+    if (error.message?.includes('requires an index')) {
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Missing Firestore index. Please check server logs for the creation link.',
+        errorType: 'INDEX_MISSING'
+      }, { status: 412 }); // Precondition Failed
+    }
+
     const status = error.message.includes('Unauthorized') ? 401 : error.message.includes('Forbidden') ? 403 : 500;
     return NextResponse.json({ success: false, message: error.message }, { status });
   }

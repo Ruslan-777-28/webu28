@@ -3,87 +3,57 @@
 import { useEffect, useState } from 'react';
 import { collection, query, where, limit, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import { useUser } from '@/hooks/use-auth';
-import type { CommunityArchitectAssignment } from '@/lib/types';
+import { useArchitectForumAccess } from '@/hooks/use-architect-forum-access';
 
 /**
- * Lightweight pending indicator for architect forum sidebar.
+ * Lightweight pending indicator for architect forum.
  * Shows a pulsing red dot if there are pending forum questions
  * in any of the architect's assigned subcategories.
+ * 
+ * Uses the shared useArchitectForumAccess hook for topic scope.
  */
 export function ArchitectForumPendingIndicator() {
-  const { user } = useUser();
+  const { hasAccess, topicKeys } = useArchitectForumAccess();
   const [hasPending, setHasPending] = useState(false);
 
   useEffect(() => {
-    if (!user?.uid) return;
+    if (!hasAccess || topicKeys.length === 0) {
+      setHasPending(false);
+      return;
+    }
 
-    let questionUnsubs: (() => void)[] = [];
+    // Chunk topicKeys by 10 for Firestore 'in' limit
+    const chunks: string[][] = [];
+    for (let i = 0; i < topicKeys.length; i += 10) {
+      chunks.push(topicKeys.slice(i, i + 10));
+    }
 
-    // Step 1: Get active assignments for this architect
-    const assignmentsQuery = query(
-      collection(db, 'communityArchitectAssignments'),
-      where('userId', '==', user.uid),
-      where('isActive', '==', true)
-    );
+    const chunkResults = new Map<number, boolean>();
+    const unsubs: (() => void)[] = [];
 
-    const assignmentUnsub = onSnapshot(
-      assignmentsQuery,
-      (assignmentSnap) => {
-        // Clean up previous question listeners
-        questionUnsubs.forEach(u => u());
-        questionUnsubs = [];
+    chunks.forEach((chunk, idx) => {
+      const q = query(
+        collection(db, 'forumQuestions'),
+        where('status', '==', 'pending'),
+        where('topicKey', 'in', chunk),
+        limit(1)
+      );
 
-        const topicKeys = assignmentSnap.docs
-          .map(d => (d.data() as CommunityArchitectAssignment).subcategoryId)
-          .filter(Boolean);
-
-        if (topicKeys.length === 0) {
-          setHasPending(false);
-          return;
+      const unsub = onSnapshot(
+        q,
+        (snap) => {
+          chunkResults.set(idx, !snap.empty);
+          setHasPending(Array.from(chunkResults.values()).some(Boolean));
+        },
+        () => {
+          chunkResults.set(idx, false);
         }
+      );
+      unsubs.push(unsub);
+    });
 
-        // Step 2: Listen for pending questions in architect's topics (chunked by 10)
-        const chunks: string[][] = [];
-        for (let i = 0; i < topicKeys.length; i += 10) {
-          chunks.push(topicKeys.slice(i, i + 10));
-        }
-
-        const chunkResults = new Map<number, boolean>();
-
-        chunks.forEach((chunk, idx) => {
-          const q = query(
-            collection(db, 'forumQuestions'),
-            where('status', '==', 'pending'),
-            where('topicKey', 'in', chunk),
-            limit(1)
-          );
-
-          const unsub = onSnapshot(
-            q,
-            (snap) => {
-              chunkResults.set(idx, !snap.empty);
-              // If any chunk has pending, show dot
-              setHasPending(Array.from(chunkResults.values()).some(Boolean));
-            },
-            () => {
-              // Fail silently on permission errors
-              chunkResults.set(idx, false);
-            }
-          );
-          questionUnsubs.push(unsub);
-        });
-      },
-      () => {
-        // Fail silently
-      }
-    );
-
-    return () => {
-      assignmentUnsub();
-      questionUnsubs.forEach(u => u());
-    };
-  }, [user?.uid]);
+    return () => unsubs.forEach(u => u());
+  }, [hasAccess, topicKeys.join(',')]); // join to create stable dep
 
   if (!hasPending) return null;
 

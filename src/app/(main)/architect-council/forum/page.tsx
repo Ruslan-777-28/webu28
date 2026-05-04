@@ -4,93 +4,70 @@ import React, { useEffect, useState } from 'react';
 import { Navigation } from '@/components/navigation';
 import Footer from '@/components/layout/footer';
 import { useUser } from '@/hooks/use-auth';
-import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { useArchitectForumAccess } from '@/hooks/use-architect-forum-access';
+import { collection, query, where, limit, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { updateQuestionStatus } from '@/lib/forum/forum-service';
 import type { ForumQuestion } from '@/lib/forum/forum-types';
-import type { CommunityArchitectAssignment } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ShieldCheck, MessageSquare, Heart, Clock } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ArchitectForumPage() {
-  const { user, loading: authLoading } = useUser();
-  const [assignments, setAssignments] = useState<CommunityArchitectAssignment[]>([]);
+  const { user } = useUser();
+  const { toast } = useToast();
+  const { loading: accessLoading, hasAccess, topicKeys, assignments } = useArchitectForumAccess();
   const [questions, setQuestions] = useState<ForumQuestion[]>([]);
+  const [questionsLoading, setQuestionsLoading] = useState(false);
+  const [debugData, setDebugData] = useState<any>(null);
   const [statusFilter, setStatusFilter] = useState<string>('pending');
   const [topicFilter, setTopicFilter] = useState<string>('all');
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasAccess, setHasAccess] = useState(false);
 
-  // Step 1: Load architect assignments
-  useEffect(() => {
-    if (authLoading || !user?.uid) return;
+  const loadQuestions = async () => {
+    if (!hasAccess) return;
+    
+    setQuestionsLoading(true);
+    try {
+      const idToken = await user?.getIdToken();
+      if (!idToken) return;
 
-    const q = query(
-      collection(db, 'communityArchitectAssignments'),
-      where('userId', '==', user.uid),
-      where('isActive', '==', true)
-    );
-
-    const unsub = onSnapshot(
-      q,
-      (snap) => {
-        const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as CommunityArchitectAssignment));
-        setAssignments(data);
-        setHasAccess(data.length > 0);
-        setIsLoading(false);
-      },
-      () => {
-        setIsLoading(false);
-        setHasAccess(false);
-      }
-    );
-
-    return () => unsub();
-  }, [authLoading, user?.uid]);
-
-  // Step 2: Subscribe to forum questions scoped to architect's topics
-  useEffect(() => {
-    if (assignments.length === 0) {
-      setQuestions([]);
-      return;
-    }
-
-    const topicKeys = assignments.map(a => a.subcategoryId).filter(Boolean);
-    if (topicKeys.length === 0) return;
-
-    // Chunk topicKeys by 10 for Firestore 'in' limit
-    const chunks: string[][] = [];
-    for (let i = 0; i < topicKeys.length; i += 10) {
-      chunks.push(topicKeys.slice(i, i + 10));
-    }
-
-    const allQuestions = new Map<string, ForumQuestion>();
-    const unsubs: (() => void)[] = [];
-
-    chunks.forEach((chunk) => {
-      const q = query(
-        collection(db, 'forumQuestions'),
-        where('topicKey', 'in', chunk),
-        orderBy('createdAt', 'desc'),
-        limit(50)
-      );
-
-      const unsub = onSnapshot(q, (snap) => {
-        snap.docs.forEach(d => {
-          allQuestions.set(d.id, { id: d.id, ...d.data() } as ForumQuestion);
-        });
-        setQuestions(Array.from(allQuestions.values()).sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0)));
+      const url = `/api/forum/architect-questions?status=${statusFilter}`;
+      const res = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
       });
 
-      unsubs.push(unsub);
-    });
+      const json = await res.json();
+      if (json.success) {
+        setQuestions(json.data);
+        setDebugData(json.debug);
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[ArchitectForum] Loaded questions:', json.data.length, json.debug);
+        }
+      } else {
+        throw new Error(json.message);
+      }
+    } catch (error: any) {
+      console.error('[ArchitectForum] Failed to load questions:', error);
+      toast({
+        title: "Помилка завантаження",
+        description: error.message || "Не вдалося отримати список питань",
+        variant: "destructive"
+      });
+    } finally {
+      setQuestionsLoading(false);
+    }
+  };
 
-    return () => unsubs.forEach(u => u());
-  }, [assignments]);
+  // Step 2: Fetch forum questions scoped to architect's topics via API
+  useEffect(() => {
+    loadQuestions();
+  }, [hasAccess, user?.uid, statusFilter]);
 
   const architectTopicKeys = assignments.map(a => a.subcategoryId);
 
@@ -102,22 +79,45 @@ export default function ArchitectForumPage() {
 
   const handleAction = async (q: ForumQuestion, newStatus: ForumQuestion['status'], action: string) => {
     try {
-      await updateQuestionStatus(q.id, newStatus, {
-        moderation: {
-          moderatedBy: user?.uid || '',
-          moderatedByName: user?.displayName || user?.email || 'Architect',
-          moderatedByRole: 'architect',
-          moderationAction: action,
-          moderatedByArchitectTopicKey: q.topicKey,
-          moderatedByArchitectTopicLabel: q.topicLabel,
-        }
+      const idToken = await user?.getIdToken();
+      if (!idToken) throw new Error("No id token available. Please refresh and try again.");
+
+      const res = await fetch('/api/forum/moderate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify({
+          questionId: q.id,
+          newStatus,
+          action
+        })
       });
-    } catch (error) {
-      console.error('Failed to update status', error);
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Moderation failed');
+      }
+
+      toast({
+        title: "Успішно",
+        description: `Статус змінено на: ${newStatus}`,
+      });
+
+      // Refresh list after action
+      loadQuestions();
+    } catch (error: any) {
+      console.error('[ArchitectForum] Action failed:', error);
+      toast({
+        title: "Помилка",
+        description: error.message || "Не вдалося оновити статус",
+        variant: "destructive"
+      });
     }
   };
 
-  if (authLoading || isLoading) {
+  if (accessLoading) {
     return (
       <div className="min-h-screen bg-slate-50/30 flex flex-col">
         <Navigation subtitle="Architect Council" />
@@ -198,12 +198,54 @@ export default function ArchitectForumPage() {
             </Select>
           </div>
 
+          {/* Debug Info (Dev only) */}
+          {process.env.NODE_ENV === 'development' && debugData && (
+            <div className="p-4 bg-slate-900 text-slate-50 text-[10px] font-mono rounded-xl overflow-x-auto">
+              <p className="text-amber-400 font-bold mb-2">DEBUG: Architect visibility diagnostic</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="opacity-50">Architect Canonical Keys:</p>
+                  <pre>{JSON.stringify(debugData.architectCanonicalKeys, null, 2)}</pre>
+                </div>
+                <div>
+                  <p className="opacity-50">Raw Source Keys:</p>
+                  <pre>{JSON.stringify(debugData.rawTopicKeys, null, 2)}</pre>
+                </div>
+              </div>
+              <p className="mt-2 opacity-50">Reason for count {debugData.returnedCount}:</p>
+              <p className="text-amber-200">{debugData.reason || 'Questions matched successfully'}</p>
+            </div>
+          )}
+
           {/* Questions */}
           <div className="grid gap-4">
-            {filteredQuestions.length === 0 ? (
+            {questionsLoading ? (
+              <div className="space-y-4">
+                <Skeleton className="h-32 w-full rounded-2xl" />
+                <Skeleton className="h-32 w-full rounded-2xl" />
+                <Skeleton className="h-32 w-full rounded-2xl" />
+              </div>
+            ) : topicKeys.length === 0 ? (
+              <div className="text-center py-16 border-2 border-dashed border-amber-200 bg-amber-50/30 rounded-2xl">
+                <ShieldCheck className="h-8 w-8 text-amber-400 mx-auto mb-3" />
+                <p className="text-sm font-bold text-amber-900">Увага: Немає призначених підкатегорій</p>
+                <p className="text-xs text-amber-700 mt-1 max-w-xs mx-auto">
+                  Хоча ви маєте статус архітектора, у ваших призначеннях не вказано Subcategory ID. 
+                  Будь ласка, зверніться до адміністратора.
+                </p>
+              </div>
+            ) : filteredQuestions.length === 0 ? (
               <div className="text-center py-16 border-2 border-dashed border-muted/30 rounded-2xl">
                 <MessageSquare className="h-8 w-8 text-muted-foreground/20 mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground">Немає питань для цього фільтру.</p>
+                <p className="text-sm text-muted-foreground">Немає питань для статусу: <span className="font-bold">{statusFilter}</span> у вибраних темах.</p>
+                <Button 
+                  variant="link" 
+                  size="sm" 
+                  onClick={() => { setStatusFilter('all'); setTopicFilter('all'); }}
+                  className="text-xs mt-2"
+                >
+                  Скинути всі фільтри
+                </Button>
               </div>
             ) : (
               filteredQuestions.map((q) => (

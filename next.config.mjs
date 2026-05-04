@@ -6,6 +6,20 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  async redirects() {
+    return [
+      {
+        source: '/users/:uid',
+        destination: '/profile/:uid',
+        permanent: true,
+      },
+      {
+        source: '/users/:uid/products/:productId',
+        destination: '/profile/:uid',
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
