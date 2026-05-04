@@ -24,7 +24,9 @@ import {
     Send,
     AlertTriangle,
     Sparkles,
+    Inbox,
 } from 'lucide-react';
+import { ArchitectForumPendingIndicator } from '@/components/architect/forum-pending-indicator';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -283,6 +285,27 @@ export default function ArchitectCouncilPage() {
                                         </div>
                                     </div>
                                 </CardContent>
+                            </Card>
+
+                            {/* Forum Moderation Link */}
+                            <Card className="rounded-3xl border-muted/50 overflow-hidden">
+                                <Link href="/architect-council/forum" className="block">
+                                    <CardContent className="p-4 flex items-center justify-between hover:bg-muted/5 transition-colors">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-8 w-8 rounded-xl bg-accent/10 flex items-center justify-center">
+                                                <Inbox className="h-4 w-4 text-accent" />
+                                            </div>
+                                            <div>
+                                                <span className="text-xs font-black tracking-tight">Forum Moderation</span>
+                                                <p className="text-[9px] text-muted-foreground font-medium">Pending community questions</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <ArchitectForumPendingIndicator />
+                                            <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/40" />
+                                        </div>
+                                    </CardContent>
+                                </Link>
                             </Card>
 
                             {/* Principles Block */}

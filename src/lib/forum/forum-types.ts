@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 
-export type ForumQuestionStatus = "open" | "answered" | "featured" | "hidden";
+export type ForumQuestionStatus = "pending" | "open" | "answered" | "featured" | "hidden" | "rejected";
 
 export interface ForumQuestion {
   id: string;

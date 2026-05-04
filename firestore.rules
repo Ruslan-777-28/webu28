@@ -278,7 +278,7 @@ service cloud.firestore {
         && request.resource.data.answerCount == 0
         && request.resource.data.likeCount == 0
         && request.resource.data.viewCount == 0
-        && request.resource.data.status == 'open'
+        && request.resource.data.status == 'pending'
         && request.resource.data.pinned == false
         && request.resource.data.featured == false;
       

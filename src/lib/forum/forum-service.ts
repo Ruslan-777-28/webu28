@@ -28,7 +28,7 @@ export async function createQuestion(data: Partial<ForumQuestion>) {
   
   const questionData = {
     ...data,
-    status: 'open',
+    status: 'pending',
     answerCount: 0,
     likeCount: 0,
     viewCount: 0,
@@ -62,15 +62,75 @@ export function subscribeToQuestions(topicKey: string, callback: (questions: For
     limit(20)
   );
 
-  // If topicKey is 'lector', we might want to show all if that's the logic, 
-  // but for now let's stick to the specific topicKey.
-  
   return onSnapshot(q, (snapshot) => {
     const questions = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     } as ForumQuestion));
     callback(questions);
+  });
+}
+
+export function subscribeToAdminQuestions(callback: (questions: ForumQuestion[]) => void) {
+  const colRef = collection(db, QUESTIONS_COLLECTION);
+  let q = query(
+    colRef,
+    orderBy('createdAt', 'desc'),
+    limit(100)
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const questions = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as ForumQuestion));
+    callback(questions);
+  });
+}
+
+export type ModerationMeta = {
+  moderatedBy: string;
+  moderatedByName: string;
+  moderatedByRole: 'admin' | 'moderator' | 'architect';
+  moderationAction: string;
+  moderatedByArchitectTopicKey?: string;
+  moderatedByArchitectTopicLabel?: string;
+};
+
+export async function updateQuestionStatus(
+  questionId: string,
+  status: ForumQuestion['status'],
+  options?: { pinned?: boolean; featured?: boolean; moderation?: ModerationMeta }
+) {
+  const docRef = doc(db, QUESTIONS_COLLECTION, questionId);
+  const updateData: any = {
+    status,
+    updatedAt: serverTimestamp()
+  };
+  if (options?.pinned !== undefined) updateData.pinned = options.pinned;
+  if (options?.featured !== undefined) updateData.featured = options.featured;
+
+  if (options?.moderation) {
+    updateData.moderatedAt = serverTimestamp();
+    updateData.moderatedBy = options.moderation.moderatedBy;
+    updateData.moderatedByName = options.moderation.moderatedByName;
+    updateData.moderatedByRole = options.moderation.moderatedByRole;
+    updateData.moderationAction = options.moderation.moderationAction;
+    if (options.moderation.moderatedByArchitectTopicKey) {
+      updateData.moderatedByArchitectTopicKey = options.moderation.moderatedByArchitectTopicKey;
+      updateData.moderatedByArchitectTopicLabel = options.moderation.moderatedByArchitectTopicLabel;
+    }
+  }
+
+  await updateDoc(docRef, updateData);
+}
+
+export function subscribeToPendingCount(callback: (count: number) => void) {
+  const colRef = collection(db, QUESTIONS_COLLECTION);
+  const q = query(colRef, where('status', '==', 'pending'));
+
+  return onSnapshot(q, (snapshot) => {
+    callback(snapshot.size);
   });
 }
 

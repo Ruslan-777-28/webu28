@@ -32,6 +32,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@/hooks/use-auth';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ForumPendingIndicator } from './admin/forum-pending-indicator';
 
 const allNavItems = [
   { href: '/admin/users', label: 'Users', icon: Users, roles: ['moderator', 'admin'] },
@@ -41,6 +42,7 @@ const allNavItems = [
   { href: '/admin/content/hero', label: 'Hero Media', icon: PlayCircle, roles: ['admin'] },
   { href: '/admin/content/faq', label: 'FAQ', icon: HelpCircle, roles: ['admin'] },
   { href: '/admin/blog', label: 'Blog Dashboard', icon: LayoutDashboard, roles: ['author', 'editor', 'admin'] },
+  { href: '/admin/forum', label: 'Forum', icon: Inbox, roles: ['moderator', 'admin'] },
   { href: '/admin/blog/articles', label: 'Articles', icon: Newspaper, roles: ['author', 'editor', 'admin'] },
   { href: '/admin/blog/categories', label: 'Categories', icon: Folder, roles: ['editor', 'admin'] },
   { href: '/admin/blog/settings', label: 'Settings', icon: Settings, roles: ['admin'] },
@@ -95,6 +97,7 @@ export function AdminNav() {
                   <a>
                     <item.icon />
                     <span>{item.label}</span>
+                    {item.href === '/admin/forum' && <ForumPendingIndicator />}
                   </a>
                 </SidebarMenuButton>
               </Link>
