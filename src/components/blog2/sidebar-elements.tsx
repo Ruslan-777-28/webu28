@@ -18,63 +18,75 @@ export function VoiceOfTheDay({ author, posts }: { author: UserProfile | null, p
     if (!author) return null;
 
     return (
-        <section className="bg-black rounded-3xl p-8 md:p-12 text-white overflow-hidden relative group border border-white/10 shadow-2xl">
-            <div className="absolute -right-24 -bottom-24 w-96 h-96 bg-primary/20 rounded-full blur-[120px] opacity-40 group-hover:opacity-60 transition-opacity duration-1000" />
+        <section className="bg-white rounded-[32px] p-8 md:p-10 border border-border/60 shadow-sm relative overflow-hidden group">
+            {/* Subtle editorial background accent */}
+            <div className="absolute -right-24 -bottom-24 w-96 h-96 bg-primary/5 rounded-full blur-[100px] opacity-40" />
             
-            <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-10">
+            <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
                 <div className="relative">
-                    <Avatar className="h-32 w-32 border-4 border-white/10 ring-8 ring-white/5">
+                    <Avatar className="h-28 w-28 border-4 border-white ring-4 ring-muted/30 shadow-md">
                         <AvatarImage src={author.avatarUrl} alt={author.displayName || author.name} />
-                        <AvatarFallback className="bg-zinc-800 text-3xl font-black">{author.name[0]}</AvatarFallback>
+                        <AvatarFallback className="bg-zinc-100 text-2xl font-black">{author.name[0]}</AvatarFallback>
                     </Avatar>
-                    <div className="absolute -bottom-2 -right-2 bg-primary p-2 rounded-full shadow-lg border-2 border-black">
-                        <Star className="w-5 h-5 text-black fill-black" />
+                    <div className="absolute -bottom-1 -right-1 bg-primary p-1.5 rounded-full shadow-lg border-2 border-white">
+                        <Star className="w-4 h-4 text-white fill-white" />
                     </div>
                 </div>
                 
-                <div className="flex-grow space-y-6 text-center md:text-left">
-                    <div className="space-y-2">
-                        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">Голос Дня</span>
-                        <h3 className="text-3xl md:text-5xl font-black tracking-tight">{author.displayName || author.name}</h3>
+                <div className="flex-grow space-y-5 text-center md:text-left">
+                    <div className="space-y-1.5">
+                        <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-2">
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Автор тижня</span>
+                            <div className="h-px flex-grow bg-border/40 hidden md:block" />
+                        </div>
+                        <h3 className="text-3xl md:text-4xl font-black tracking-tighter text-foreground">{author.displayName || author.name}</h3>
+                        <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">
+                            Голос редакції LECTOR
+                        </p>
                     </div>
                     
-                    <p className="text-sm md:text-lg text-white/70 italic font-light leading-relaxed max-w-2xl">
-                        "{author.shortBio || author.bio || "Експерт, що допомагає знайти відповіді у найскладніших питаннях буття та розвитку."}"
-                    </p>
+                    <div className="space-y-3">
+                        <p className="text-sm md:text-base text-muted-foreground italic font-light leading-relaxed max-w-2xl">
+                            "{author.shortBio || author.bio || "Експерт, що допомагає знайти відповіді у найскладніших питаннях буття та розвитку."}"
+                        </p>
+                        <p className="text-[11px] text-muted-foreground/60 leading-relaxed max-w-xl">
+                            Редакційний автор LECTOR, чиї матеріали формують стартову бібліотеку платформи та відкривають ключові теми для спільноти.
+                        </p>
+                    </div>
                     
-                    <div className="flex flex-wrap justify-center md:justify-start gap-8 py-2">
-                        <div className="space-y-1">
-                            <div className="text-2xl font-black leading-none tracking-tighter">12+</div>
-                            <div className="text-[9px] uppercase tracking-widest text-white/40">Матеріалів</div>
+                    <div className="flex flex-wrap justify-center md:justify-start gap-8 pt-2">
+                        <div className="space-y-0.5">
+                            <div className="text-xl font-black leading-none tracking-tight text-foreground">12+</div>
+                            <div className="text-[9px] uppercase tracking-widest text-muted-foreground/50 font-bold">Матеріалів</div>
                         </div>
-                        <div className="h-10 w-px bg-white/10 hidden md:block" />
-                        <div className="space-y-1">
-                            <div className="text-2xl font-black leading-none tracking-tighter">4.9</div>
-                            <div className="text-[9px] uppercase tracking-widest text-white/40">Рейтинг</div>
+                        <div className="h-8 w-px bg-border/40 hidden md:block" />
+                        <div className="space-y-0.5">
+                            <div className="text-xl font-black leading-none tracking-tight text-foreground">4.9</div>
+                            <div className="text-[9px] uppercase tracking-widest text-muted-foreground/50 font-bold">Рейтинг</div>
                         </div>
                     </div>
                 </div>
                 
                 <div className="flex flex-col gap-4 w-full md:w-auto self-center md:self-end">
                     <Link href={`/profile/${author.uid}`} className="w-full">
-                        <Button className="w-full bg-white text-black hover:bg-white/90 rounded-full py-7 px-10 font-black uppercase tracking-widest text-[10px] group/btn shadow-xl">
-                            Всі статті <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                        <Button variant="outline" className="w-full rounded-full py-6 px-10 font-black uppercase tracking-widest text-[9px] group/btn border-border/60 hover:bg-black hover:text-white transition-all">
+                            Всі статті <ArrowRight className="ml-2 w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
                         </Button>
                     </Link>
                 </div>
             </div>
 
-            {/* Author's Latest Posts Section */}
+            {/* Author's Latest Posts Section — More compact */}
             {posts && posts.length > 0 && (
-                <div className="mt-12 pt-10 border-t border-white/10 group-hover:border-white/20 transition-colors">
+                <div className="mt-10 pt-8 border-t border-border/40">
                     <div className="flex items-center justify-between mb-6">
-                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40 italic">Останні думки автора</span>
-                        <div className="h-px flex-grow mx-4 bg-white/5" />
+                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/50 italic">Останні думки</span>
+                        <div className="h-px flex-grow mx-4 bg-border/20" />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
                         {posts.slice(0, 3).map((post) => (
                             <Link key={post.id} href={`/blog/${post.slug}`} className="group/post flex gap-4 items-center sm:block sm:space-y-3">
-                                <div className="relative w-16 h-16 sm:w-full sm:aspect-[16/9] rounded-lg overflow-hidden border border-white/10 group-hover/post:border-primary/40 transition-colors flex-shrink-0">
+                                <div className="relative w-14 h-14 sm:w-full sm:aspect-[16/9] rounded-xl overflow-hidden border border-border/40 group-hover/post:border-primary/40 transition-colors flex-shrink-0">
                                     <Image 
                                         src={post.coverImageUrl || BLOG_IMAGE_FALLBACK.THUMB} 
                                         alt={post.title}
@@ -82,7 +94,7 @@ export function VoiceOfTheDay({ author, posts }: { author: UserProfile | null, p
                                         className="object-cover transition-transform duration-500 group-hover/post:scale-110"
                                     />
                                 </div>
-                                <h4 className="text-xs font-bold leading-tight line-clamp-2 group-hover/post:text-primary transition-colors italic">
+                                <h4 className="text-[11px] sm:text-xs font-bold leading-snug line-clamp-2 group-hover/post:text-primary transition-colors italic text-foreground/80">
                                     {post.title}
                                 </h4>
                             </Link>
@@ -96,28 +108,28 @@ export function VoiceOfTheDay({ author, posts }: { author: UserProfile | null, p
 
 export function EmotionalNavigation() {
     return (
-        <section className="space-y-10 py-12">
-            <div className="flex flex-col gap-2">
+        <section className="space-y-8 py-6">
+            <div className="flex flex-col gap-1">
                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Навігація Станів</span>
-                <h2 className="text-3xl md:text-4xl font-black tracking-tighter">Що вас турбує сьогодні?</h2>
+                <h2 className="text-2xl md:text-3xl font-black tracking-tighter">Що вас турбує сьогодні?</h2>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                 {EMOTIONAL_NAV_ITEMS.map((item) => {
                     const Icon = iconMap[item.icon];
                     return (
                         <Link 
                             key={item.id} 
                             href={`/blog?query=${item.title}`} 
-                            className="group relative overflow-hidden rounded-2xl p-8 h-48 flex flex-col justify-end border border-border/50 hover:border-primary/30 transition-all hover:shadow-2xl hover:bg-muted/30"
+                            className="group relative overflow-hidden rounded-2xl border border-border/60 bg-white p-4 sm:p-5 min-h-[82px] sm:min-h-[96px] flex flex-col justify-center transition-all hover:border-primary/30 hover:shadow-md hover:bg-muted/5"
                         >
-                            <div className="absolute top-6 right-6 opacity-10 group-hover:opacity-100 group-hover:text-primary transition-all duration-500 scale-150 group-hover:scale-100">
+                            <div className="absolute top-1/2 -translate-y-1/2 right-4 opacity-[0.03] group-hover:opacity-10 transition-all duration-500 scale-150 group-hover:scale-110 text-primary">
                                 {Icon && <Icon className="w-12 h-12" />}
                             </div>
                             
-                            <div className="space-y-2 relative z-10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                                <h4 className="text-xl font-black tracking-tight">{item.title}</h4>
-                                <p className="text-[10px] uppercase tracking-widest text-muted-foreground group-hover:text-primary transition-colors">
+                            <div className="space-y-0.5 relative z-10 transition-transform duration-300">
+                                <h4 className="text-sm sm:text-base md:text-lg font-black tracking-tight text-foreground group-hover:text-primary transition-colors">{item.title}</h4>
+                                <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.16em] text-muted-foreground font-bold">
                                     {item.description}
                                 </p>
                             </div>

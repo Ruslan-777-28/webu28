@@ -16,6 +16,10 @@ import { Button } from '@/components/ui/button';
 import type { Post } from '@/lib/types';
 import type { DemoPost } from '@/lib/blog2/demo-blog2-data';
 import { BlogSearchSheet } from '@/components/blog2/blog-search-sheet';
+import { CreateQuestionModal } from '@/components/forum/create-question-modal';
+import { ForumFeed } from '@/components/forum/forum-feed';
+import { useUser } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
 
 // LECTOR Editorial post IDs — posts from sites published = blog content type
 // When LECTOR _editorial_ chip is selected, show only contentType="blog" posts
@@ -32,6 +36,10 @@ function BlogPageInner() {
     const [data, setData] = useState<Blog2Data | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    const { user } = useUser();
+    const { toast } = useToast();
 
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -191,7 +199,7 @@ function BlogPageInner() {
         <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 font-sans tracking-tight">
             <Navigation />
 
-            <main className="container mx-auto px-4 md:px-6 pt-10 pb-16 sm:pt-12 lg:pt-16 lg:pb-24 space-y-20 md:space-y-24 lg:space-y-28">
+            <main className="container mx-auto px-4 md:px-6 pt-6 pb-12 sm:pt-8 lg:pt-10 lg:pb-20 space-y-12 md:space-y-16 lg:space-y-20">
 
                 {/* 1. Header Section */}
                 {displayHero && (
@@ -203,7 +211,7 @@ function BlogPageInner() {
 
                 {/* 2. Interest Selector — between hero and featured block */}
                 {availableSubcategories.length > 0 && (
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                         <InterestSelector
                             subcategories={availableSubcategories}
                             selectedIds={selectedIds}
@@ -220,62 +228,87 @@ function BlogPageInner() {
                             const isGeneral = !activeFocusId;
 
                             return (
-                                <div className="animate-in fade-in slide-in-from-top-2 duration-700">
-                                    <div className="mb-3 text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/70">
-                                        ФОРУМ
-                                    </div>
+                                <div className="animate-in fade-in slide-in-from-top-2 duration-700 space-y-8">
+                                    <div className="space-y-3">
+                                        <div className="mb-3 text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/70">
+                                            ФОРУМ
+                                        </div>
 
-                                    <div className="rounded-2xl sm:rounded-[22px] border border-border/60 bg-white p-1 shadow-sm shadow-black/[0.01]">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5">
-                                            <div className="flex items-start gap-4">
-                                                <div className="shrink-0 mt-1">
-                                                    <MessageSquare className="h-5 w-5 text-muted-foreground/40" />
+                                        <div className="rounded-2xl sm:rounded-[22px] border border-border/60 bg-white p-1 shadow-sm shadow-black/[0.01]">
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-5">
+                                                <div className="flex items-start gap-4">
+                                                    <div className="shrink-0 mt-1">
+                                                        <MessageSquare className="h-5 w-5 text-muted-foreground/40" />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <h3 className="text-sm sm:text-base font-bold tracking-tight text-foreground">
+                                                            Що вас турбує сьогодні?
+                                                        </h3>
+                                                        <p className="text-xs text-muted-foreground font-light leading-relaxed max-w-xl">
+                                                            {isGeneral ? (
+                                                                <>Поставте питання у спільноті <span className="font-bold text-foreground/80">LECTOR</span>. Відповідати зможуть експерти, архітектори та практики платформи.</>
+                                                            ) : (
+                                                                <>Поставте питання у темі <span className="font-bold text-foreground/80">{activeFocusLabel}</span>. Відповідати зможуть експерти, архітектори та практики LECTOR.</>
+                                                            )}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div className="space-y-1">
-                                                    <h3 className="text-sm sm:text-base font-bold tracking-tight text-foreground">
-                                                        Що вас турбує сьогодні?
-                                                    </h3>
-                                                    <p className="text-xs text-muted-foreground font-light leading-relaxed max-w-xl">
-                                                        {isGeneral ? (
-                                                            <>Поставте питання у спільноті <span className="font-bold text-foreground/80">LECTOR</span>. Відповідати зможуть експерти, архітектори та практики платформи.</>
-                                                        ) : (
-                                                            <>Поставте питання у темі <span className="font-bold text-foreground/80">{activeFocusLabel}</span>. Відповідати зможуть експерти, архітектори та практики LECTOR.</>
-                                                        )}
-                                                    </p>
+
+                                                <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
+                                                    <div className={cn(
+                                                        "rounded-full border px-3 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em]",
+                                                        isGeneral 
+                                                            ? "border-border/50 bg-background/50 text-muted-foreground/80" 
+                                                            : "border-primary/20 bg-primary/5 text-primary"
+                                                    )}>
+                                                        {activeFocusLabel}
+                                                    </div>
+                                                    <div className="rounded-full border border-border/50 bg-background/50 px-3 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground/80">
+                                                        Level 1+
+                                                    </div>
+                                                    <Button 
+                                                        variant="outline" 
+                                                        size="sm" 
+                                                        onClick={() => {
+                                                            if (!user) {
+                                                                toast({
+                                                                    title: "Потрібна авторизація",
+                                                                    description: "Увійдіть, щоб поставити питання.",
+                                                                    variant: "destructive"
+                                                                });
+                                                                return;
+                                                            }
+                                                            setIsCreateModalOpen(true);
+                                                        }}
+                                                        className="rounded-full h-9 px-5 text-[10px] font-black uppercase tracking-widest bg-primary text-primary-foreground border-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-95"
+                                                    >
+                                                        Поставити питання
+                                                    </Button>
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
-                                                <div className={cn(
-                                                    "rounded-full border px-3 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em]",
-                                                    isGeneral 
-                                                        ? "border-border/50 bg-background/50 text-muted-foreground/80" 
-                                                        : "border-primary/20 bg-primary/5 text-primary"
-                                                )}>
-                                                    {activeFocusLabel}
-                                                </div>
-                                                <div className="rounded-full border border-border/50 bg-background/50 px-3 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground/80">
-                                                    Level 1+
-                                                </div>
-                                                <Button 
-                                                    variant="outline" 
-                                                    size="sm" 
-                                                    disabled
-                                                    className="rounded-full h-9 px-5 text-[10px] font-black uppercase tracking-widest bg-muted/20 border-border/40 text-muted-foreground/40 cursor-not-allowed"
-                                                >
-                                                    Поставити питання
-                                                </Button>
+                                            {/* Bottom info line */}
+                                            <div className="px-5 py-3 border-t border-border/40 bg-muted/5 rounded-b-[21px] flex items-center justify-center sm:justify-start gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-primary/40" />
+                                                <span className="text-[9px] sm:text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground/60">
+                                                    Питання спільноти • відповіді експертів • модерація архітекторів
+                                                </span>
                                             </div>
                                         </div>
-
-                                        {/* Bottom info line */}
-                                        <div className="px-5 py-3 border-t border-border/40 bg-muted/5 rounded-b-[21px] flex items-center justify-center sm:justify-start gap-2">
-                                            <div className="h-1 w-1 rounded-full bg-primary/40" />
-                                            <span className="text-[9px] sm:text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground/60">
-                                                Питання спільноти • відповіді експертів • модерація архітекторів
-                                            </span>
-                                        </div>
                                     </div>
+
+                                    {/* Real Forum Feed synchronized with topic */}
+                                    <div className="max-w-4xl">
+                                        <ForumFeed topicKey={activeFocusId || 'lector'} />
+                                    </div>
+
+                                    {/* Create Question Modal */}
+                                    <CreateQuestionModal 
+                                        isOpen={isCreateModalOpen}
+                                        onClose={() => setIsCreateModalOpen(false)}
+                                        topicKey={activeFocusId || 'lector'}
+                                        topicLabel={activeFocusLabel || 'LECTOR'}
+                                    />
                                 </div>
                             );
                         })()}

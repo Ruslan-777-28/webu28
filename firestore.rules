@@ -262,6 +262,67 @@ service cloud.firestore {
       allow update, delete: if isSignedIn() && request.auth.token.admin == true;
     }
 
+    // ---------- Forum V1 ----------
+    function hasTrustLevel(uid, level) {
+      let profile = get(/databases/$(database)/documents/users/$(uid)).data;
+      return (request.auth.token.admin == true) ||
+             (profile.get('trustLevel', 0) >= level) ||
+             (profile.get('verification', {}).get('trustLevel', 0) >= level);
+    }
+
+    match /forumQuestions/{questionId} {
+      allow read: if true;
+      allow create: if isSignedIn() 
+        && hasTrustLevel(request.auth.uid, 1)
+        && request.resource.data.authorId == request.auth.uid
+        && request.resource.data.answerCount == 0
+        && request.resource.data.likeCount == 0
+        && request.resource.data.viewCount == 0
+        && request.resource.data.status == 'open'
+        && request.resource.data.pinned == false
+        && request.resource.data.featured == false;
+      
+      allow update: if isSignedIn() && (
+        // Author edit
+        (resource.data.authorId == request.auth.uid 
+          && request.resource.data.authorId == resource.data.authorId
+          && request.resource.data.status == resource.data.status
+          && request.resource.data.pinned == resource.data.pinned
+          && request.resource.data.featured == resource.data.featured)
+        ||
+        // Counter & Activity increments (safe field diff)
+        (request.resource.data.diff(resource.data).affectedKeys().hasAny(['viewCount', 'answerCount', 'likeCount', 'lastActivityAt', 'updatedAt']))
+        ||
+        // Staff/Admin override
+        (request.auth.token.admin == true)
+      );
+      allow delete: if isSignedIn() && (resource.data.authorId == request.auth.uid || request.auth.token.admin == true);
+
+      match /answers/{answerId} {
+        allow read: if true;
+        allow create: if isSignedIn() 
+          && hasTrustLevel(request.auth.uid, 1)
+          && request.resource.data.authorId == request.auth.uid
+          && request.resource.data.likeCount == 0;
+        allow update: if isSignedIn() && (
+          (resource.data.authorId == request.auth.uid && request.resource.data.authorId == resource.data.authorId)
+          ||
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount', 'updatedAt']))
+          ||
+          (request.auth.token.admin == true)
+        );
+        allow delete: if isSignedIn() && (resource.data.authorId == request.auth.uid || request.auth.token.admin == true);
+      }
+    }
+
+    match /forumLikes/{likeId} {
+      allow read: if true;
+      allow create: if isSignedIn() 
+        && request.resource.data.userId == request.auth.uid
+        && likeId == request.auth.uid + "_" + request.resource.data.targetId;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
     // ---------- Default deny ----------
     match /{document=**} {
       allow read, write: if false;

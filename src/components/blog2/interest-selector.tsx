@@ -36,7 +36,7 @@ export function InterestSelector({ subcategories, selectedIds, onToggle, onClear
     };
 
     return (
-        <div className="w-full space-y-4 py-8 border-t border-border/30 border-b border-border/20">
+        <div className="w-full space-y-4 py-6 border-t border-border/20 border-b border-border/10">
             <div className="flex items-center justify-between">
                 <span className="text-[9px] font-black uppercase tracking-[0.55em] text-muted-foreground/60">
                     Ваш фокус
